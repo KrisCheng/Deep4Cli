@@ -1,3 +1,4 @@
-# climate-deeplearning
-:cloud: the code and data for my paper.
+# Deep4Cli
+
+:cloud: a framework for climate predection based on deeplearning.
 
