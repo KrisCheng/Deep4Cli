@@ -8,12 +8,7 @@ Copyright (c) 2017 - Kris Peng <kris.dacpc@gmail.com>
 '''
 
 from copy import copy
-
-
-#from amb4cast.utils import doc_inherit
 from learning.base_class import RegressionModel
-from keras.callbacks import Callback
-from keras.callbacks import EarlyStopping
 from keras.layers import BatchNormalization
 from keras.layers import Dense
 from keras.layers import Dropout
@@ -78,7 +73,6 @@ class KerasRegressionModel(RegressionModel):
         self.create_input_layer()  # stack up remaining layers.
         self.create_hidden_layers()
         self.create_output_layer()
-
 
         # compile the neural network
         self.__model.compile(optimizer=RMSprop(lr=0.001), loss=self.loss_function)
