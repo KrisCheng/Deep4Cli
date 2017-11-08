@@ -13,38 +13,38 @@ from learning.regression import keras_ANN
 import pandas as pd
 import matplotlib.pyplot as plt
 
-path = "data/NINO3.txt"
+path = "data/NINO34.txt"
 NINO = read.read_csv(path, sep="\t", date_key='date_time')
 
-path = "data/ST_windburst.txt"
+path = "data/Sd_PC2.txt"
 STwind = read.read_csv(path=path, sep='\t', date_key='date_time')
 
 raw_data = pd.concat([NINO, STwind], axis=1).dropna(axis=0)
 
-print(raw_data)
+# X, y = regression_set(NINOTrain, target_key='NINO3', initial_time=1961, horizon=1)
+# model = keras_ANN.KerasRegressionModel(arity=1, network_structure=(5, 1), batch_size=1, nb_epoch=1)
+# model.fit(X, y)
+# yhat = model.predict(X)
+# print(len(yhat))
+raw_data = pd.concat([NINO, STwind], axis=1).dropna(axis=0)
 
-X, y = regression_set(raw_data, target_key='NINO3', initial_time=1969, horizon=1)
-
-model = keras_ANN.KerasRegressionModel(arity=3, network_structure=(5, 1), batch_size=1, nb_epoch=1)
+X, y = regression_set(raw_data, target_key='NINO3', initial_time=2004, horizon=1)
+model = keras_ANN.KerasRegressionModel(arity=3, network_structure=(5, 1), batch_size=1, nb_epoch=1000)
 model.fit(X, y)
 yhat = model.predict(X)
 
-# plot the testdata
-path = "data/nino_3_4_10d_test.txt"
-NINOTest = read.read_csv(path, sep="\t", date_key='date_time')
-plt.plot(range(len(NINOTest)), NINOTest, '--', color='red', label="actual")
-plt.legend(loc='upper left')
-
-plt.plot(range(len(yhat)), yhat, '-', color='blue', label="predict")
-# plt.plot(range(len(y)), y, '--', color='red', label="actual")
+plt.plot(range(len(yhat)), yhat, '-', color='blue', label="predicted")
+plt.plot(range(len(y)), y, '--', color='red', label="actual")
 # plt.legend(loc='upper left')
 
 # calculate the cost(NRMSE)
 cost = 0
-# for n in range(len(NINOTest)):
-#     cost += (NINOTest[n][0] - y[n])**2
-#
-# cost = (1/(max(NINOTest) - min(y))) * ((cost/len(y))**0.5)
+for n in range(len(y)):
+    cost += (y[n] - yhat[n])**2
+
+cost = (1/(max(y) - min(yhat)) * ((cost/len(yhat))**0.5))
 print(cost)
+
+plt.legend(loc='upper right')
 plt.show()
 
