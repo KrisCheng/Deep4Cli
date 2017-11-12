@@ -43,7 +43,7 @@ for n in range(len(y)):
     cost += (y[n] - yhat[n])**2
 
 cost = (1/(max(y) - min(yhat)) * ((cost/len(yhat))**0.5))
-print(cost)
+print("NRMSE: %f" %cost)
 
 plt.legend(loc='upper right')
 plt.show()
