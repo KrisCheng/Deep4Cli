@@ -93,15 +93,6 @@ class ClassificationModel(object):
         """
         return self.func(xpred)
 
-
-
-
-
-
-
-
-
-
 class Regression(object):
     def __init__(self, data, hyper,  n_targets=None, label_targets=None):
         """
