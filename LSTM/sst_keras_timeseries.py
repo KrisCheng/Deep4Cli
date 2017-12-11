@@ -20,9 +20,7 @@ from pandas import datetime
 from pandas import Series
 from math import sqrt
 import pylab as pl
-from matplotlib import pyplot
 import numpy
-
 
 # data preprocessing
 train = '../data/sst/train_sst.mat'  
@@ -37,16 +35,14 @@ test_sst = test_data['test_sst'][:,:,:] # ground-truth, view as 305 imgs(single 
 # print(train_sst.shape) # (10, 50, 1216)
 # print(test_sst.shape)  # (10, 50, 305)
 
-# check single data point
+# check single data  [0][0]
 # x = []
 # y = []
-# for i in range(len(train_sst[1][1]) + 1):
-#     x.append(train_sst[1][1][i-1])
+# for i in range(len(train_sst[0][0]) + 1):
+#     x.append(train_sst[0][0][i-1])
 #     y.append(i-1)
 # pl.plot(y, x)
 # pl.show()
-
-# design network
 
 # frame a sequence as a supervised learning problem
 def timeseries_to_supervised(data, lag=1):
@@ -99,7 +95,7 @@ def fit_lstm(train, batch_size, nb_epoch, neurons):
 	model.add(Dense(1))
 	model.compile(loss='mean_squared_error', optimizer='adam')
 	for i in range(nb_epoch):
-		model.fit(X, y, epochs=1, batch_size=batch_size, verbose=0, shuffle=False)
+		model.fit(X, y, epochs=10, batch_size=batch_size, verbose=0, shuffle=False)
 		model.reset_states()
 	return model
  
@@ -109,15 +105,9 @@ def forecast_lstm(model, batch_size, X):
 	yhat = model.predict(X, batch_size=batch_size)
 	return yhat[0,0]
  
-# load dataset
-# series = read_csv('shampoo-sales.csv', header=0, parse_dates=[0], index_col=0, squeeze=True, date_parser=parser)
- 
+# load dataset, use the [0][0] data for experiment.
 # transform data to be stationary
-# just use a single point data [1][1]
-raw_values = []
-for i in range(len(train_sst[1][1]) + 1):
-    raw_values.append(train_sst[1][1][i-1])
-
+raw_values = train_sst[0][0]
 diff_values = difference(raw_values, 1)
  
 # transform data to be supervised learning
@@ -125,40 +115,36 @@ supervised = timeseries_to_supervised(diff_values, 1)
 supervised_values = supervised.values
  
 # split data into train and test-sets
-train, test = supervised_values[0:-12], supervised_values[-12:]
+train, test = supervised_values[0:-305], supervised_values[-305:]
  
 # transform the scale of the data
 scaler, train_scaled, test_scaled = scale(train, test)
  
-# repeat experiment
-repeats = 30
-error_scores = list()
-for r in range(repeats):
-	# fit the model
-	lstm_model = fit_lstm(train_scaled, 1, 3000, 4)
-	# forecast the entire training dataset to build up state for forecasting
-	train_reshaped = train_scaled[:, 0].reshape(len(train_scaled), 1, 1)
-	lstm_model.predict(train_reshaped, batch_size=1)
-	# walk-forward validation on the test data
-	predictions = list()
-	for i in range(len(test_scaled)):
-		# make one-step forecast
-		X, y = test_scaled[i, 0:-1], test_scaled[i, -1]
-		yhat = forecast_lstm(lstm_model, 1, X)
-		# invert scaling
-		yhat = invert_scale(scaler, X, yhat)
-		# invert differencing
-		yhat = inverse_difference(raw_values, yhat, len(test_scaled)+1-i)
-		# store forecast
-		predictions.append(yhat)
-	# report performance
-	rmse = sqrt(mean_squared_error(raw_values[-12:], predictions))
-	print('%d) Test RMSE: %.3f' % (r+1, rmse))
-	error_scores.append(rmse)
+# fit the model
+lstm_model = fit_lstm(train_scaled, 1, 3, 4)
+# forecast the entire training dataset to build up state for forecasting
+train_reshaped = train_scaled[:, 0].reshape(len(train_scaled), 1, 1)
+lstm_model.predict(train_reshaped, batch_size=1)
  
-# summarize results
-results = DataFrame()
-results['rmse'] = error_scores
-print(results.describe())
-results.boxplot()
+# walk-forward validation on the test data
+predictions = list()
+for i in range(len(test_scaled)):
+	# make one-step forecast
+	X, y = test_scaled[i, 0:-1], test_scaled[i, -1]
+	yhat = forecast_lstm(lstm_model, 1, X)
+	# invert scaling
+	yhat = invert_scale(scaler, X, yhat)
+	# invert differencing
+	yhat = inverse_difference(raw_values, yhat, len(test_scaled)+1-i)
+	# store forecast
+	predictions.append(yhat)
+	expected = raw_values[len(train) + i + 1]
+	print('Month=%d, Predicted=%f, Expected=%f' % (i+1, yhat, expected))
+ 
+# report performance
+rmse = sqrt(mean_squared_error(raw_values[-305:], predictions))
+print('Test RMSE: %.3f' % rmse)
+# line plot of observed vs predicted
+pyplot.plot(raw_values[-305:])
+pyplot.plot(predictions)
 pyplot.show()
