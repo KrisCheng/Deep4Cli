@@ -8,7 +8,7 @@ Copyright (c) 2017 - Kris Peng <kris.dacpc@gmail.com>
 '''
 
 from copy import copy
-from learning.base_class import RegressionModel
+from base_class import RegressionModel
 from keras.layers import BatchNormalization
 from keras.layers import Dense
 from keras.layers import Dropout
