@@ -22,18 +22,6 @@ from pandas import Series
 from math import sqrt
 import numpy
 
-# data preprocessing
-# train = '../data/nino34/nino3_4_train.txt'  
-# train_data = numpy.loadtxt(train)
-# train_data = numpy.delete(train_data, 0, 1)
-
-# test = '../data/nino34/nino3_4_test.txt'
-# test_data = numpy.loadtxt(test)
-# test_data = numpy.delete(test_data, 0, 1)
-
-# train_sst = train_data.reshape(1,12*119)
-# test_sst = test_data.reshape(1,12*18)
-
 raw = '../data/nino34/nino3_4_anomaly.txt'  
 raw_data = numpy.loadtxt(raw)
 raw_data = numpy.delete(raw_data, 0, 1)
@@ -62,7 +50,7 @@ def inverse_difference(history, yhat, interval=1):
 	return yhat + history[-interval]
  
 # scale train and test data to [-1, 1]
-def scale(train, test):
+def scale(train, test):	
 	# fit scaler
 	scaler = MinMaxScaler(feature_range=(-1, 1))
 	scaler = scaler.fit(train)
@@ -103,6 +91,8 @@ def forecast_lstm(model, batch_size, X):
 
 # transform data to be stationary
 raw_values = raw_values
+# print(len(raw_values))
+
 diff_values = difference(raw_values, 1)
 # transform data to be supervised learning
 supervised = timeseries_to_supervised(diff_values, 1)
@@ -115,17 +105,17 @@ train, test = supervised_values[0:-228], supervised_values[-228:]
 scaler, train_scaled, test_scaled = scale(train, test)
  
 # fit the model
-lstm_model = fit_lstm(train_scaled, 1, 100, 4)
+lstm_model = fit_lstm(train_scaled, 1, 1, 4)
 # forecast the entire training dataset to build up state for forecasting
 train_reshaped = train_scaled[:, 0].reshape(len(train_scaled), 1, 1)
 lstm_model.predict(train_reshaped, batch_size=1)
  
-# walk-forward validation on the test data
-predictions = list()
-
 time = []
 currentYear = 1998
 currentMonth = 1
+
+# walk-forward validation on the test data
+predictions = list()
 
 for i in range(len(test_scaled)):
     # make one-step forecast
@@ -134,10 +124,10 @@ for i in range(len(test_scaled)):
     # invert scaling
     yhat = invert_scale(scaler, X, yhat)
 	# invert differencing
-    yhat = inverse_difference(raw_values, yhat, len(test_scaled)+1-i)
+    yhat = inverse_difference(raw_values, yhat, len(test_scaled) + 1 - i)
     # store forecast
     predictions.append(yhat)
-    expected = raw_values[len(train)+i+1]
+    expected = raw_values[len(train) + i + 1]
     if(currentMonth is 13):
         currentYear = currentYear + 1
         currentMonth = 1
