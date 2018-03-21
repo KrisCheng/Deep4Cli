@@ -72,7 +72,7 @@ y = array(y).reshape(1, 228)
 # print(X)
 
 # fit model
-history = model.fit(X, y, batch_size = 20, epochs = 100)
+history = model.fit(X, y, batch_size = 20, epochs = 20)
 
 # evaluate model
 # X, y = generate_examples(length, 100, output)
