@@ -23,71 +23,54 @@ import numpy
 raw = '../data/nino34/nino3_4_anomaly.txt'  
 raw_data = numpy.loadtxt(raw)
 raw_data = numpy.delete(raw_data, 0, 1)
-raw_values = raw_data.reshape(1, 12 * 147)
+raw_values = raw_data.reshape(1, 12 * 148)
 raw_values = raw_values[0]
-
-# generate damped sine wave [0, 1]
-def generate_sequence(length, period, decay):
-    return [0.5 + 0.5 * sin(2 * pi * i / period) * exp(-decay * i) for i in range(length)]
-
-# generate input-output pairs
-def generate_examples(length, n_patterns, output):
-    X, y = list(), list()
-    for _ in range(n_patterns):
-        p = randint(10, 20)
-        d = uniform(0.01, 0.1)
-        
-        sequence = generate_sequence(length + output, p, d)
-        sequence = raw_values
-        print(len(sequence))
-        X.append(sequence[:-output])
-        y.append(sequence[-output:])
-    # X = array(X).reshape(len(X), 1, 1)
-    # y = array(y).reshape(len(y), output)
-    return X, y
 
 # configure number
 length = 1536
-output = 228
+output = 240
 
-# define model
+# define model (Stacked LSTM model)
+# model = Sequential()
+# model.add(LSTM(20, return_sequences = True, input_shape = (length, 1)))
+# model.add(LSTM(20))
+# model.add(Dense(output))
+# model.compile(loss = 'mse', optimizer = 'adam')
+# print(model.summary())
+
+# define model (one LSTM layer model)
 model = Sequential()
-model.add(LSTM(20, return_sequences = True, input_shape = (length, 1)))
-model.add(LSTM(20))
+model.add(LSTM(1, input_shape = (length, 1)))
 model.add(Dense(output))
-model.compile(loss = 'mae', optimizer = 'adam')
+model.compile(loss = 'mse', optimizer = 'adam')
 print(model.summary())
 
 # data prepare 
 # train: 1870.01~1997.12 (1536)
-# test: 1998.01~2016.12 (228)
+# test: 1998.01~2017.12 (240)
 
 # print(raw_values)
 X, y = list(), list()
-X = raw_values[:-228]
-y = raw_values[-228:]
-# X, y = generate_examples(length, 1, output)
+X = raw_values[:-240]
+y = raw_values[-240:]
 X = array(X).reshape(1, 1536, 1)
-y = array(y).reshape(1, 228)
-# print(X)
+y = array(y).reshape(1, 240)
 
 # fit model
-history = model.fit(X, y, batch_size = 20, epochs = 20)
+history = model.fit(X, y, epochs = 200)
 
 # evaluate model
-# X, y = generate_examples(length, 100, output)
 loss = model.evaluate(X, y, verbose = 0)
-print("MAE: %f" % loss)
+print("MSE: %f" % loss)
 
 # predict new data
-# X, y = generate_examples(length, 1, output)
 yhat = model.predict(X, verbose = 0)
 
 time = []
 currentYear = 1998
 currentMonth = 1
 
-for i in range(228):
+for i in range(240):
     if(currentMonth is 13):
         currentYear = currentYear + 1
         currentMonth = 1
@@ -96,9 +79,10 @@ for i in range(228):
     currentMonth = currentMonth + 1
 
 xs = [datetime.strptime(t, '%Y/%m').date() for t in time]
-pyplot.plot(xs, y[0], color = "blue", label = "actual")
-pyplot.plot(xs, yhat[0], color = "red", linestyle = '--', label = "predict")
+pyplot.plot(xs, y[0], color = "red", linestyle = '--', label = "actual")
+pyplot.plot(xs, yhat[0], color = "blue", label = "predicted")
 pyplot.legend(loc = 'upper left')
-
+pyplot.xlabel('time(years)')
+pyplot.ylabel('NINO3.4/°C')
 pyplot.legend()
 pyplot.show()
