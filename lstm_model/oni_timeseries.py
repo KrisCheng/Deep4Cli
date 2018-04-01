@@ -21,7 +21,7 @@ from pandas import concat
 from pandas import datetime
 from pandas import Series
 from math import sqrt
-import numpy
+import numpy,pandas
 
 # frame a sequence as a supervised learning problem
 def timeseries_to_supervised(data, lag = 1):
@@ -74,6 +74,7 @@ def fit_lstm(train, batch_size, nb_epoch, neurons):
 	model.add(Dense(1))
 	model.compile(loss = 'mean_squared_error', optimizer = 'adam')
 	print(model.summary())
+	# TODO: why??
 	for i in range(nb_epoch): 
 		model.fit(X, y, epochs = 1, batch_size = batch_size, verbose = 1, shuffle = False)
 		model.reset_states()
@@ -86,12 +87,18 @@ def forecast_lstm(model, batch_size, X):
 	return yhat[0,0]
 
 # load data
-raw = '../data/oni/txt/nino3
-_anomaly.txt'  
-raw_data = numpy.loadtxt(raw)
-raw_data = numpy.delete(raw_data, 0, 1)
-raw_values = raw_data.reshape(1, 12 * 148)
-raw_values = raw_values[0]
+# from txt
+# raw = '../data/oni/txt/nino4_anomaly.txt'
+# raw_data = numpy.loadtxt(raw)
+# raw_data = numpy.delete(raw_data, 0, 1)
+# raw_values = raw_data.reshape(1, 12 * 148)
+# raw_values = raw_values[0]
+
+# from csv
+raw = '../data/oni/csv/nwp.csv'
+series = pandas.read_csv(raw, header=-1, parse_dates=[0], index_col=0, squeeze=True)
+# transform to supervised learning
+raw_values = series.values
 
 # transform data to be stationary
 raw_values = raw_values
@@ -109,7 +116,7 @@ train, test = supervised_values[0:-228], supervised_values[-228:]
 scaler, train_scaled, test_scaled = scale(train, test)
  
 # fit the model
-lstm_model = fit_lstm(train_scaled, 1, 100, 4)
+lstm_model = fit_lstm(train_scaled, 1, 10, 50)
 # forecast the entire training dataset to build up state for forecasting
 train_reshaped = train_scaled[:, 0].reshape(len(train_scaled), 1, 1)
 lstm_model.predict(train_reshaped, batch_size = 1)
@@ -149,3 +156,6 @@ pyplot.plot(xs, raw_values[-228:], color = "blue", label = "actual")
 pyplot.plot(xs, predictions, color = "red", linestyle = '--', label = "predict")
 pyplot.legend(loc = 'upper left')
 pyplot.show()
+
+dataframe = pandas.DataFrame({'TIME':time,'nino4':predictions})
+dataframe.to_csv("nino4.csv",index=False,sep=',')
