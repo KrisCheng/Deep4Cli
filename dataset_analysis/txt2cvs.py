@@ -1,0 +1,26 @@
+# txt --> csv
+import numpy
+import pandas as pd
+
+raw = '../data/oni/txt/nino3_anomaly.txt'  
+raw_data = numpy.loadtxt(raw)
+raw_data = numpy.delete(raw_data, 0, 1)
+raw_values = raw_data.reshape(12 * 148)
+raw_values = raw_values.tolist()
+timeList = []
+beginYear = 1870
+beginMonth = 1
+for i in raw_values:
+    if beginMonth < 10:
+        time = str(str(beginYear)+'-'+str('0'+str(beginMonth)))
+    else: 
+        time = str(str(beginYear)+'-'+str(beginMonth))
+    timeList.append(time)
+    beginMonth = beginMonth + 1
+    if(beginMonth is 13):
+        beginMonth = 1
+        beginYear = beginYear + 1
+    
+dataframe = pd.DataFrame({'TIME':timeList,'NINO34':raw_values})
+
+dataframe.to_csv("nino3_anomaly.csv",index=False,sep=',')

@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 
 '''
-Desc:  apply the LSTM model, on the nino3.4 anomaly dataset, based on keras (from 1870~2016 monthly.)
-DataSource: https://www.esrl.noaa.gov/psd/gcos_wgsp/Timeseries/Data/nino34.long.anom.data
+Desc:  apply the LSTM model, on the oni index anomaly dataset, based on keras (from 1870~2017 monthly)
+DataSource: https://www.esrl.noaa.gov/psd/gcos_wgsp/Timeseries/
+Reference: https://machinelearningmastery.com/time-series-forecasting-long-short-term-memory-network-python/
 Author: Kris Peng
 Copyright (c) 2017 - Kris Peng <kris.dacpc@gmail.com>
 '''
@@ -21,12 +22,6 @@ from pandas import datetime
 from pandas import Series
 from math import sqrt
 import numpy
-
-raw = '../data/nino34/nino3_4_anomaly.txt'  
-raw_data = numpy.loadtxt(raw)
-raw_data = numpy.delete(raw_data, 0, 1)
-raw_values = raw_data.reshape(1, 12 * 147)
-raw_values = raw_values[0]
 
 # frame a sequence as a supervised learning problem
 def timeseries_to_supervised(data, lag = 1):
@@ -78,8 +73,9 @@ def fit_lstm(train, batch_size, nb_epoch, neurons):
 	model.add(LSTM(neurons, batch_input_shape = (batch_size, X.shape[1], X.shape[2]), stateful = True))
 	model.add(Dense(1))
 	model.compile(loss = 'mean_squared_error', optimizer = 'adam')
+	print(model.summary())
 	for i in range(nb_epoch): 
-		model.fit(X, y, epochs = 1, batch_size = batch_size, verbose = 0, shuffle = False)
+		model.fit(X, y, epochs = 1, batch_size = batch_size, verbose = 1, shuffle = False)
 		model.reset_states()
 	return model
  
@@ -88,6 +84,14 @@ def forecast_lstm(model, batch_size, X):
 	X = X.reshape(1, 1, len(X))
 	yhat = model.predict(X, batch_size = batch_size)
 	return yhat[0,0]
+
+# load data
+raw = '../data/oni/txt/nino3
+_anomaly.txt'  
+raw_data = numpy.loadtxt(raw)
+raw_data = numpy.delete(raw_data, 0, 1)
+raw_values = raw_data.reshape(1, 12 * 148)
+raw_values = raw_values[0]
 
 # transform data to be stationary
 raw_values = raw_values
@@ -105,13 +109,13 @@ train, test = supervised_values[0:-228], supervised_values[-228:]
 scaler, train_scaled, test_scaled = scale(train, test)
  
 # fit the model
-lstm_model = fit_lstm(train_scaled, 1, 1, 20)
+lstm_model = fit_lstm(train_scaled, 1, 100, 4)
 # forecast the entire training dataset to build up state for forecasting
 train_reshaped = train_scaled[:, 0].reshape(len(train_scaled), 1, 1)
 lstm_model.predict(train_reshaped, batch_size = 1)
  
 time = []
-currentYear = 1998
+currentYear = 1999
 currentMonth = 1
 
 # walk-forward validation on the test data
@@ -134,7 +138,7 @@ for i in range(len(test_scaled)):
     temp = str(str(currentYear) + '/' + str(currentMonth))
     time.append(temp)
     currentMonth = currentMonth + 1
-    print('Month=%s, Predicted=%f, Expected=%f' % (temp, yhat, expected))
+    # print('Month=%s, Predicted=%f, Expected=%f' % (temp, yhat, expected))
 
 # report performance
 rmse = sqrt(mean_squared_error(raw_values[-228:], predictions))
