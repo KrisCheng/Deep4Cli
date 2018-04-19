@@ -95,8 +95,8 @@ def forecast_lstm(model, batch_size, X):
 # raw_values = raw_values[0]
 
 # from csv
-raw = '../data/oni/csv/nwp.csv'
-series = pandas.read_csv(raw, header=-1, parse_dates=[0], index_col=0, squeeze=True)
+raw = '../data/oni/csv/nino3_4_anomaly.csv'
+series = pandas.read_csv(raw, header=0, parse_dates=[0], index_col=0, squeeze=True)
 # transform to supervised learning
 raw_values = series.values
 
@@ -116,7 +116,7 @@ train, test = supervised_values[0:-228], supervised_values[-228:]
 scaler, train_scaled, test_scaled = scale(train, test)
  
 # fit the model
-lstm_model = fit_lstm(train_scaled, 1, 10, 50)
+lstm_model = fit_lstm(train_scaled, 1, 10, 4)
 # forecast the entire training dataset to build up state for forecasting
 train_reshaped = train_scaled[:, 0].reshape(len(train_scaled), 1, 1)
 lstm_model.predict(train_reshaped, batch_size = 1)
@@ -139,6 +139,8 @@ for i in range(len(test_scaled)):
     # store forecast
     predictions.append(yhat)
     expected = raw_values[len(train) + i + 1]
+
+	# time calculates
     if(currentMonth is 13):
         currentYear = currentYear + 1
         currentMonth = 1
@@ -155,7 +157,6 @@ xs = [datetime.strptime(t, '%Y/%m').date() for t in time]
 pyplot.plot(xs, raw_values[-228:], color = "blue", label = "actual")
 pyplot.plot(xs, predictions, color = "red", linestyle = '--', label = "predict")
 pyplot.legend(loc = 'upper left')
+pyplot.xlabel('time(years)')
+pyplot.ylabel('NINO3.4/°C')
 pyplot.show()
-
-dataframe = pandas.DataFrame({'TIME':time,'nino4':predictions})
-dataframe.to_csv("nino4.csv",index=False,sep=',')

@@ -32,6 +32,7 @@ test_data = sio.loadmat(test)
 train_sst = train_data['train_sst'][:,:,:] # input, view as 1216 imgs(single channel), resolution is 10 * 50
 test_sst = test_data['test_sst'][:,:,:] # ground-truth, view as 305 imgs(single channel), resolution is 10 * 50
 
+
 # print(train_sst.shape) # (10, 50, 1216)
 # print(test_sst.shape)  # (10, 50, 305)
 

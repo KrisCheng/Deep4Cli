@@ -1,5 +1,6 @@
 '''
 Desc: the Stacked LSTM model for NINO index, based on keras.(Unfinished)
+divide the data to two individual parts, todo.
 DataSource: https://www.esrl.noaa.gov/psd/gcos_wgsp/Timeseries/
 Author: Kris Peng
 Copyright (c) 2018 - Kris Peng <kris.dacpc@gmail.com>
@@ -20,7 +21,7 @@ from pandas import datetime
 from matplotlib import pyplot
 import numpy
 
-raw = '../data/oni/nino3_4_anomaly.txt'  
+raw = '../data/oni/txt/nino3_4_anomaly.txt'  
 raw_data = numpy.loadtxt(raw)
 raw_data = numpy.delete(raw_data, 0, 1)
 raw_values = raw_data.reshape(1, 12 * 148)
@@ -68,7 +69,7 @@ ytest = array(ytest).reshape(1, 96)
 # y = array(y).reshape(1, 240)
 
 # fit model
-history = model.fit(Xtrain, Xtest, epochs = 1000)
+history = model.fit(Xtrain, Xtest, epochs = 10)
 
 # evaluate model
 loss = model.evaluate(ytrain, ytest, verbose = 0)
@@ -91,8 +92,9 @@ for i in range(96):
     currentMonth = currentMonth + 1
 
 xs = [datetime.strptime(t, '%Y/%m').date() for t in time]
-pyplot.plot(xs, ytest[0], color = "red", linestyle = '--', label = "actual")
-pyplot.plot(xs, yhat[0], color = "blue", label = "predicted")
+
+pyplot.plot(xs, ytest[0], color = "blue", label = "actual")
+pyplot.plot(xs, yhat[0], color = "red", linestyle = '--', label = "predict")
 pyplot.legend(loc = 'upper left')
 pyplot.xlabel('time(years)')
 pyplot.ylabel('NINO3.4/°C')
