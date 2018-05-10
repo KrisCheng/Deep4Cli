@@ -2,15 +2,17 @@
 
 ***Manuscript Version***Bin Mu, Cheng Peng and Shijin Yuan(✉) 
 School of Software Engineering, Tongji University, Shanghai 201804, China
-yuanshijin2003@163.com, tjupengcheng@163.com, binmu@tongji.edu.cn### Abstract.
+binmu@tongji.edu.cn,  tjupengcheng@163.com, yuanshijin2003@163.com### Abstract.
 
 The abstract should summarize the contents of the paper in short terms, i.e. 150-250 words.
 ### Keywords: 
 
 time series prediction, deep neural networks, ENSO.
 ### Writing Skill:
-《芝加哥大学论文写作指南》
-《The-Science-of-Scientific-Writing》
+* 《芝加哥大学论文写作指南》
+
+	* 	 
+* 《The-Science-of-Scientific-Writing》
 
 ### 1	IntroductionTodo1.1 the reason (significance) of study ENSO, traditional methods (statistical method && regular machine learning methods) and limitations.
 
