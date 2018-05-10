@@ -33,6 +33,8 @@ time series prediction, deep neural networks, ENSO.
 	* Use climate network to construct input and LSTM network as model to predict ENSO, but just priedict single NINO3.4 index, no spatial information discussed, for the experiment, forecast the  NINO3.4 index from 6-month lead, 9-month lead and 12-month lead, use RMSE and MAE, no contrast experiment. the conclusion said that more data and more complex LSTM neural network is needed. 
 
 	* **pyunicorn** --> which is used for construct Climate Network in this paper.
+
+	* Nino34 + Climate Network (Preprocessing)  --> predict Nino34 with different time leads
 *  NOAA related blogs
 	
 	* [How Good Have ENSO Forecasts Been Lately?](https://www.climate.gov/news-features/blogs/enso/how-good-have-enso-forecasts-been-lately) ( a good reference when inroduce the prediction situation of ENSO )
