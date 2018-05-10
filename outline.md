@@ -8,21 +8,17 @@ The abstract should summarize the contents of the paper in short terms, i.e. 150
 ### Keywords: 
 
 time series prediction, deep neural networks, ENSO.
-### Writing Skill:
-1. 《芝加哥大学论文写作指南》
+### 1	IntroductionTodo1. the reason (significance) of study ENSO, traditional methods (statistical method && regular machine learning methods) and limitations.
 
-	* 	 
-2. 《The-Science-of-Scientific-Writing》
+	* *"The dynamical models use physical equations of the ocean and atmosphere to forecast ENSO event, which are computationally very expensive and not available outside the at- mospheric scientific community."*
 
-### 1	IntroductionTodo1.1 the reason (significance) of study ENSO, traditional methods (statistical method && regular machine learning methods) and limitations.
+2. deep learning method’s success on data-driven problem
 
-*"The dynamical models use physical equations of the ocean and atmosphere to forecast ENSO event, which are computationally very expensive and not available outside the at- mospheric scientific community."*
+	* "capturing long-term temporal dependencies" -- LSTM
 
-1.2	 deep learning method’s success on data-driven problem
+3. ENSO SST prediction is a suitable (reasonable) candidate for deep learning（machine learning） method, some work have been done on this problem[1][2], which show great potential, but:
 
-"capturing long-term temporal dependencies" -- LSTM
-
-1.3	 ENSO SST prediction is a suitable (reasonable) candidate for deep learning（machine learning） method, some work have been done on this problem[1][2],*Ref:*
+	* s ***Ref:***
 1. 《Prediction of Sea Surface Temperature using Long Short-Term Memory》
 
 	* Single SST prediction (Bohai SST)
@@ -30,7 +26,6 @@ time series prediction, deep neural networks, ENSO.
 	* two aspects -- the structure of the model (different layers, memory cells in each layer) && machine learning algorithms (SVR, MLPR)
 
 	* need more training data
-
 
 2. 《El niño-southern oscillation forecasting using complex networks analysis of LSTM neural networks》 ***（highly related）***
 
@@ -72,21 +67,24 @@ time series prediction, deep neural networks, ENSO.
 
 ### 2	Preliminaries 
 #### 2.1	Formulation of ENSO Prediction Problem
-Todo1.	Goal of ENSO prediction (NINO index and simulation pattern)2.	From the perspective of machine learning， a spatiotemporal regression prediction problem*Ref:*
+Todo1.	Goal of ENSO prediction (NINO index and simulation pattern)2.	From the perspective of machine learning， a spatiotemporal regression prediction problem***Ref:***
 1. 《Convolutional LSTM Network- A Machine Learning Approach for Precipitation Nowcasting》#### 2.2	Special Neural Networks for Sequence Modeling
-LSTM and CNN-LSTM network for spatiotemporal prediction, which have show great effectiveness on spatiotemporal problems  1. Structure of CNN and RNN, and combine them together, view as a single variable prediction and a sequence generation problem*Ref:*
+LSTM and CNN-LSTM network for spatiotemporal prediction, which have show great effectiveness on spatiotemporal problems  1. Structure of CNN and RNN, and combine them together, view as a single variable prediction and a sequence generation problem***Ref:***
 1. 《Deep Learning for Precipitation Nowcasting - A Benchmark and A New Model》### 3	Model
 #### 3.1	Multi-layer LSTM Blocks
-Todothe structure of multi LSTM for single variable prediction*Ref:*#### 3.2	CNN –LSTM Spatiotemporal Model
-The structure and detail description of the network (how to capture spatio and temporal structure independently)*Ref:*### 4 Experiment and Results
+Todothe structure of multi LSTM for single variable prediction***Ref:***#### 3.2	CNN –LSTM Spatiotemporal Model
+The structure and detail description of the network (how to capture spatio and temporal structure independently)***Ref:***### 4 Experiment and Results
 #### 4.1	Single Niño Index Prediction
 Todo1.	Connect those single nino index experiment together
-2.	Compare with different statistical approaches (todo)*Ref:*
+2.	Compare with different statistical approaches (todo)***Ref:***
 1. Final Report for “Machine learning applications in oceanography” (on GitHub)
 
-	*  
-#### 4.2	Grid Spatiotemporal SST Region Prediction
-Todo1.	Different models for grid experiment (todo)*Ref:*
+	*  Four other index --> ONI
+	*  LSTM model, random forest, linear regression#### 4.2	Grid Spatiotemporal SST Region Prediction
+Todo1.	Different models for grid experiment (todo)***Ref:***
 
-### 5 Conclusion and Future WorkTodo### References
-1.	Author, F.: Article title. Journal 2(5), 99–110 (2016).2.	Author, F., Author, S.: Title of a proceedings paper. In: Editor, F., Editor, S. (eds.) CONFERENCE 2016, LNCS, vol. 9999, pp. 1–13. Springer, Heidelberg (2016). 3.	Author, F., Author, S., Author, T.: Book title. 2nd edn. Publisher, Location (1999).4.	Author, F.: Contribution title. In: 9th International Proceedings on Proceedings, pp. 1–2. Publisher, Location (2010).5.	LNCS Homepage, http://www.springer.com/lncs, last accessed 2016/11/21.
+### 5 Conclusion and Future WorkTodo### Writing Skill:
+1. 《芝加哥大学论文写作指南》
+
+	* 	 
+2. 《The-Science-of-Scientific-Writing》
