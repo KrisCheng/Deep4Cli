@@ -3,3 +3,4 @@ Deep4Cli.iml
 *.pyc
 *.csv
 data
+model

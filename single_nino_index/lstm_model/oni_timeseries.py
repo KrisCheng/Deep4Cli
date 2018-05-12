@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 '''
-Desc:  apply the LSTM model, on the oni index anomaly dataset, based on keras (from 1870~2017 monthly)
+Desc:  apply the LSTM model, on the oni index anomaly dataset, based on keras (from 1870~2017, monthly)
 DataSource: https://www.esrl.noaa.gov/psd/gcos_wgsp/Timeseries/
 Reference: https://machinelearningmastery.com/time-series-forecasting-long-short-term-memory-network-python/
 Author: Kris Peng
@@ -12,6 +12,7 @@ Copyright (c) 2017 - Kris Peng <kris.dacpc@gmail.com>
 from sklearn.metrics import mean_squared_error
 from sklearn.preprocessing import MinMaxScaler
 from keras.models import Sequential
+from keras.models import load_model
 from keras.layers import LSTM, TimeDistributed, Dense
 from keras.optimizers import Adam
 import scipy.io as sio   
@@ -74,10 +75,22 @@ def fit_lstm(train, batch_size, nb_epoch, neurons):
 	model.add(Dense(1))
 	model.compile(loss = 'mean_squared_error', optimizer = 'adam')
 	print(model.summary())
-	# TODO: why??
-	for i in range(nb_epoch): 
-		model.fit(X, y, epochs = 1, batch_size = batch_size, verbose = 1, shuffle = False)
-		model.reset_states()
+	# TODO: why?? (同一个模型多次训练？？而且每次仅仅一轮)
+	# for i in range(nb_epoch): 
+		# model.fit(X, y, epochs = 1, batch_size = batch_size, verbose = 1, shuffle = False)
+		# model.reset_states()
+	history = model.fit(X, y, epochs = nb_epoch, batch_size = batch_size, verbose = 1, shuffle = False)
+	pyplot.plot(history.history['loss'])
+	# pyplot.plot(history.history['val_loss'])
+	pyplot.title('model loss')
+	pyplot.ylabel('loss')
+	pyplot.xlabel('epoch')
+	pyplot.legend(['train', 'test'], loc='upper left')
+	pyplot.show()
+
+	# save the trained model
+	model.save('100e_mse_nino34_model.h5')
+
 	return model
  
 # make a one-step forecast
@@ -95,28 +108,35 @@ def forecast_lstm(model, batch_size, X):
 # raw_values = raw_values[0]
 
 # from csv
-raw = '../data/oni/csv/nino3_4_anomaly.csv'
+raw = '../../data/oni/csv/nino3_4_anomaly.csv'
 series = pandas.read_csv(raw, header=0, parse_dates=[0], index_col=0, squeeze=True)
 # transform to supervised learning
 raw_values = series.values
 
 # transform data to be stationary
 raw_values = raw_values
-# print(len(raw_values))
+# print(raw_values)
 
 diff_values = difference(raw_values, 1)
+# print(diff_values)
+
 # transform data to be supervised learning
 supervised = timeseries_to_supervised(diff_values, 1)
 supervised_values = supervised.values
- 
+# print(supervised_values)
+
 # split data into train and test-sets
 train, test = supervised_values[0:-228], supervised_values[-228:]
- 
+
 # transform the scale of the data
 scaler, train_scaled, test_scaled = scale(train, test)
  
 # fit the model
-lstm_model = fit_lstm(train_scaled, 1, 10, 4)
+# lstm_model = fit_lstm(train_scaled, 1, 100, 40)
+
+# load the exist model
+# lstm_model = load_model('100e_mse_nino34_model.h5')
+
 # forecast the entire training dataset to build up state for forecasting
 train_reshaped = train_scaled[:, 0].reshape(len(train_scaled), 1, 1)
 lstm_model.predict(train_reshaped, batch_size = 1)
@@ -147,11 +167,12 @@ for i in range(len(test_scaled)):
     temp = str(str(currentYear) + '/' + str(currentMonth))
     time.append(temp)
     currentMonth = currentMonth + 1
-    # print('Month=%s, Predicted=%f, Expected=%f' % (temp, yhat, expected))
+
+    print('Month=%s, Predicted=%f, Expected=%f' % (temp, yhat, expected))
 
 # report performance
-rmse = sqrt(mean_squared_error(raw_values[-228:], predictions))
-print('Test RMSE: %.3f' % rmse)
+mse = mean_squared_error(raw_values[-228:], predictions)
+print('Test MSE: %.3f' % mse)
 # line plot of observed vs predicted
 xs = [datetime.strptime(t, '%Y/%m').date() for t in time]
 pyplot.plot(xs, raw_values[-228:], color = "blue", label = "actual")

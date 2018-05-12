@@ -35,9 +35,9 @@ time series prediction, deep neural networks, ENSO.
 
 	* Use climate network to construct input and LSTM network as model to predict ENSO, but just priedict single NINO3.4 index, no spatial information discussed, for the experiment, forecast the  NINO3.4 index from 6-month lead, 9-month lead and 12-month lead, use RMSE and MAE, no contrast experiment. the conclusion said that more data and more complex LSTM neural network is needed. 
 
-	* Nino3.4 + Climate Network (Preprocessing)  --> predict Nino34 with different time leads
+	* Nino3.4 + Climate Network (Preprocessing)  --> predict Nino34 with different time leads, and no contrast experiment done.
 
-	* *"We believe this approach has great potential performance skills to augment the ENSO forecasting activity of climate scien- tists and meteorologists. And our vision is to improve the model by increasing the data sample size and the complex- ity of the LSTM architecture."*
+	* *"We believe this approach has great potential performance skills to augment the ENSO forecasting activity of climate scientists and meteorologists. And our vision is to improve the model by increasing the data sample size and the complexity of the LSTM architecture."*
 
 	* **pyunicorn** --> which is used for construct Climate Network in this paper.
 
@@ -93,12 +93,19 @@ time series prediction, deep neural networks, ENSO.
 #### 4.1	Single Niño Index Prediction
 ***Outline:***1.	Connect those single nino index experiment together
 
-	* the single nino index predition with LSTM 
-2.	Compare with different statistical approaches (todo)***Ref:***
+	* the single nino index predition with different LSTM networks
+2.	Compare the result with different statistical approaches. (todo)***Ref:***
 1. Final Report for “Machine learning applications in oceanography” (on GitHub)
 
 	*  Four other index --> ONI
-	*  LSTM model, random forest, linear regression#### 4.2	Grid Spatiotemporal SST Region Prediction
+	*  LSTM model, random forest, linear regression
+
+2. [Nino3/4/3.4 index Data (1870~2018)](https://www.esrl.noaa.gov/psd/gcos_wgsp/Timeseries/Nino34/)
+
+3. [Time Series Forecasting with the Long Short-Term Memory Network in Python](https://machinelearningmastery.com/time-series-forecasting-long-short-term-memory-network-python/)
+	* Rawdata --> Difference (stationary) --> Transfer to Supervised learning (pairs) --> Scale [-1~1] --> Model --> Output
+
+4. #### 4.2	Grid Spatiotemporal SST Region Prediction
 
 ***Outline:***1.	Different models for grid experiment (todo)***Ref:***
 ### 5 Conclusion and Future WorkTodo### Writing Skill:
