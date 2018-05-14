@@ -107,7 +107,7 @@ def forecast_lstm(model, batch_size, X):
 # raw_values = raw_values[0]
 
 # from csv
-raw = '../../data/oni/csv/nino3_4_anomaly.csv'
+raw = '../../data/oni/csv/nino4_anomaly.csv'
 series = pandas.read_csv(raw, header=0, parse_dates=[0], index_col=0, squeeze=True)
 # transform to supervised learning
 raw_values = series.values
@@ -134,7 +134,7 @@ scaler, train_scaled, test_scaled = scale(train, test)
 # lstm_model = fit_lstm(train_scaled, 1, 100, 40)
 
 # load the exist model
-# lstm_model = load_model('100e_mse_nino34_model.h5')
+lstm_model = load_model('100e_mse_nino34_model.h5')
 
 # forecast the entire training dataset to build up state for forecasting
 train_reshaped = train_scaled[:, 0].reshape(len(train_scaled), 1, 1)

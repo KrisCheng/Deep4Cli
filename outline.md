@@ -96,14 +96,14 @@ time series prediction, deep neural networks, ENSO.
 #### 4.1	Single Niño Index Prediction
 ***Outline:***1.	Connect those single nino index experiment together
 
-	* the single nino index predition with different LSTM networks
-	* different LSTM cell && different LSTM layers
-	* different training methods 
+	* the single nino index predition with different LSTM networks ( Nino3 / Nino4 / Nino34 )
+	* different LSTM cell && different LSTM layers && parameters setting
+	* different training methods ( Adam / Rmsprop etc. )
 2.	Compare the result with different statistical approaches. (todo)
 
 	* Baseline prediction ( naive method )
 	* ARIMA model
-	* Auto regression model***Ref:***
+	* Traditional Machine Learning ( SVR, NN etc. )***Ref:***
 1. Final Report for “Machine learning applications in oceanography” ( on [GitHub](https://github.com/Yongyao/enso-forcasting) )
 
 	*  Four other index ( SOI, PNA, Nino3, precipitation ) --> ONI
