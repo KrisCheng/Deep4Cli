@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 '''
-Desc:  apply the LSTM model, on the oni index anomaly dataset, based on keras (from 1870~2017, monthly)
+Desc:  apply the LSTM model, on the oni index anomaly dataset, based on keras (from 1870~2017, monthly).
 DataSource: https://www.esrl.noaa.gov/psd/gcos_wgsp/Timeseries/
 Reference: https://machinelearningmastery.com/time-series-forecasting-long-short-term-memory-network-python/
 Author: Kris Peng
@@ -81,7 +81,6 @@ def fit_lstm(train, batch_size, nb_epoch, neurons):
 		# model.reset_states()
 	history = model.fit(X, y, epochs = nb_epoch, batch_size = batch_size, verbose = 1, shuffle = False)
 	pyplot.plot(history.history['loss'])
-	# pyplot.plot(history.history['val_loss'])
 	pyplot.title('model loss')
 	pyplot.ylabel('loss')
 	pyplot.xlabel('epoch')

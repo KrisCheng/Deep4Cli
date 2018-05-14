@@ -22,7 +22,8 @@ time series prediction, deep neural networks, ENSO.
 3. ENSO SST prediction is a suitable (reasonable) candidate for deep learning method, some work have been done on this problem[1][2], which show great potential for this problem, but limitation as follow:
 
 	* only SST prediction, no specified climate problem analysis.[1]
-	* only single nino index (NINO3.4) prediction, no spatio information (pattern) considered, and both network model and data input size can be improved.[2]***Ref:***
+	* only single nino index (NINO3.4) prediction, no spatio information (pattern) considered, and both network model and data input size can be improved.[2]
+	* Todo***Ref:***
 1. 《Prediction of Sea Surface Temperature using Long Short-Term Memory》
 
 	* Single SST prediction (Bohai SST)
@@ -38,6 +39,8 @@ time series prediction, deep neural networks, ENSO.
 	* Nino3.4 + Climate Network (Preprocessing)  --> predict Nino34 with different time leads, and no contrast experiment done.
 
 	* *"We believe this approach has great potential performance skills to augment the ENSO forecasting activity of climate scientists and meteorologists. And our vision is to improve the model by increasing the data sample size and the complexity of the LSTM architecture."*
+
+	* *"To the best of our knowledge, this is the first time this approach has been applied to forecast ENSO phenomenon."*
 
 	* **pyunicorn** --> which is used for construct Climate Network in this paper.
 
@@ -94,18 +97,39 @@ time series prediction, deep neural networks, ENSO.
 ***Outline:***1.	Connect those single nino index experiment together
 
 	* the single nino index predition with different LSTM networks
-2.	Compare the result with different statistical approaches. (todo)***Ref:***
-1. Final Report for “Machine learning applications in oceanography” (on GitHub)
+	* different LSTM cell && different LSTM layers
+	* different training methods 
+2.	Compare the result with different statistical approaches. (todo)
 
-	*  Four other index --> ONI
+	* Baseline prediction ( naive method )
+	* ARIMA model
+	* Auto regression model***Ref:***
+1. Final Report for “Machine learning applications in oceanography” ( on [GitHub](https://github.com/Yongyao/enso-forcasting) )
+
+	*  Four other index ( SOI, PNA, Nino3, precipitation ) --> ONI
 	*  LSTM model, random forest, linear regression
 
-2. [Nino3/4/3.4 index Data (1870~2018)](https://www.esrl.noaa.gov/psd/gcos_wgsp/Timeseries/Nino34/)
+2. [Nino3 / 4 / 3.4 index Data (1870~2018)](https://www.esrl.noaa.gov/psd/gcos_wgsp/Timeseries/Nino34/) （ Raw Data ）
 
 3. [Time Series Forecasting with the Long Short-Term Memory Network in Python](https://machinelearningmastery.com/time-series-forecasting-long-short-term-memory-network-python/)
-	* Rawdata --> Difference (stationary) --> Transfer to Supervised learning (pairs) --> Scale [-1~1] --> Model --> Output
+	* Raw data --> Difference (stationary) --> Transfer Time series to Supervised learning problem (pairs) --> Scale [-1~1] --> Model --> Output
 
-4. #### 4.2	Grid Spatiotemporal SST Region Prediction
+4. [Multi-step Time Series Forecasting with Long Short-Term Memory Networks in Python](https://machinelearningmastery.com/multi-step-time-series-forecasting-long-short-term-memory-networks-python/) ( how to make multistep forecasting )
+	* *"The LSTM is stateful; this means that we have to manually reset the state of the network at the end of each training epoch. The network will be fit for 1500 epochs."*
+
+5. [Multivariate Time Series Forecasting with LSTMs in Keras](https://machinelearningmastery.com/multivariate-time-series-forecasting-lstms-keras/) ( how to make multivariate forecasting )
+	* figure out related ( seem related ) raw data
+	* *"multvariate time series forecasting with multiple lag inputs"*
+
+
+6. [NINO SST INDICES (NINO 1+2, 3, 3.4, 4; ONI AND TNI)](https://climatedataguide.ucar.edu/climate-data/nino-sst-indices-nino-12-3-34-4-oni-and-tni) ( different SST anomalies for different regions)
+	* *"The Niño 3.4 index and the Oceanic Niño Index (ONI) are the most commonly used indices to define El Niño and La Niña events."*
+
+7. [enso-forecast](https://github.com/lohancock/enso-forecast) ( GitHub, based on R) (todo)
+
+
+
+#### 4.2	Grid Spatiotemporal SST Region Prediction
 
 ***Outline:***1.	Different models for grid experiment (todo)***Ref:***
 ### 5 Conclusion and Future WorkTodo### Writing Skill:
