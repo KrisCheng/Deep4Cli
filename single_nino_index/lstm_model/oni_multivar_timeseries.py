@@ -25,6 +25,7 @@ import os.path
 from keras.models import load_model
 import numpy as np 
 
+# covert timeseries problem to a supervised problem
 def series_to_supervised(data, n_in=1, n_out=1, dropnan=True):
     n_vars = 1 if type(data) is list else data.shape[1]
     df = DataFrame(data)
@@ -55,19 +56,19 @@ def fit_lstm(train, n_lag, n_ahead, n_batch, nb_epoch, n_neurons):
     X = X.reshape(X.shape[0], n_lag, int(X.shape[1]/n_lag))
     # y = y.reshape(y.shape[0], 1, n_ahead)
 
-    # design network
+    # network structure design ( what is stateful mean here ??)
     model = Sequential()
     model.add(LSTM(n_neurons, batch_input_shape=(n_batch, X.shape[1], X.shape[2]), stateful=True))
     
     model.add(Dense(n_ahead))
     model.compile(loss='mean_squared_error', optimizer='adam')
     # fit network
-    for i in range(nb_epoch):
-        model.fit(X, y, epochs=1, batch_size=n_batch, verbose=2, shuffle=False)
-        model.reset_states()
+    # for i in range(nb_epoch):
+    model.fit(X, y, epochs=30, batch_size=n_batch, verbose=2, shuffle=False)
+        # model.reset_states()
     return model
 
-# make one forecast with an LSTM,
+# make forecast
 def forecast_lstm(model, X, n_batch, n_lag):
     # reshape input pattern to [samples, timesteps, features]
     X = X.reshape(1, n_lag, int(len(X)/n_lag))
@@ -114,14 +115,14 @@ def plot_forecasts(series, forecasts, n_test, xlim, ylim, n_ahead, linestyle = N
                
     # show the plot
     pyplot.show()
-        
+
+# load dataset
 def parser(x):
     if x.endswith('11') or x.endswith('12')or x.endswith('10'):
         return datetime.strptime(x, '%Y%m')
     else:
        return datetime.strptime(x, '%Y0%m') 
 df = read_csv('../../data/oni/csv/indice_everything_included.csv', header=0, parse_dates=[0], index_col=0, date_parser=parser)
-# print(df)
 df = df.drop('olr', 1)
 start = 336 
 df = df.iloc[start:]
@@ -129,22 +130,21 @@ df = df.iloc[start:]
 df = (df - df.mean()) / df.std()
 
 cols = df.columns.tolist()
-# print(cols)
+
 cols = cols[1:] + cols[:1]
 df = df[cols]
-# print(df)
+
 enso = df.values.astype('float32')
-# print(enso)
+
 # specify the sliding window size and number of features
 lag = 12
 ahead = 3
-n_features = 1
 # frame as supervised learning
 reframed = series_to_supervised(enso, lag, ahead)
-print(len(reframed))
-# drop columns we don't want to predict
-# print(reframed.head())
 
+print(reframed.head())
+
+# plot the correlation between SOI and other vatiables
 df_temp = reframed.drop(['VAR(t+1)','VAR(t+2)'], 1)
 fig = pyplot.figure()
 df_cor = df_temp.corr().abs()
@@ -163,7 +163,7 @@ test = values[n_train:, :]
 # fit model
 file_path = 'muiti_var_model.h5'
 if not os.path.exists(file_path):
-    model = fit_lstm(train, lag, ahead, 1, 3, 30)
+    model = fit_lstm(train, lag, ahead, 1, 30, 30)
     model.save(file_path)
 else:
     model = load_model(file_path)
