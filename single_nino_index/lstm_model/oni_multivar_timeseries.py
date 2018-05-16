@@ -62,10 +62,18 @@ def fit_lstm(train, n_lag, n_ahead, n_batch, nb_epoch, n_neurons):
     
     model.add(Dense(n_ahead))
     model.compile(loss='mean_squared_error', optimizer='adam')
+    print(model.summary())
     # fit network
     # for i in range(nb_epoch):
-    model.fit(X, y, epochs=30, batch_size=n_batch, verbose=2, shuffle=False)
-        # model.reset_states()
+    history = model.fit(X, y, epochs=3, batch_size=n_batch, verbose=1, shuffle=False)
+    # model.reset_states()
+    pyplot.figure()
+    pyplot.plot(history.history['loss'])
+    pyplot.title('model loss')
+    pyplot.ylabel('loss')
+    pyplot.xlabel('epoch')
+    pyplot.legend(['train', 'test'], loc='upper left')
+    pyplot.show()
     return model
 
 # make forecast
@@ -142,16 +150,16 @@ ahead = 3
 # frame as supervised learning
 reframed = series_to_supervised(enso, lag, ahead)
 
-print(reframed.head())
+# print(reframed.head())
 
-# plot the correlation between SOI and other vatiables
-df_temp = reframed.drop(['VAR(t+1)','VAR(t+2)'], 1)
-fig = pyplot.figure()
-df_cor = df_temp.corr().abs()
-for i in range(0,4):
-    index = np.arange(0, 56, 5) + i
-    fig.add_subplot(2, 2, i+1)
-    df_cor['VAR(t)'].iloc[index[::-1]].plot(title = df.columns[i])
+# # plot the correlation between SOI and other vatiables
+# df_temp = reframed.drop(['VAR(t+1)','VAR(t+2)'], 1)
+# fig = pyplot.figure()
+# df_cor = df_temp.corr().abs()
+# for i in range(0,4):
+#     index = np.arange(0, 56, 5) + i
+#     fig.add_subplot(2, 2, i+1)
+#     df_cor['VAR(t)'].iloc[index[::-1]].plot(title = df.columns[i])
 
 # Define and Fit Model
 values = reframed.values
@@ -161,7 +169,7 @@ train = values[:n_train, :]
 test = values[n_train:, :]
 
 # fit model
-file_path = 'muiti_var_model.h5'
+file_path = '100e_mse_multi_soi.h5'
 if not os.path.exists(file_path):
     model = fit_lstm(train, lag, ahead, 1, 30, 30)
     model.save(file_path)

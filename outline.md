@@ -101,7 +101,7 @@ time series prediction, deep neural networks, ENSO.
 	* different training methods ( Adam / Rmsprop etc. )
 2.	Compare the result with different statistical approaches. (todo)
 
-	* Baseline prediction ( naive method )
+	* Baseline prediction ( naive method ) [8]
 	* ARIMA model ( Statistics model )
 	* Traditional Machine Learning ( SVR, NN etc. )***Ref:***
 1. Final Report for “Machine learning applications in oceanography” ( on [GitHub](https://github.com/Yongyao/enso-forcasting) )
@@ -125,11 +125,12 @@ time series prediction, deep neural networks, ENSO.
 6. [NINO SST INDICES (NINO 1+2, 3, 3.4, 4; ONI AND TNI)](https://climatedataguide.ucar.edu/climate-data/nino-sst-indices-nino-12-3-34-4-oni-and-tni) ( different SST anomalies for different regions)
 	* *"The Niño 3.4 index and the Oceanic Niño Index (ONI) are the most commonly used indices to define El Niño and La Niña events."*
 
-7. [enso-forecast](https://github.com/lohancock/enso-forecast) ( GitHub, based on R) (todo)
+7. [enso-forecast](https://github.com/lohancock/enso-forecast) ( GitHub, based on R ) (todo)
 
 
+8. [How to Make Baseline Predictions for Time Series Forecasting with Python](https://machinelearningmastery.com/persistence-time-series-forecasting-with-python/) 
 
-#### 4.2	Grid Spatiotemporal SST Region Prediction
+#### 4.2	Grid Spatiotemporal SST Region Prediction
 
 ***Outline:***1.	Different models for grid experiment (todo)***Ref:***
 ### 5 Conclusion and Future WorkTodo### Writing Skill:
