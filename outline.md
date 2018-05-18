@@ -51,7 +51,9 @@ time series prediction, deep neural networks, ENSO.
 		* *"how well the forecasts have matched reality"*
 		* lead time --> *" The month from which forecasts are made is often called the start month, and the season that the forecast is for is often called the target season."*
 		* measurements (MAE && RMSE && Correlation Coefficient)
-		* *"we have a long way to go in improving their performance and utility beyond that.  It is especially hard to predict the timing of ENSO transitions and the correct strength. "*4. 《Deep learning》
+		* *"we have a long way to go in improving their performance and utility beyond that.  It is especially hard to predict the timing of ENSO transitions and the correct strength. "*
+
+	* [EXPERT USER GUIDANCE](https://climatedataguide.ucar.edu/climate-data/nino-sst-indices-nino-12-3-34-4-oni-and-tni?qt-climatedatasetmaintabs=1#qt-climatedatasetmaintabs)4. 《Deep learning》
 
 5. 《Prediction of Sea Surface Temperature by Combining Numerical and Neural Techniques》
 
@@ -123,12 +125,13 @@ time series prediction, deep neural networks, ENSO.
 
 
 6. [NINO SST INDICES (NINO 1+2, 3, 3.4, 4; ONI AND TNI)](https://climatedataguide.ucar.edu/climate-data/nino-sst-indices-nino-12-3-34-4-oni-and-tni) ( different SST anomalies for different regions)
-	* *"The Niño 3.4 index and the Oceanic Niño Index (ONI) are the most commonly used indices to define El Niño and La Niña events."*
+
+	* *"Usually the anomalies are computed relative to a base period of 30 years.  The Niño 3.4 index and the Oceanic Niño Index (ONI) are the most commonly used indices to define El Niño and La Niña events. Other indices are used to help characterize the unique nature of each event."*
 
 7. [enso-forecast](https://github.com/lohancock/enso-forecast) ( GitHub, based on R ) (todo)
 
 
-8. [How to Make Baseline Predictions for Time Series Forecasting with Python](https://machinelearningmastery.com/persistence-time-series-forecasting-with-python/)  (current as the prediction of the next several steps)
+8. [How to Make Baseline Predictions for Time Series Forecasting with Python](https://machinelearningmastery.com/persistence-time-series-forecasting-with-python/) ( using current stage as the prediction of the next several steps )
 
 #### 4.2	Grid Spatiotemporal SST Region Prediction
 

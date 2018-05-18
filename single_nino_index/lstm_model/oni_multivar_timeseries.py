@@ -3,7 +3,7 @@
 
 '''
 Desc:  apply the LSTM model, on the oni index anomaly dataset, based on keras (from 1870~2017, monthly).
-DataSource: https://www.esrl.noaa.gov/psd/gcos_wgsp/Timeseries/
+DataSource: https://github.com/Yongyao/enso-forcasting
 Reference: https://machinelearningmastery.com/multi-step-time-series-forecasting-long-short-term-memory-networks-python/
            https://machinelearningmastery.com/multivariate-time-series-forecasting-lstms-keras/
            https://github.com/Yongyao/enso-forcasting/blob/master/inotebook/LSTM%20modeling.ipynb
@@ -146,7 +146,7 @@ enso = df.values.astype('float32')
 
 # specify the sliding window size and number of features
 lag = 12
-ahead = 3
+ahead = 12
 # frame as supervised learning
 reframed = series_to_supervised(enso, lag, ahead)
 
