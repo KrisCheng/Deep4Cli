@@ -112,7 +112,7 @@ time series prediction, deep neural networks, ENSO.
 2. [Nino3 / 4 / 3.4 index Data (1870~2018)](https://www.esrl.noaa.gov/psd/gcos_wgsp/Timeseries/Nino34/) （ Raw Data ）
 
 3. [Time Series Forecasting with the Long Short-Term Memory Network in Python](https://machinelearningmastery.com/time-series-forecasting-long-short-term-memory-network-python/)
-	* Raw data --> Difference (stationary) --> Transfer Time series to Supervised learning problem (pairs) --> Scale [-1~1] --> Model --> Output
+	* Raw data --> Difference (stationary) --> Transfer Time series to Supervised learning problem (a list of numbers --> a list of input and output pattern) --> Scale [-1~1] --> Model --> Output
 
 4. [Multi-step Time Series Forecasting with Long Short-Term Memory Networks in Python](https://machinelearningmastery.com/multi-step-time-series-forecasting-long-short-term-memory-networks-python/) ( how to make multistep forecasting )
 	* *"The LSTM is stateful; this means that we have to manually reset the state of the network at the end of each training epoch. The network will be fit for 1500 epochs."*
@@ -128,7 +128,7 @@ time series prediction, deep neural networks, ENSO.
 7. [enso-forecast](https://github.com/lohancock/enso-forecast) ( GitHub, based on R ) (todo)
 
 
-8. [How to Make Baseline Predictions for Time Series Forecasting with Python](https://machinelearningmastery.com/persistence-time-series-forecasting-with-python/) 
+8. [How to Make Baseline Predictions for Time Series Forecasting with Python](https://machinelearningmastery.com/persistence-time-series-forecasting-with-python/)  (current as the prediction of the next several steps)
 
 #### 4.2	Grid Spatiotemporal SST Region Prediction
 
