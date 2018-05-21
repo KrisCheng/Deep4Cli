@@ -12,6 +12,7 @@ Date: 2018/05/18
 '''
 
 from math import sqrt
+import numpy as np
 from numpy import concatenate
 from matplotlib import pyplot
 from pandas import read_csv
@@ -27,101 +28,141 @@ from matplotlib import pyplot
 
 # convert series to supervised learning
 def series_to_supervised(data, n_in=1, n_out=1, dropnan=True):
-	n_vars = 1 if type(data) is list else data.shape[1]
-	df = DataFrame(data)
-	cols, names = list(), list()
-	# input sequence (t-n, ... t-1)
-	for i in range(n_in, 0, -1):
-		cols.append(df.shift(i))
-		names += [('var%d(t-%d)' % (j+1, i)) for j in range(n_vars)]
-	# forecast sequence (t, t+1, ... t+n)
-	for i in range(0, n_out):
-		cols.append(df.shift(-i))
-		if i == 0:
-			names += [('var%d(t)' % (j+1)) for j in range(n_vars)]
-		else:
-			names += [('var%d(t+%d)' % (j+1, i)) for j in range(n_vars)]
-	# put it all together
-	agg = concat(cols, axis=1)
-	agg.columns = names
-	# drop rows with NaN values
-	if dropnan:
-		agg.dropna(inplace=True)
-	return agg
+    n_vars = 1 if type(data) is list else data.shape[1]
+    df = DataFrame(data)
+    cols, names = list(), list()
+    # input sequence (t-n, ... t-1)
+    for i in range(n_in, 0, -1):
+        cols.append(df.shift(i))
+        names += [('var%d(t-%d)' % (j+1, i)) for j in range(n_vars)]
+    # forecast sequence (t, t+1, ... t+n)
+    for i in range(0, n_out):
+        cols.append(df.shift(-i).iloc[:,-1])
+        if i == 0:
+            names += ['VAR(t)']
+        else:
+            names += ['VAR(t+%d)' % i]
+
+    # put it all together
+    agg = concat(cols, axis=1)
+    agg.columns = names
+    # drop rows with NaN values
+    if dropnan:
+        agg.dropna(inplace=True)
+    return agg
+
+def fit_lstm(train, n_lag, n_ahead, n_batch, nb_epoch, n_neurons):
+    # reshape training into [samples, timesteps, features]
+    X, y = train[:, :-n_ahead], train[:, -n_ahead:]
+    # X = X.reshape(X.shape[0], 1, X.shape[1])
+    X = X.reshape(X.shape[0], n_lag, int(X.shape[1]/n_lag))
+    # y = y.reshape(y.shape[0], 1, n_ahead)
+
+    # design network
+    model = Sequential()
+    model.add(LSTM(n_neurons, batch_input_shape=(n_batch, X.shape[1], X.shape[2]), stateful=True))
+    model.add(Dense(n_ahead))
+    model.compile(loss='mean_squared_error', optimizer='adam')
+    # fit network
+    for i in range(nb_epoch):
+        model.fit(X, y, epochs=1, batch_size=n_batch, verbose=1, shuffle=False)
+        model.reset_states()
+    return model
+
+def forecast_lstm(model, X, n_batch, n_lag):
+    # reshape input pattern to [samples, timesteps, features]
+    X = X.reshape(1, n_lag, int(len(X)/n_lag))
+    # make forecast
+    forecast = model.predict(X, batch_size=n_batch)
+    # convert to array
+    return [x for x in forecast[0, :]]
+
+def make_forecasts(model, n_batch, train, test, n_lag, n_ahead):
+    forecasts = list()
+    for i in range(len(test)):
+        X = test[i, :-n_ahead]
+        # make forecast
+        forecast = forecast_lstm(model, X, n_batch, n_lag)
+        # store the forecast
+        forecasts.append(forecast)
+    return forecasts
+
+def evaluate_forecasts(y, forecasts, n_lag, n_seq):
+    sum_rmse = []
+    for i in range(n_seq):
+        actual = [row[i] for row in y]
+        predicted = [forecast[i] for forecast in forecasts]
+        rmse = sqrt(mean_squared_error(actual, predicted))
+        print('t+%d RMSE: %f' % ((i+1), rmse))
+        sum_rmse.append(rmse) 
+    print("%.3f" % ((sum_rmse[0]+sum_rmse[1]+sum_rmse[2]+sum_rmse[3]+sum_rmse[4]+sum_rmse[5])/6))
+    print("%.3f" % ((sum_rmse[0]+sum_rmse[1]+sum_rmse[2]+sum_rmse[3]+sum_rmse[4]+sum_rmse[5]+sum_rmse[6]+sum_rmse[7]+sum_rmse[8])/9))
+    print("%.3f" % ((sum_rmse[0]+sum_rmse[1]+sum_rmse[2]+sum_rmse[3]+sum_rmse[4]+sum_rmse[5]+sum_rmse[6]+sum_rmse[7]+sum_rmse[8]+sum_rmse[9]+sum_rmse[10]+sum_rmse[11])/12))
+        
+# plot the forecasts in the context of the original dataset, multiple segments
+def plot_forecasts(series, forecasts, n_test, xlim, ylim, n_ahead, linestyle = None):
+    # plot the entire dataset in blue
+    pyplot.figure()
+    if linestyle==None:
+        pyplot.plot(series, label='observed')
+    else:
+        pyplot.plot(series, linestyle, label='observed')
+    pyplot.xlim(xlim, ylim)
+    pyplot.legend(loc='upper right')
+    # plot the forecasts in red
+    for i in range(len(forecasts)):
+        if i%n_ahead ==0: # this ensures not all segements are plotted, instead it is plotted every n_ahead
+            off_s = len(series) - n_test + 2 + i - 1
+            off_e = off_s + len(forecasts[i]) + 1
+            xaxis = [x for x in range(off_s, off_e)]
+            yaxis = [series[off_s]] + forecasts[i] 
+            pyplot.plot(xaxis, yaxis, 'r')
+            # print(off_s, off_e)
+    # show the plot
+    pyplot.show()
 
 # load dataset
-dataset = read_csv('../../data/oni/csv/all_nino_anomaly.csv', header=0, index_col=0)
+df = read_csv('../../data/oni/csv/all_nino_anomaly.csv', header=0, index_col=0)
+df = (df - df.mean()) / df.std()
 
-# plot
-# values = dataset.values
-# # specify columns to plot
-# groups = [0, 1, 2, 3]
-# i = 1
-# # plot each column
-# pyplot.figure()
-# for group in groups:
-# 	pyplot.subplot(len(groups), 1, i)
-# 	pyplot.plot(values[:, group])
-# 	pyplot.title(dataset.columns[group], y=0.5, loc='right')
-# 	i += 1
-# pyplot.show()
+cols = df.columns.tolist()
+cols = cols[1:] + cols[:1]
 
+df = df[cols]
+
+enso = df.values.astype('float32')
+# print(enso)
+
+# parameter setting
 lag = 12
 ahead = 12
-n_features = 4
-# load dataset
-values = dataset.values
-# integer encode direction
-# ensure all data is float
-values = values.astype('float32')
+n_test = 96
 
-# normalize features (you can skip it)
-scaler = MinMaxScaler(feature_range=(0, 1))
-scaled = scaler.fit_transform(values)
-# frame as supervised learning
-reframed = series_to_supervised(scaled, lag, 1)
+reframed = series_to_supervised(enso, lag, ahead)
 # print(reframed.head())
 
-# split into train and test sets
+# Define and Fit Model
 values = reframed.values
-n_train_hours = -96
-train = values[:n_train_hours, :]
-test = values[n_train_hours:, :]
-# split into input and outputs
-n_obs = 12 * 4
-train_X, train_y = train[:, :n_obs], train[:, -n_features]
-test_X, test_y = test[:, :n_obs], test[:, -n_features]
-# print(train_X.shape, len(train_X), train_y.shape)
-# reshape input to be 3D [samples, timesteps, features]
-train_X = train_X.reshape((train_X.shape[0], 12, n_features))
-test_X = test_X.reshape((test_X.shape[0], 12, n_features))
+n_train = int(len(values) - n_test)
 
-# design network
-model = Sequential()
-model.add(LSTM(1, input_shape=(train_X.shape[1], train_X.shape[2])))
-model.add(Dense(1))
-model.compile(loss='mean_squared_error', optimizer='adam')
-print(model.summary())
-# fit network
-history = model.fit(train_X, train_y, epochs=3, batch_size=1, validation_data=(test_X, test_y), verbose=1, shuffle=False)
-# plot history
-pyplot.plot(history.history['loss'], label='train')
-pyplot.plot(history.history['val_loss'], label='test')
-pyplot.legend()
-pyplot.show()
- 
-# make a prediction
-yhat = model.predict(test_X)
-test_X = test_X.reshape((test_X.shape[0], 12*4))
-# invert scaling for forecast
-inv_yhat = concatenate((yhat, test_X[:, -3:]), axis=1)
-inv_yhat = scaler.inverse_transform(inv_yhat)
-inv_yhat = inv_yhat[:,0]
-# invert scaling for actual
-test_y = test_y.reshape((len(test_y), 1))
-inv_y = concatenate((test_y, test_X[:, -3:]), axis=1)
-inv_y = scaler.inverse_transform(inv_y)
-inv_y = inv_y[:,0]
-# calculate RMSE
-rmse = sqrt(mean_squared_error(inv_y, inv_yhat))
-print('Test RMSE: %.3f' % rmse)
+train = values[:n_train, :]
+
+test = values[n_train:, :]
+
+model = fit_lstm(train, lag, ahead, 1, 30, 30)
+
+file_path = 'my_model.h5'
+model.save(file_path)
+
+forecasts = make_forecasts(model, 1, train, test, lag, ahead)
+
+# evaluate forecasts
+actual = [row[-ahead:] for row in test]
+evaluate_forecasts(actual, forecasts, lag, ahead)
+
+# plot forecasts
+# print(df['soi'].values)
+plot_forecasts(df['NINO3_4'].values, forecasts, test.shape[0] + ahead - 1, 0, len(values), ahead)
+plot_forecasts(df['NINO3_4'].values, forecasts, test.shape[0] + ahead - 1, len(values) - n_test, len(values), ahead, 'go')
+
+
