@@ -21,7 +21,9 @@ from sklearn.preprocessing import MinMaxScaler
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.layers import LSTM
+from keras.models import load_model
 from numpy import array
+import os.path
 
 # convert time series into supervised learning problem
 def series_to_supervised(data, n_in=1, n_out=1, dropnan=True):
@@ -95,7 +97,7 @@ def fit_lstm(train, n_lag, n_seq, n_batch, nb_epoch, n_neurons):
 	#     model.fit(X, y, epochs=1, batch_size=n_batch, verbose=1, shuffle=False)
 	#     model.reset_states()
 
-    model.fit(X, y, epochs=10, batch_size=n_batch, verbose=1, shuffle=False)
+    model.fit(X, y, epochs=nb_epoch, batch_size=n_batch, verbose=1, shuffle=False)
     return model
 
 # make one forecast with an LSTM,
@@ -164,16 +166,19 @@ def evaluate_forecasts(test, forecasts, n_lag, n_seq):
     # print('12 month RMSE Avg: %f' % ((sum_rmse[0]+sum_rmse[1]+sum_rmse[2]+sum_rmse[3]+sum_rmse[4]+sum_rmse[5]+sum_rmse[6]+sum_rmse[7]+sum_rmse[8]+sum_rmse[9]+sum_rmse[10]+sum_rmse[11])/12))
 
 # plot the forecasts in the context of the original dataset
-def plot_forecasts(series, forecasts, n_test):
-	# plot the entire dataset in blue
-	pyplot.plot(series.values)
+def plot_forecasts(series, forecasts, n_test, linestyle = None):
+    	# plot the entire dataset in blue
+	pyplot.plot(series.values, label='observed')
+	pyplot.title("oni_singlevariate_multistep_timeseries")
+	pyplot.legend(loc='upper right')
 	# plot the forecasts in red
 	for i in range(len(forecasts)):
-		off_s = len(series) - n_test + i - 1
-		off_e = off_s + len(forecasts[i]) + 1
-		xaxis = [x for x in range(off_s, off_e)]
-		yaxis = [series.values[off_s]] + forecasts[i]
-		pyplot.plot(xaxis, yaxis, color='red')
+		if i%n_seq == 0 and i != 0:
+		    off_s = len(series) - n_test + i - 1
+		    off_e = off_s + len(forecasts[i]) + 1
+		    xaxis = [x for x in range(off_s, off_e)]
+		    yaxis = [series.values[off_s]] + forecasts[i]
+		    pyplot.plot(xaxis, yaxis, color='red')
 	# show the plot
 	pyplot.show()
 
@@ -193,7 +198,15 @@ n_neurons = 20
 # prepare data
 scaler, train, test = prepare_data(series, n_test, n_lag, n_seq)
 # fit model
-model = fit_lstm(train, n_lag, n_seq, n_batch, n_epochs, n_neurons)
+
+file_path = 'my_model.h5'
+
+if not os.path.exists(file_path):
+    model = fit_lstm(train, n_lag, n_seq, n_batch, n_epochs, n_neurons)
+    model.save(file_path)
+else:
+    model = load_model(file_path)
+
 # make forecasts
 forecasts = make_forecasts(model, n_batch, train, test, n_lag, n_seq)
 # inverse transform forecasts and test

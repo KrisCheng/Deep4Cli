@@ -24,7 +24,9 @@ from sklearn.metrics import mean_squared_error
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.layers import LSTM
+from keras.models import load_model
 from matplotlib import pyplot
+import os.path
 
 # convert series to supervised learning
 def series_to_supervised(data, n_in=1, n_out=1, dropnan=True):
@@ -60,9 +62,15 @@ def fit_lstm(train, n_lag, n_ahead, n_batch, nb_epoch, n_neurons):
 
     # design network
     model = Sequential()
+    # single layer
     model.add(LSTM(n_neurons, batch_input_shape=(n_batch, X.shape[1], X.shape[2]), stateful=True))
+    # multi layer
+    # model.add(LSTM(n_neurons, return_sequences=True, batch_input_shape=(n_batch, X.shape[1], X.shape[2]), stateful=True))
+    # model.add(LSTM(n_neurons))
+    
     model.add(Dense(n_ahead))
     model.compile(loss='mean_squared_error', optimizer='adam')
+    print(model.summary())
     # fit network
     for i in range(nb_epoch):
         model.fit(X, y, epochs=1, batch_size=n_batch, verbose=1, shuffle=False)
@@ -93,26 +101,26 @@ def evaluate_forecasts(y, forecasts, n_lag, n_seq):
         actual = [row[i] for row in y]
         predicted = [forecast[i] for forecast in forecasts]
         rmse = sqrt(mean_squared_error(actual, predicted))
-        print('t+%d RMSE: %f' % ((i+1), rmse))
+        print('%.3f' % ((i+1), rmse))
         sum_rmse.append(rmse) 
     print("%.3f" % ((sum_rmse[0]+sum_rmse[1]+sum_rmse[2]+sum_rmse[3]+sum_rmse[4]+sum_rmse[5])/6))
     print("%.3f" % ((sum_rmse[0]+sum_rmse[1]+sum_rmse[2]+sum_rmse[3]+sum_rmse[4]+sum_rmse[5]+sum_rmse[6]+sum_rmse[7]+sum_rmse[8])/9))
     print("%.3f" % ((sum_rmse[0]+sum_rmse[1]+sum_rmse[2]+sum_rmse[3]+sum_rmse[4]+sum_rmse[5]+sum_rmse[6]+sum_rmse[7]+sum_rmse[8]+sum_rmse[9]+sum_rmse[10]+sum_rmse[11])/12))
         
 # plot the forecasts in the context of the original dataset, multiple segments
-def plot_forecasts(series, forecasts, n_test, xlim, ylim, n_ahead, linestyle = None):
+def plot_forecasts(series, forecasts, n_test, linestyle = None):
     # plot the entire dataset in blue
     pyplot.figure()
     if linestyle==None:
         pyplot.plot(series, label='observed')
     else:
         pyplot.plot(series, linestyle, label='observed')
-    pyplot.xlim(xlim, ylim)
+    pyplot.title("oni_multivariate_multistep_timeseries")
     pyplot.legend(loc='upper right')
     # plot the forecasts in red
     for i in range(len(forecasts)):
-        if i%n_ahead ==0: # this ensures not all segements are plotted, instead it is plotted every n_ahead
-            off_s = len(series) - n_test + 2 + i - 1
+        if i%n_seq ==0 and i != 0: # this ensures not all segements are plotted, instead it is plotted every n_ahead
+            off_s = len(series) - n_test + i - 1
             off_e = off_s + len(forecasts[i]) + 1
             xaxis = [x for x in range(off_s, off_e)]
             yaxis = [series[off_s]] + forecasts[i] 
@@ -131,14 +139,19 @@ cols = cols[1:] + cols[:1]
 df = df[cols]
 
 enso = df.values.astype('float32')
+
 # print(enso)
 
 # parameter setting
-lag = 12
-ahead = 12
+n_lag = 12
+n_seq = 12
 n_test = 96
+n_epochs = 10
+n_neurons = 1
+n_batch = 1
 
-reframed = series_to_supervised(enso, lag, ahead)
+reframed = series_to_supervised(enso, n_lag, n_seq)
+# print(reframed)
 # print(reframed.head())
 
 # Define and Fit Model
@@ -149,20 +162,24 @@ train = values[:n_train, :]
 
 test = values[n_train:, :]
 
-model = fit_lstm(train, lag, ahead, 1, 30, 30)
+file_path = 'mse_multi_var_nino34.h5'
+if not os.path.exists(file_path):
+    model = fit_lstm(train, n_lag, n_seq, n_batch, n_epochs, n_neurons)
+    model.save(file_path)
+else:
+    model = load_model(file_path)
 
-file_path = 'my_model.h5'
-model.save(file_path)
 
-forecasts = make_forecasts(model, 1, train, test, lag, ahead)
+forecasts = make_forecasts(model, n_batch, train, test, n_lag, n_seq)
 
 # evaluate forecasts
-actual = [row[-ahead:] for row in test]
-evaluate_forecasts(actual, forecasts, lag, ahead)
+actual = [row[-n_seq:] for row in test]
+evaluate_forecasts(actual, forecasts, n_lag, n_seq)
 
 # plot forecasts
 # print(df['soi'].values)
-plot_forecasts(df['NINO3_4'].values, forecasts, test.shape[0] + ahead - 1, 0, len(values), ahead)
-plot_forecasts(df['NINO3_4'].values, forecasts, test.shape[0] + ahead - 1, len(values) - n_test, len(values), ahead, 'go')
+# print(len(values))
+# plot_forecasts(df['NINO3_4'].values, forecasts, test.shape[0] + n_seq - 1, 0, len(values), n_seq)
+plot_forecasts(df['NINO3_4'][-96:].values, forecasts, n_test+11)
 
 

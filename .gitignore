@@ -4,3 +4,4 @@ Deep4Cli.iml
 *.csv
 data
 model
+*.h5

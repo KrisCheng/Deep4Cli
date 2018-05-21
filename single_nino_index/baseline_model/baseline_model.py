@@ -74,6 +74,7 @@ def evaluate_forecasts(test, forecasts, n_lag, n_seq):
     for i in range(n_seq):
         actual = test[:,(n_lag+i)]
         predicted = [forecast[i] for forecast in forecasts]
+        # print(len(predicted))
         rmse = sqrt(mean_squared_error(actual, predicted))
         sum_rmse.append(rmse)
         # print('t+%d RMSE: %f' % ((i+1), rmse))
@@ -88,17 +89,17 @@ def evaluate_forecasts(test, forecasts, n_lag, n_seq):
 # plot the forecasts in the context of the original dataset
 def plot_forecasts(series, forecasts, n_test):
 	# plot the entire dataset in blue
-	# print(series.values)
-	pyplot.plot(series.values)
+	pyplot.plot(series.values, label='observed')
+	pyplot.legend(loc='upper right')
+	pyplot.title("oni_baseline_timeseries")
 	# plot the forecasts in red
 	for i in range(len(forecasts)):
-		off_s = len(series) - n_test + i - 1
-		off_e = off_s + len(forecasts[i]) + 1
-		# print(off_e)
-		xaxis = [x for x in range(off_s, off_e)]
-		yaxis = [series.values[off_s]] + forecasts[i]
-	# 	# print(yaxis)
-		pyplot.plot(xaxis, yaxis, color='red')
+		if i%n_seq == 0 and i != 0:
+		    off_s = len(series) - n_test + i - 1
+		    off_e = off_s + len(forecasts[i]) + 1
+		    xaxis = [x for x in range(off_s, off_e)]
+		    yaxis = [series.values[off_s]] + forecasts[i]
+		    pyplot.plot(xaxis, yaxis, color='red')
 	# show the plot
 	pyplot.show()
 
@@ -109,10 +110,11 @@ n_seq = 12
 n_test = 96
 # prepare data
 train, test = prepare_data(series, n_test, n_lag, n_seq)
+
 # make forecasts
 forecasts = make_forecasts(train, test, n_lag, n_seq)
 # evaluate forecasts
 evaluate_forecasts(test, forecasts, n_lag, n_seq)
 # plot forecasts
 # print(forecasts)
-plot_forecasts(series[-96:], forecasts, n_test+11)
+# plot_forecasts(series[-96:], forecasts, n_test+11)
