@@ -63,18 +63,21 @@ def fit_lstm(train, n_lag, n_ahead, n_batch, nb_epoch, n_neurons):
     # design network
     model = Sequential()
     # single layer
-    model.add(LSTM(n_neurons, batch_input_shape=(n_batch, X.shape[1], X.shape[2]), stateful=True))
+    # model.add(LSTM(n_neurons, batch_input_shape=(n_batch, X.shape[1], X.shape[2]), stateful=True))
     # multi layer
-    # model.add(LSTM(n_neurons, return_sequences=True, batch_input_shape=(n_batch, X.shape[1], X.shape[2]), stateful=True))
-    # model.add(LSTM(n_neurons))
+    model.add(LSTM(n_neurons, return_sequences=True, batch_input_shape=(n_batch, X.shape[1], X.shape[2]), stateful=True))
+    model.add(LSTM(n_neurons))
     
     model.add(Dense(n_ahead))
     model.compile(loss='mean_squared_error', optimizer='adam')
     print(model.summary())
     # fit network
-    for i in range(nb_epoch):
-        model.fit(X, y, epochs=1, batch_size=n_batch, verbose=1, shuffle=False)
-        model.reset_states()
+
+    # for i in range(nb_epoch):
+	#     model.fit(X, y, epochs=1, batch_size=n_batch, verbose=1, shuffle=False)
+	#     model.reset_states()
+
+    model.fit(X, y, epochs=nb_epoch, batch_size=n_batch, verbose=1, shuffle=False)
     return model
 
 def forecast_lstm(model, X, n_batch, n_lag):
@@ -101,7 +104,7 @@ def evaluate_forecasts(y, forecasts, n_lag, n_seq):
         actual = [row[i] for row in y]
         predicted = [forecast[i] for forecast in forecasts]
         rmse = sqrt(mean_squared_error(actual, predicted))
-        print('%.3f' % ((i+1), rmse))
+        print('%.3f' % rmse)
         sum_rmse.append(rmse) 
     print("%.3f" % ((sum_rmse[0]+sum_rmse[1]+sum_rmse[2]+sum_rmse[3]+sum_rmse[4]+sum_rmse[5])/6))
     print("%.3f" % ((sum_rmse[0]+sum_rmse[1]+sum_rmse[2]+sum_rmse[3]+sum_rmse[4]+sum_rmse[5]+sum_rmse[6]+sum_rmse[7]+sum_rmse[8])/9))
@@ -146,8 +149,8 @@ enso = df.values.astype('float32')
 n_lag = 12
 n_seq = 12
 n_test = 96
-n_epochs = 10
-n_neurons = 1
+n_epochs = 3
+n_neurons = 20
 n_batch = 1
 
 reframed = series_to_supervised(enso, n_lag, n_seq)
@@ -165,7 +168,7 @@ test = values[n_train:, :]
 file_path = 'mse_multi_var_nino34.h5'
 if not os.path.exists(file_path):
     model = fit_lstm(train, n_lag, n_seq, n_batch, n_epochs, n_neurons)
-    model.save(file_path)
+    # model.save(file_path)
 else:
     model = load_model(file_path)
 

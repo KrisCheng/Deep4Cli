@@ -93,6 +93,7 @@ def fit_lstm(train, n_lag, n_seq, n_batch, nb_epoch, n_neurons):
     model.compile(loss='mean_squared_error', optimizer='adam')
     print(model.summary())
 	# fit network
+	
     # for i in range(nb_epoch):
 	#     model.fit(X, y, epochs=1, batch_size=n_batch, verbose=1, shuffle=False)
 	#     model.reset_states()

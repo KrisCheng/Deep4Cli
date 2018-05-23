@@ -88,7 +88,7 @@ def fit_lstm(train, batch_size, nb_epoch, neurons):
 	pyplot.show()
 
 	# save the trained model
-	model.save('100e_mse_nino34_model.h5')
+	# model.save('100e_mse_nino34_model.h5')
 
 	return model
  
@@ -131,10 +131,10 @@ train, test = supervised_values[0:-228], supervised_values[-228:]
 scaler, train_scaled, test_scaled = scale(train, test)
  
 # fit the model
-# lstm_model = fit_lstm(train_scaled, 1, 100, 40)
+lstm_model = fit_lstm(train_scaled, 1, 10, 40)
 
 # load the exist model
-lstm_model = load_model('100e_mse_nino34_model.h5')
+# lstm_model = load_model('100e_mse_nino34_model.h5')
 
 # forecast the entire training dataset to build up state for forecasting
 train_reshaped = train_scaled[:, 0].reshape(len(train_scaled), 1, 1)
@@ -166,7 +166,6 @@ for i in range(len(test_scaled)):
     temp = str(str(currentYear) + '/' + str(currentMonth))
     time.append(temp)
     currentMonth = currentMonth + 1
-
     print('Month=%s, Predicted=%f, Expected=%f' % (temp, yhat, expected))
 
 # report performance

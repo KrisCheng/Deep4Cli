@@ -108,7 +108,7 @@ time series prediction, deep neural networks, ENSO.
 	* Traditional Machine Learning ( SVR, NN etc. )***Ref:***
 1. Final Report for “Machine learning applications in oceanography” ( on [GitHub](https://github.com/Yongyao/enso-forcasting) )
 
-	*  Four other index ( SOI, PNA, Nino3, precipitation ) --> ONI
+	*  Four other index ( SOI, PNA, Nino3, precipitation，ONI ) --> SOI
 	*  LSTM model, random forest, linear regression
 
 2. [Nino3 / 4 / 3.4 index Data (1870~2018)](https://www.esrl.noaa.gov/psd/gcos_wgsp/Timeseries/Nino34/) （ Raw Data ）
@@ -132,6 +132,16 @@ time series prediction, deep neural networks, ENSO.
 
 
 8. [How to Make Baseline Predictions for Time Series Forecasting with Python](https://machinelearningmastery.com/persistence-time-series-forecasting-with-python/) ( using current stage as the prediction of the next several steps )
+
+
+9. [How To Backtest Machine Learning Models for Time Series Forecasting](https://machinelearningmastery.com/backtest-machine-learning-models-time-series-forecasting/)
+
+	* *"A model that remembered the timestamps and value for each observation
+would achieve perfect performance."*
+	* Train-Test Split
+	* Multiple Train-Test Splits
+	* *"Walk-forward validation is the gold standard of model evaluation. It is the k-fold cross validation of the time series world and is recommended for your own projects."* 
+
 
 #### 4.2	Grid Spatiotemporal SST Region Prediction
 

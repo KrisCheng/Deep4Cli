@@ -117,4 +117,4 @@ forecasts = make_forecasts(train, test, n_lag, n_seq)
 evaluate_forecasts(test, forecasts, n_lag, n_seq)
 # plot forecasts
 # print(forecasts)
-# plot_forecasts(series[-96:], forecasts, n_test+11)
+plot_forecasts(series[-96:], forecasts, n_test+11)
