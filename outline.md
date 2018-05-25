@@ -1,4 +1,4 @@
-# Using Deep Neural Networks to Predict ENSO
+# Multivariate Time Series Forecasting with LSTM for ENSO Case
 
 ***Manuscript Version***Bin Mu, Cheng Peng and Shijin Yuan(✉) 
 School of Software Engineering, Tongji University, Shanghai 201804, China
@@ -91,7 +91,7 @@ time series prediction, deep neural networks, ENSO.
 1. 《Deep Learning for Precipitation Nowcasting - A Benchmark and A New Model》### 3	Model
 #### 3.1	Multi-layer LSTM Blocks
 
-***Outline:***the structure of multi LSTM for single variable prediction***Ref:***#### 3.2	CNN–LSTM Spatiotemporal Model
+***Outline:***the structure of multi LSTM for single variable prediction***Ref:***#### ~~3.2	CNN–LSTM Spatiotemporal Model~~
 
 ***Outline:***
 The structure and detail description of the network (how to capture spatio and temporal structure independently)***Ref:***### 4 Experiment and Results
@@ -143,7 +143,7 @@ would achieve perfect performance."*
 	* *"Walk-forward validation is the gold standard of model evaluation. It is the k-fold cross validation of the time series world and is recommended for your own projects."* 
 
 
-#### 4.2	Grid Spatiotemporal SST Region Prediction
+#### ~~4.2	Grid Spatiotemporal SST Region Prediction~~
 
 ***Outline:***1.	Different models for grid experiment (todo)***Ref:***
 ### 5 Conclusion and Future WorkTodo### Writing Skill:

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 '''
-Desc:  apply the LSTM model, on the oni index anomaly dataset, based on keras (from 1870~2017, monthly).
+Desc:  apply the LSTM model for one-step univariate time series forecasting, on the oni index anomaly dataset, based on keras (from 1870~2017, monthly data).
 DataSource: https://www.esrl.noaa.gov/psd/gcos_wgsp/Timeseries/
 Reference: https://machinelearningmastery.com/time-series-forecasting-long-short-term-memory-network-python/
 Author: Kris Peng
