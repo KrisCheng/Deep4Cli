@@ -21,6 +21,7 @@ from sklearn.preprocessing import MinMaxScaler
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.layers import LSTM
+from keras.layers import Flatten
 from keras.models import load_model
 from numpy import array
 import os.path
@@ -83,22 +84,35 @@ def fit_lstm(train, n_lag, n_seq, n_batch, nb_epoch, n_neurons):
     X = X.reshape(X.shape[0], 1, X.shape[1])
 	# design network
     model = Sequential()
-    # single layer
-    model.add(LSTM(n_neurons, batch_input_shape=(n_batch, X.shape[1], X.shape[2]), stateful=True))
 
-    # multi layer
+    # single layer LSTM
+    # model.add(LSTM(n_neurons, batch_input_shape=(n_batch, X.shape[1], X.shape[2]), stateful=True))
+
+    # multi layer LSTM
     # model.add(LSTM(n_neurons, return_sequences=True, batch_input_shape=(n_batch, X.shape[1], X.shape[2]), stateful=True))
     # model.add(LSTM(n_neurons))
+
+    # MLP Model
+    model.add(Dense(n_neurons, batch_input_shape=(n_batch, X.shape[1], X.shape[2]), activation='relu'))
+    model.add(Dense(n_neurons))
+    model.add(Flatten())
+
     model.add(Dense(y.shape[1]))
     model.compile(loss='mean_squared_error', optimizer='adam')
     print(model.summary())
+
 	# fit network
-	
     # for i in range(nb_epoch):
 	#     model.fit(X, y, epochs=1, batch_size=n_batch, verbose=1, shuffle=False)
 	#     model.reset_states()
-
-    model.fit(X, y, epochs=nb_epoch, batch_size=n_batch, verbose=1, shuffle=False)
+	
+    history = model.fit(X, y, epochs=nb_epoch, batch_size=n_batch, verbose=1, shuffle=False)
+    pyplot.plot(history.history['loss'])
+    pyplot.title('model loss')
+    pyplot.ylabel('loss')
+    pyplot.xlabel('epoch')
+    pyplot.legend(['train', 'test'], loc='upper left')
+    pyplot.show()
     return model
 
 # make one forecast with an LSTM,
@@ -191,7 +205,7 @@ series = read_csv('../../data/oni/csv/nino3_4_anomaly.csv', header=0, parse_date
 n_lag = 12
 n_seq = 12
 n_test = 96
-n_epochs = 5
+n_epochs = 30
 n_batch = 1
 n_neurons = 20
 
@@ -204,7 +218,7 @@ file_path = 'my_model.h5'
 
 if not os.path.exists(file_path):
     model = fit_lstm(train, n_lag, n_seq, n_batch, n_epochs, n_neurons)
-    model.save(file_path)
+    # model.save(file_path)
 else:
     model = load_model(file_path)
 

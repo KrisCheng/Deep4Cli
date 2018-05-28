@@ -96,7 +96,14 @@ time series prediction, deep neural networks, ENSO.
 ***Outline:***
 The structure and detail description of the network (how to capture spatio and temporal structure independently)***Ref:***### 4 Experiment and Results
 #### 4.1	Single Niño Index Prediction
-***Outline:***1.	Connect those single nino index experiment together
+***Outline:***Framework:
+
+* Single Variable Single Step ( SVSS )
+* Single Variable Multi Step ( SVMS )
+* Multi Variable Single Step ( MVSS )
+* Multi Variable Multi Step ( MVMS )1.	Connect those single nino index experiment together ( single variabte && multivariate )
+
+	Evaluation: Walk-forward Model Validation
 
 	* the single nino index predition with different LSTM networks ( Nino3 / Nino4 / Nino3.4 )
 	* different LSTM cell && different LSTM layers && parameters setting
@@ -104,8 +111,10 @@ time series prediction, deep neural networks, ENSO.
 2.	Compare the result with different statistical approaches. (todo)
 
 	* Baseline prediction ( naive method ) [8]
+	* Traditional Machine Learning ( SVR, Random Forecast, MLP etc. )
 	* ARIMA model ( Statistics model )
-	* Traditional Machine Learning ( SVR, NN etc. )***Ref:***
+
+3. Develop a Robust Result ( Randomness in Machine Learning ) ***Ref:***
 1. Final Report for “Machine learning applications in oceanography” ( on [GitHub](https://github.com/Yongyao/enso-forcasting) )
 
 	*  Four other index ( SOI, PNA, Nino3, precipitation，ONI ) --> SOI

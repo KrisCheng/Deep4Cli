@@ -2,7 +2,9 @@
 # -*- coding: utf-8 -*-
 
 '''
-Desc:  apply the LSTM model for one-step univariate time series forecasting, on the oni index anomaly dataset, based on keras (from 1870~2017, monthly data).
+Desc:  apply the LSTM model for one-step univariate time series forecasting, on the oni index anomaly dataset,
+	   Walk-forward Model Validation,
+	   based on keras (from 1870~2017, monthly data).
 DataSource: https://www.esrl.noaa.gov/psd/gcos_wgsp/Timeseries/
 Reference: https://machinelearningmastery.com/time-series-forecasting-long-short-term-memory-network-python/
 Author: Kris Peng
@@ -75,10 +77,12 @@ def fit_lstm(train, batch_size, nb_epoch, neurons):
 	model.add(Dense(1))
 	model.compile(loss = 'mean_squared_error', optimizer = 'adam')
 	print(model.summary())
-	# TODO: why?? (同一个模型多次训练？？而且每次仅仅一轮)
+
+	# TODO: why?? (同一个模型多次训练？？而且每次仅仅一轮, stateful or not)
 	# for i in range(nb_epoch): 
 		# model.fit(X, y, epochs = 1, batch_size = batch_size, verbose = 1, shuffle = False)
 		# model.reset_states()
+	
 	history = model.fit(X, y, epochs = nb_epoch, batch_size = batch_size, verbose = 1, shuffle = False)
 	pyplot.plot(history.history['loss'])
 	pyplot.title('model loss')
@@ -107,7 +111,7 @@ def forecast_lstm(model, batch_size, X):
 # raw_values = raw_values[0]
 
 # from csv
-raw = '../../data/oni/csv/nino4_anomaly.csv'
+raw = '../../data/oni/csv/nino3_4_anomaly.csv'
 series = pandas.read_csv(raw, header=0, parse_dates=[0], index_col=0, squeeze=True)
 # transform to supervised learning
 raw_values = series.values
@@ -131,7 +135,7 @@ train, test = supervised_values[0:-228], supervised_values[-228:]
 scaler, train_scaled, test_scaled = scale(train, test)
  
 # fit the model
-lstm_model = fit_lstm(train_scaled, 1, 10, 40)
+lstm_model = fit_lstm(train_scaled, 1, 1, 40)
 
 # load the exist model
 # lstm_model = load_model('100e_mse_nino34_model.h5')
@@ -150,6 +154,8 @@ predictions = list()
 for i in range(len(test_scaled)):
     # make one-step forecast
     X, y = test_scaled[i, 0:-1], test_scaled[i, -1]
+    # print(X)
+    # print(y)
     yhat = forecast_lstm(lstm_model, 1, X)
     # invert scaling
     yhat = invert_scale(scaler, X, yhat)

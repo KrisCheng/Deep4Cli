@@ -18,8 +18,6 @@ from matplotlib import pyplot
 from pandas import read_csv
 from pandas import DataFrame
 from pandas import concat
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import mean_squared_error
 from keras.models import Sequential
 from keras.layers import Dense
@@ -73,11 +71,11 @@ def fit_lstm(train, n_lag, n_ahead, n_batch, nb_epoch, n_neurons):
     print(model.summary())
     # fit network
 
-    # for i in range(nb_epoch):
-	#     model.fit(X, y, epochs=1, batch_size=n_batch, verbose=1, shuffle=False)
-	#     model.reset_states()
+    for i in range(nb_epoch):
+	    model.fit(X, y, epochs=1, batch_size=n_batch, verbose=1, shuffle=False)
+	    model.reset_states()
 
-    model.fit(X, y, epochs=nb_epoch, batch_size=n_batch, verbose=1, shuffle=False)
+    # model.fit(X, y, epochs=nb_epoch, batch_size=n_batch, verbose=1, shuffle=False)
     return model
 
 def forecast_lstm(model, X, n_batch, n_lag):
