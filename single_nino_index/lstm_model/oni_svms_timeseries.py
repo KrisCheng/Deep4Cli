@@ -68,6 +68,7 @@ def prepare_data(series, n_test, n_lag, n_seq):
 	diff_values = diff_values.reshape(len(diff_values), 1)
 	# rescale values to -1, 1
 	scaler = MinMaxScaler(feature_range=(-1, 1))
+	# scaled_values = diff_values
 	scaled_values = scaler.fit_transform(diff_values)
 	scaled_values = scaled_values.reshape(len(scaled_values), 1)
 	# transform into supervised learning problem X, y
@@ -75,6 +76,7 @@ def prepare_data(series, n_test, n_lag, n_seq):
 	supervised_values = supervised.values
 	# split into train and test sets
 	train, test = supervised_values[0:-n_test], supervised_values[-n_test:]
+	# print(train[0])
 	return scaler, train, test
 
 # fit an LSTM network to training data
@@ -101,7 +103,7 @@ def fit_lstm(train, n_lag, n_seq, n_batch, nb_epoch, n_neurons):
     model.compile(loss='mean_squared_error', optimizer='adam')
     print(model.summary())
 
-	# fit network
+	# fit network, stateful version 
     # for i in range(nb_epoch):
 	#     model.fit(X, y, epochs=1, batch_size=n_batch, verbose=1, shuffle=False)
 	#     model.reset_states()
@@ -205,15 +207,15 @@ series = read_csv('../../data/oni/csv/nino3_4_anomaly.csv', header=0, parse_date
 n_lag = 12
 n_seq = 12
 n_test = 96
-n_epochs = 30
+n_epochs = 10
 n_batch = 1
 n_neurons = 20
 
 # LSTM model
 # prepare data
 scaler, train, test = prepare_data(series, n_test, n_lag, n_seq)
-# fit model
 
+# fit model
 file_path = 'my_model.h5'
 
 if not os.path.exists(file_path):
@@ -225,9 +227,9 @@ else:
 # make forecasts
 forecasts = make_forecasts(model, n_batch, train, test, n_lag, n_seq)
 # inverse transform forecasts and test
-forecasts = inverse_transform(series, forecasts, scaler, n_test+2)
+forecasts = inverse_transform(series, forecasts, scaler, n_test+11)
 actual = [row[n_lag:] for row in test]
-actual = inverse_transform(series, actual, scaler, n_test+2)
+actual = inverse_transform(series, actual, scaler, n_test+11)
 # evaluate forecasts
 evaluate_forecasts(actual, forecasts, n_lag, n_seq)
 # plot forecasts

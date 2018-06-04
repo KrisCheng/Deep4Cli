@@ -51,6 +51,14 @@ def series_to_supervised(data, n_in=1, n_out=1, dropnan=True):
         agg.dropna(inplace=True)
     return agg
 
+# create a differenced series
+def difference(dataset, interval=1):
+	diff = list()
+	for i in range(interval, len(dataset)):
+		value = dataset[i] - dataset[i - interval]
+		diff.append(value)
+	return Series(diff)
+
 def fit_lstm(train, n_lag, n_ahead, n_batch, nb_epoch, n_neurons):
     # reshape training into [samples, timesteps, features]
     X, y = train[:, :-n_ahead], train[:, -n_ahead:]
@@ -132,6 +140,8 @@ def plot_forecasts(series, forecasts, n_test, linestyle = None):
 
 # load dataset
 df = read_csv('../../data/oni/csv/all_nino_anomaly.csv', header=0, index_col=0)
+
+# 标准化，使之符合正态分布
 df = (df - df.mean()) / df.std()
 
 cols = df.columns.tolist()
@@ -141,13 +151,11 @@ df = df[cols]
 
 enso = df.values.astype('float32')
 
-# print(enso)
-
 # parameter setting
 n_lag = 12
 n_seq = 12
 n_test = 96
-n_epochs = 3
+n_epochs = 5
 n_neurons = 20
 n_batch = 1
 
@@ -157,12 +165,14 @@ reframed = series_to_supervised(enso, n_lag, n_seq)
 
 # Define and Fit Model
 values = reframed.values
+# print(len(values))
 n_train = int(len(values) - n_test)
 
 train = values[:n_train, :]
 
 test = values[n_train:, :]
 
+# print(len(train[0]))
 file_path = 'mse_multi_var_nino34.h5'
 if not os.path.exists(file_path):
     model = fit_lstm(train, n_lag, n_seq, n_batch, n_epochs, n_neurons)
@@ -170,11 +180,11 @@ if not os.path.exists(file_path):
 else:
     model = load_model(file_path)
 
-
 forecasts = make_forecasts(model, n_batch, train, test, n_lag, n_seq)
-
+# forecasts = inverse_transform(series, forecasts, scaler, n_test+2)
 # evaluate forecasts
-actual = [row[-n_seq:] for row in test]
+actual = [row[n_lag:] for row in test]
+# actual = inverse_transform(series, actual, scaler, n_test+2)
 evaluate_forecasts(actual, forecasts, n_lag, n_seq)
 
 # plot forecasts

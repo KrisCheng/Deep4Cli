@@ -74,11 +74,11 @@ def evaluate_forecasts(test, forecasts, n_lag, n_seq):
     for i in range(n_seq):
         actual = test[:,(n_lag+i)]
         predicted = [forecast[i] for forecast in forecasts]
-        # print(len(predicted))
         rmse = sqrt(mean_squared_error(actual, predicted))
         sum_rmse.append(rmse)
         # print('t+%d RMSE: %f' % ((i+1), rmse))
         print("%.3f" % rmse)
+    # print(len(sum_rmse))
     print("%.3f" % ((sum_rmse[0]+sum_rmse[1]+sum_rmse[2]+sum_rmse[3]+sum_rmse[4]+sum_rmse[5])/6))
     print("%.3f" % ((sum_rmse[0]+sum_rmse[1]+sum_rmse[2]+sum_rmse[3]+sum_rmse[4]+sum_rmse[5]+sum_rmse[6]+sum_rmse[7]+sum_rmse[8])/9))
     print("%.3f" % ((sum_rmse[0]+sum_rmse[1]+sum_rmse[2]+sum_rmse[3]+sum_rmse[4]+sum_rmse[5]+sum_rmse[6]+sum_rmse[7]+sum_rmse[8]+sum_rmse[9]+sum_rmse[10]+sum_rmse[11])/12))
@@ -114,6 +114,7 @@ train, test = prepare_data(series, n_test, n_lag, n_seq)
 # make forecasts
 forecasts = make_forecasts(train, test, n_lag, n_seq)
 # evaluate forecasts
+
 evaluate_forecasts(test, forecasts, n_lag, n_seq)
 # plot forecasts
 # print(forecasts)

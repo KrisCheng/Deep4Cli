@@ -9,7 +9,7 @@ Todo
 The abstract should summarize the contents of the paper in short terms, i.e. 150-250 words.
 ### Keywords: 
 
-time series prediction, deep neural networks, ENSO.
+time series prediction, LSTM, ENSO.
 ### 1	Introduction***Outline:***1. the reason (significance) of study ENSO, traditional methods (statistical methods && regular machine learning methods) and limitations.
 
 	* *"The dynamical models use physical equations of the ocean and atmosphere to forecast ENSO event, which are computationally very expensive and not available outside the atmospheric scientific community."*
@@ -96,7 +96,7 @@ time series prediction, deep neural networks, ENSO.
 ***Outline:***
 The structure and detail description of the network (how to capture spatio and temporal structure independently)***Ref:***### 4 Experiment and Results
 #### 4.1	Single Niño Index Prediction
-***Outline:***Framework:
+***Outline:***Consider Data Analysis part.Framework:
 
 * Single Variable Single Step ( SVSS )
 * Single Variable Multi Step ( SVMS )
@@ -150,7 +150,6 @@ would achieve perfect performance."*
 	* Train-Test Split
 	* Multiple Train-Test Splits
 	* *"Walk-forward validation is the gold standard of model evaluation. It is the k-fold cross validation of the time series world and is recommended for your own projects."* 
-
 
 #### ~~4.2	Grid Spatiotemporal SST Region Prediction~~
 
