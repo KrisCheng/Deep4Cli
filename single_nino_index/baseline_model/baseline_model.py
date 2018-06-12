@@ -107,7 +107,7 @@ series = read_csv('../../data/oni/csv/nino3_4_anomaly.csv', header=0, parse_date
 # configure
 n_lag = 1
 n_seq = 12
-n_test = 96
+n_test = 360
 # prepare data
 train, test = prepare_data(series, n_test, n_lag, n_seq)
 
@@ -118,4 +118,4 @@ forecasts = make_forecasts(train, test, n_lag, n_seq)
 evaluate_forecasts(test, forecasts, n_lag, n_seq)
 # plot forecasts
 # print(forecasts)
-plot_forecasts(series[-96:], forecasts, n_test+11)
+plot_forecasts(series[-n_test:], forecasts, n_test+11)

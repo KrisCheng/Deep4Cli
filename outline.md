@@ -151,10 +151,11 @@ would achieve perfect performance."*
 	* Multiple Train-Test Splits
 	* *"Walk-forward validation is the gold standard of model evaluation. It is the k-fold cross validation of the time series world and is recommended for your own projects."* 
 
+10. [LSTM Climatological Time Series Analysis](https://github.com/danielefranceschi/lstm-climatological-time-series) ( GitHub )
 #### ~~4.2	Grid Spatiotemporal SST Region Prediction~~
 
 ***Outline:***1.	Different models for grid experiment (todo)***Ref:***
 ### 5 Conclusion and Future WorkTodo### Writing Skill:
 1. 《芝加哥大学论文写作指南》
 
-2. 《The-Science-of-Scientific-Writing》
+2. 《The-Science-of-Scientific-Writing》

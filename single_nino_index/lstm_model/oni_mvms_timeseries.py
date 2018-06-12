@@ -62,33 +62,47 @@ def difference(dataset, interval=1):
 def fit_lstm(train, n_lag, n_ahead, n_batch, nb_epoch, n_neurons):
     # reshape training into [samples, timesteps, features]
     X, y = train[:, :-n_ahead], train[:, -n_ahead:]
-    # X = X.reshape(X.shape[0], 1, X.shape[1])
-    X = X.reshape(X.shape[0], n_lag, int(X.shape[1]/n_lag))
+
+    X = X.reshape(X.shape[0], 1, X.shape[1])
+    # X = X.reshape(X.shape[0], n_lag, int(X.shape[1]/n_lag))
+
+
     # y = y.reshape(y.shape[0], 1, n_ahead)
 
     # design network
     model = Sequential()
     # single layer
-    # model.add(LSTM(n_neurons, batch_input_shape=(n_batch, X.shape[1], X.shape[2]), stateful=True))
+    model.add(LSTM(n_neurons, batch_input_shape=(n_batch, X.shape[1], X.shape[2]), stateful=True))
+    
     # multi layer
-    model.add(LSTM(n_neurons, return_sequences=True, batch_input_shape=(n_batch, X.shape[1], X.shape[2]), stateful=True))
-    model.add(LSTM(n_neurons))
+    # model.add(LSTM(n_neurons, return_sequences=True, batch_input_shape=(n_batch, X.shape[1], X.shape[2]), stateful=True))
+    # model.add(LSTM(n_neurons))
     
     model.add(Dense(n_ahead))
     model.compile(loss='mean_squared_error', optimizer='adam')
     print(model.summary())
     # fit network
 
-    for i in range(nb_epoch):
-	    model.fit(X, y, epochs=1, batch_size=n_batch, verbose=1, shuffle=False)
-	    model.reset_states()
+    # for i in range(nb_epoch):
+	#     model.fit(X, y, epochs=1, batch_size=n_batch, verbose=1, shuffle=False)
+	#     model.reset_states()
 
     # model.fit(X, y, epochs=nb_epoch, batch_size=n_batch, verbose=1, shuffle=False)
+    
+    history = model.fit(X, y, epochs=nb_epoch, batch_size=n_batch, verbose=1, shuffle=False)
+    pyplot.plot(history.history['loss'])
+    pyplot.title('model loss')
+    pyplot.ylabel('loss')
+    pyplot.xlabel('epoch')
+    pyplot.legend(['train', 'test'], loc='upper left')
+    pyplot.show()
+    
     return model
 
 def forecast_lstm(model, X, n_batch, n_lag):
     # reshape input pattern to [samples, timesteps, features]
-    X = X.reshape(1, n_lag, int(len(X)/n_lag))
+    # X = X.reshape(1, n_lag, int(len(X)/n_lag))
+    X = X.reshape(1, 1, int(len(X)))
     # make forecast
     forecast = model.predict(X, batch_size=n_batch)
     # convert to array
@@ -104,7 +118,7 @@ def make_forecasts(model, n_batch, train, test, n_lag, n_ahead):
         forecasts.append(forecast)
     return forecasts
 
-def evaluate_forecasts(y, forecasts, n_lag, n_seq):
+def evaluate_forecasts(y, forecasts, n_seq):
     sum_rmse = []
     for i in range(n_seq):
         actual = [row[i] for row in y]
@@ -141,7 +155,7 @@ def plot_forecasts(series, forecasts, n_test, linestyle = None):
 # load dataset
 df = read_csv('../../data/oni/csv/all_nino_anomaly.csv', header=0, index_col=0)
 
-# 标准化，使之符合正态分布
+# 标准化，使之符合正态分布,可注释对比
 df = (df - df.mean()) / df.std()
 
 cols = df.columns.tolist()
@@ -154,25 +168,22 @@ enso = df.values.astype('float32')
 # parameter setting
 n_lag = 12
 n_seq = 12
-n_test = 96
-n_epochs = 5
-n_neurons = 20
+n_test = 360
+n_epochs = 30
+n_neurons = 10
 n_batch = 1
 
 reframed = series_to_supervised(enso, n_lag, n_seq)
-# print(reframed)
-# print(reframed.head())
 
 # Define and Fit Model
 values = reframed.values
-# print(len(values))
+
 n_train = int(len(values) - n_test)
 
 train = values[:n_train, :]
 
 test = values[n_train:, :]
 
-# print(len(train[0]))
 file_path = 'mse_multi_var_nino34.h5'
 if not os.path.exists(file_path):
     model = fit_lstm(train, n_lag, n_seq, n_batch, n_epochs, n_neurons)
@@ -181,16 +192,21 @@ else:
     model = load_model(file_path)
 
 forecasts = make_forecasts(model, n_batch, train, test, n_lag, n_seq)
-# forecasts = inverse_transform(series, forecasts, scaler, n_test+2)
+
 # evaluate forecasts
-actual = [row[n_lag:] for row in test]
-# actual = inverse_transform(series, actual, scaler, n_test+2)
-evaluate_forecasts(actual, forecasts, n_lag, n_seq)
+actual = [row[-n_lag:] for row in test]
+
+evaluate_forecasts(actual, forecasts, n_seq)
+
+# print(len(actual[0]))
+# print(actual[0])
+# print(len(forecasts[0]))
+# print(forecasts[0])
 
 # plot forecasts
 # print(df['soi'].values)
 # print(len(values))
 # plot_forecasts(df['NINO3_4'].values, forecasts, test.shape[0] + n_seq - 1, 0, len(values), n_seq)
-plot_forecasts(df['NINO3_4'][-96:].values, forecasts, n_test+11)
+plot_forecasts(df['NINO3_4'][-n_test:].values, forecasts, n_test+11)
 
 

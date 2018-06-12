@@ -88,27 +88,27 @@ def fit_lstm(train, n_lag, n_seq, n_batch, nb_epoch, n_neurons):
     model = Sequential()
 
     # single layer LSTM
-    # model.add(LSTM(n_neurons, batch_input_shape=(n_batch, X.shape[1], X.shape[2]), stateful=True))
+    model.add(LSTM(n_neurons, batch_input_shape=(n_batch, X.shape[1], X.shape[2]), stateful=True))
 
     # multi layer LSTM
     # model.add(LSTM(n_neurons, return_sequences=True, batch_input_shape=(n_batch, X.shape[1], X.shape[2]), stateful=True))
     # model.add(LSTM(n_neurons))
 
     # MLP Model
-    model.add(Dense(n_neurons, batch_input_shape=(n_batch, X.shape[1], X.shape[2]), activation='relu'))
-    model.add(Dense(n_neurons))
-    model.add(Flatten())
+    # model.add(Dense(n_neurons, batch_input_shape=(n_batch, X.shape[1], X.shape[2]), activation='relu'))
+    # model.add(Dense(n_neurons))
+    # model.add(Flatten())
 
     model.add(Dense(y.shape[1]))
     model.compile(loss='mean_squared_error', optimizer='adam')
     print(model.summary())
 
 	# fit network, stateful version 
-    # for i in range(nb_epoch):
-	#     model.fit(X, y, epochs=1, batch_size=n_batch, verbose=1, shuffle=False)
-	#     model.reset_states()
-	
-    history = model.fit(X, y, epochs=nb_epoch, batch_size=n_batch, verbose=1, shuffle=False)
+    for i in range(nb_epoch):
+	    history = model.fit(X, y, epochs=1, batch_size=n_batch, verbose=1, shuffle=False)
+	    model.reset_states()
+
+    # history = model.fit(X, y, epochs=nb_epoch, batch_size=n_batch, verbose=1, shuffle=False)
     pyplot.plot(history.history['loss'])
     pyplot.title('model loss')
     pyplot.ylabel('loss')
@@ -206,10 +206,10 @@ series = read_csv('../../data/oni/csv/nino3_4_anomaly.csv', header=0, parse_date
 # configure
 n_lag = 12
 n_seq = 12
-n_test = 96
-n_epochs = 10
+n_test = 360
+n_epochs = 100
 n_batch = 1
-n_neurons = 20
+n_neurons = 10
 
 # LSTM model
 # prepare data
@@ -233,4 +233,4 @@ actual = inverse_transform(series, actual, scaler, n_test+11)
 # evaluate forecasts
 evaluate_forecasts(actual, forecasts, n_lag, n_seq)
 # plot forecasts
-plot_forecasts(series[-96:], forecasts, n_test+11)
+plot_forecasts(series[-n_test:], forecasts, n_test+11)
