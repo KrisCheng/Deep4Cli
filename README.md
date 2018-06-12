@@ -7,4 +7,4 @@ Solving climate predection problems based on deeplearning methods. Concretely, u
 Here is the post link:
 
 
-[*Survey of Apply LSTM for Niño Indices*∂](http://pengcheng.tech/2018/06/12/survey-of-apply-lstm-for-nino-indices/)
+[*Survey of Apply LSTM for Niño Indices*](http://pengcheng.tech/2018/06/12/survey-of-apply-lstm-for-nino-indices/)
