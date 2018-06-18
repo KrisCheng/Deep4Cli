@@ -91,7 +91,7 @@ time series prediction, LSTM, ENSO.
 1. 《Deep Learning for Precipitation Nowcasting - A Benchmark and A New Model》### 3	Model
 #### 3.1	Multi-layer LSTM Blocks
 
-***Outline:***the structure of multi LSTM for single variable prediction***Ref:***#### ~~3.2	CNN–LSTM Spatiotemporal Model~~
+***Outline:***the structure of multi LSTM for single variable prediction***Ref:***#### 3.2	CNN–LSTM Spatiotemporal Model
 
 ***Outline:***
 The structure and detail description of the network (how to capture spatio and temporal structure independently)***Ref:***### 4 Experiment and Results
@@ -112,7 +112,7 @@ time series prediction, LSTM, ENSO.
 
 	* Baseline prediction ( naive method ) [8]
 	* Traditional Machine Learning ( SVR, Random Forecast, MLP etc. )
-	* ARIMA model ( Statistics model )
+	* ARIMA model ( Statistics model ) [12]
 
 3. Develop a Robust Result ( Randomness in Machine Learning ) ***Ref:***
 1. Final Report for “Machine learning applications in oceanography” ( on [GitHub](https://github.com/Yongyao/enso-forcasting) )
@@ -137,7 +137,9 @@ time series prediction, LSTM, ENSO.
 
 	* *"Usually the anomalies are computed relative to a base period of 30 years.  The Niño 3.4 index and the Oceanic Niño Index (ONI) are the most commonly used indices to define El Niño and La Niña events. Other indices are used to help characterize the unique nature of each event."*
 
-7. [enso-forecast](https://github.com/lohancock/enso-forecast) ( GitHub, based on R ) (todo)
+7. [enso-forecast](https://github.com/lohancock/enso-forecast) ( GitHub, based on R ) 
+
+	* [Trying Out a Planetary Ring System for ENSO Prediction](https://ams.confex.com/ams/98Annual/webprogram/Paper321391.html) (ensemble predict for [MEI](https://www.esrl.noaa.gov/psd/enso/mei/))
 
 
 8. [How to Make Baseline Predictions for Time Series Forecasting with Python](https://machinelearningmastery.com/persistence-time-series-forecasting-with-python/) ( using current stage as the prediction of the next several steps )
@@ -152,7 +154,13 @@ would achieve perfect performance."*
 	* *"Walk-forward validation is the gold standard of model evaluation. It is the k-fold cross validation of the time series world and is recommended for your own projects."* 
 
 10. [LSTM Climatological Time Series Analysis](https://github.com/danielefranceschi/lstm-climatological-time-series) ( GitHub )
-#### ~~4.2	Grid Spatiotemporal SST Region Prediction~~
+
+11. Multivariate ENSO Index(MEI) [wiki](https://en.wikipedia.org/wiki/Multivariate_ENSO_index)
+
+	* 6 variables -- sea-level pressure (P), zonal (U) and meridional (V) components of the surface wind, sea surface temperature (S), surface air temperature (A), and total cloudiness fraction of the sky (C)
+
+12. [ARIMA Model](https://machinelearningmastery.com/arima-for-time-series-forecasting-with-python/)
+#### 4.2	Grid Spatiotemporal SST Region Prediction
 
 ***Outline:***1.	Different models for grid experiment (todo)***Ref:***
 ### 5 Conclusion and Future WorkTodo### Writing Skill:

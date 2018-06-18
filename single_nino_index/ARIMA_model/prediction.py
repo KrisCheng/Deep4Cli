@@ -39,7 +39,7 @@ predictions = list()
 # print('>Predicted=%.2f, Expected=%.2f' % (yhat, y[0]))
 # rolling forecasts
 time = []
-currentYear = 1999
+currentYear = 1989
 currentMonth = 1
 
 for i in range(0, len(y)):

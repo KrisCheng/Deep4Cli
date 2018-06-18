@@ -2,26 +2,28 @@
 # -*- coding: utf-8 -*-
 
 '''
-Desc:  apply the ARIMA model, on the oni index anomaly dataset.
+Desc:  apply the ARIMA model, on the nino3.4 index anomaly dataset, single variable multiple steps.
 DataSource: https://www.esrl.noaa.gov/psd/gcos_wgsp/Timeseries/
 Author: Kris Peng
 Copyright (c) 2018 - Kris Peng <kris.dacpc@gmail.com>
 '''
 
-raw_path = '../data/oni/csv/nino3_4_anomaly.csv'
-
 import warnings
 from pandas import Series
+from pandas import read_csv
 from sklearn.metrics import mean_squared_error
 from statsmodels.tsa.arima_model import ARIMA
 from math import sqrt
 from matplotlib import pyplot
+from pandas.tools.plotting import autocorrelation_plot
 import numpy
-# load data
 
-series = Series.from_csv('dataset.csv')
+# load data
+series = read_csv('../../data/oni/csv/nino3_4_anomaly.csv', header=0, parse_dates=[0], index_col=0, squeeze=True)
+
 # data visulization
 # series.plot()
+# autocorrelation_plot(series)
 # pyplot.show()
 
 # pyplot.figure(1)
@@ -33,16 +35,36 @@ series = Series.from_csv('dataset.csv')
 
 # create a differenced series
 def difference(dataset, interval=1):
-diff = list()
-for i in range(interval, len(dataset)):
-    value = dataset[i] - dataset[i - interval]
-    diff.append(value)
-return numpy.array(diff)
+    diff = list()
+    for i in range(interval, len(dataset)):
+        value = dataset[i] - dataset[i - interval]
+        diff.append(value)
+    return numpy.array(diff)
 
 # invert differenced value
 def inverse_difference(history, yhat, interval=1):
     return yhat + history[-interval]
 
+X = series.values
+size = 1776-360
+train, test = X[0:size], X[size:len(X)]
+history = [x for x in train]
+predictions = list()
+for t in range(len(test)):
+	model = ARIMA(history, order=(5,1,0))
+	model_fit = model.fit(disp=0)
+	output = model_fit.forecast()
+	yhat = output[0]
+	predictions.append(yhat)
+	obs = test[t]
+	history.append(obs)
+	# print('predicted=%f, expected=%f' % (yhat, obs))
+error = sqrt(mean_squared_error(test, predictions))
+print('Test RMSE: %.3f' % error)
+# plot
+pyplot.plot(test)
+pyplot.plot(predictions, color='red')
+pyplot.show()
 
 # Grid Search to get the suitable hyper parameters (Resource Insufficient)
 # evaluate an ARIMA model for a given order (p,d,q) and return RMSE
@@ -93,30 +115,30 @@ def inverse_difference(history, yhat, interval=1):
 # warnings.filterwarnings("ignore")
 # evaluate_models(series.values, p_values, d_values, q_values)
 
-# monkey patch around bug in ARIMA class
-def __getnewargs__(self):
-    return ((self.endog),(self.k_lags, self.k_diff, self.k_ma))
-ARIMA.__getnewargs__ = __getnewargs__
-# create a differenced series
-def difference(dataset, interval=1):
-    diff = list()
-    for i in range(interval, len(dataset)):
-        value = dataset[i] - dataset[i - interval]
-        diff.append(value)
-    return diff
-# load data
-series = Series.from_csv('dataset.csv')
-# prepare data
-X = series.values
-X = X.astype('float32')
-# difference data
-months_in_year = 12
-diff = difference(X, months_in_year)
-# fit model
-model = ARIMA(diff, order=(1,0,3))
-model_fit = model.fit(trend='nc', disp=0)
-# bias constant, could be calculated from in-sample mean residual
-bias = 0
-# save model
-model_fit.save("model.pkl")
-numpy.save("model_bias.npy", [bias])
+# # monkey patch around bug in ARIMA class
+# def __getnewargs__(self):
+#     return ((self.endog),(self.k_lags, self.k_diff, self.k_ma))
+# ARIMA.__getnewargs__ = __getnewargs__
+# # create a differenced series
+# def difference(dataset, interval=1):
+#     diff = list()
+#     for i in range(interval, len(dataset)):
+#         value = dataset[i] - dataset[i - interval]
+#         diff.append(value)
+#     return diff
+# # load data
+# series = Series.from_csv('dataset.csv')
+# # prepare data
+# X = series.values
+# X = X.astype('float32')
+# # difference data
+# months_in_year = 12
+# diff = difference(X, months_in_year)
+# # fit model
+# model = ARIMA(diff, order=(1,0,3))
+# model_fit = model.fit(trend='nc', disp=0)
+# # bias constant, could be calculated from in-sample mean residual
+# bias = 0
+# # save model
+# model_fit.save("model.pkl")
+# numpy.save("model_bias.npy", [bias])
