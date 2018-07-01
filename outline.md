@@ -160,6 +160,8 @@ would achieve perfect performance."*
 	* 6 variables -- sea-level pressure (P), zonal (U) and meridional (V) components of the surface wind, sea surface temperature (S), surface air temperature (A), and total cloudiness fraction of the sky (C)
 
 12. [ARIMA Model](https://machinelearningmastery.com/arima-for-time-series-forecasting-with-python/)
+
+	* [Time Series Forecast Study with Python: Monthly Sales of French Champagne](https://machinelearningmastery.com/time-series-forecast-study-python-monthly-sales-french-champagne/)
 #### 4.2	Grid Spatiotemporal SST Region Prediction
 
 ***Outline:***1.	Different models for grid experiment (todo)***Ref:***
