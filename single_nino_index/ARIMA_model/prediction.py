@@ -30,6 +30,7 @@ y = validation.values.astype('float32')
 # load model
 model_fit = ARIMAResults.load('model.pkl')
 bias = numpy.load('model_bias.npy')
+
 # make first prediction
 predictions = list()
 # yhat = float(model_fit.forecast()[0])
