@@ -1,4 +1,4 @@
-# Multivariate Time Series Forecasting with LSTM for ENSO Case
+# Time Series Forecasting with Hybridization of LSTM Networks and ARIMA Models for ENSO Case
 
 ***Manuscript Version***Bin Mu, Cheng Peng and Shijin Yuan(✉) 
 School of Software Engineering, Tongji University, Shanghai 201804, China
@@ -9,7 +9,7 @@ Todo
 The abstract should summarize the contents of the paper in short terms, i.e. 150-250 words.
 ### Keywords: 
 
-time series prediction, LSTM, ENSO.
+time series prediction, LSTM, ARIMA, ENSO.
 ### 1	Introduction***Outline:***1. the reason (significance) of study ENSO, traditional methods (statistical methods && regular machine learning methods) and limitations.
 
 	* *"The dynamical models use physical equations of the ocean and atmosphere to forecast ENSO event, which are computationally very expensive and not available outside the atmospheric scientific community."*
@@ -114,7 +114,7 @@ time series prediction, LSTM, ENSO.
 	* Traditional Machine Learning ( SVR, Random Forecast, MLP etc. )
 	* ARIMA model ( Statistics model ) [12]
 
-3. Develop a Robust Result ( Randomness in Machine Learning ) ***Ref:***
+3. Develop a Robust Result ( Randomness in Machine Learning ) 4. Construct A Hybrid Model ( ARIMA + LSTM )***Ref:***
 1. Final Report for “Machine learning applications in oceanography” ( on [GitHub](https://github.com/Yongyao/enso-forcasting) )
 
 	*  Four other index ( SOI, PNA, Nino3, precipitation，ONI ) --> SOI
