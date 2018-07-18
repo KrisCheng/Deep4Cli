@@ -84,14 +84,32 @@ time series prediction, LSTM, ARIMA, ENSO.
 ### 2	Preliminaries 
 #### 2.1	Formulation of ENSO Prediction Problem
 ***Outline:***1.	Goal of ENSO prediction (NINO index and simulation pattern)2.	From the perspective of machine learning, this is a spatiotemporal regression prediction problem***Ref:***
-1. 《Convolutional LSTM Network - A Machine Learning Approach for Precipitation Nowcasting》#### 2.2	Special Neural Networks for Sequence Modeling
+1. 《Convolutional LSTM Network - A Machine Learning Approach for Precipitation Nowcasting》#### ~~2.2	Special Neural Networks for Sequence Modeling~~
 
 ***Outline:***
 1. LSTM and CNN-LSTM network for spatiotemporal prediction, which have show great effectiveness on spatiotemporal problems  2. Structure of CNN and RNN, and combine them together, view as a single variable prediction and a sequence generation problem***Ref:***
-1. 《Deep Learning for Precipitation Nowcasting - A Benchmark and A New Model》### 3	Model
+1. 《Deep Learning for Precipitation Nowcasting - A Benchmark and A New Model》### 3	Model
 #### 3.1	Multi-layer LSTM Blocks
 
-***Outline:***the structure of multi LSTM for single variable prediction***Ref:***#### 3.2	CNN–LSTM Spatiotemporal Model
+***Outline:***the structure of multi LSTM for single variable prediction***Ref:***#### 3.2 ARIMA Model
+
+***Outline:***
+
+todo
+
+***Ref:***
+
+1. [A Guide to Time Series Forecasting with ARIMA in Python 3](https://www.digitalocean.com/community/tutorials/a-guide-to-time-series-forecasting-with-arima-in-python-3) ()
+
+#### 3.3 Hybrid Model
+
+***Outline:***
+
+todo
+
+***Ref:***
+
+#### ~~3.2	CNN–LSTM Spatiotemporal Model~~
 
 ***Outline:***
 The structure and detail description of the network (how to capture spatio and temporal structure independently)***Ref:***### 4 Experiment and Results
@@ -123,6 +141,7 @@ time series prediction, LSTM, ARIMA, ENSO.
 2. [Nino3 / 4 / 3.4 index Data (1870~2018)](https://www.esrl.noaa.gov/psd/gcos_wgsp/Timeseries/Nino34/) （ Raw Data ）
 
 3. [Time Series Forecasting with the Long Short-Term Memory Network in Python](https://machinelearningmastery.com/time-series-forecasting-long-short-term-memory-network-python/)
+
 	* Raw data --> Difference (stationary) --> Transfer Time series to Supervised learning problem (a list of numbers --> a list of input and output pattern) --> Scale [-1~1] --> Model --> Output
 
 4. [Multi-step Time Series Forecasting with Long Short-Term Memory Networks in Python](https://machinelearningmastery.com/multi-step-time-series-forecasting-long-short-term-memory-networks-python/) ( how to make multistep forecasting )
@@ -162,10 +181,15 @@ would achieve perfect performance."*
 12. [ARIMA Model](https://machinelearningmastery.com/arima-for-time-series-forecasting-with-python/)
 
 	* [Time Series Forecast Study with Python: Monthly Sales of French Champagne](https://machinelearningmastery.com/time-series-forecast-study-python-monthly-sales-french-champagne/)
-#### 4.2	Grid Spatiotemporal SST Region Prediction
+
+#### 4.2	ARIMA Model for ENSO
+
+***Outline:***todo ***Ref:***
+
+
+#### ~~4.2	Grid Spatiotemporal SST Region Prediction~~
 
 ***Outline:***1.	Different models for grid experiment (todo)***Ref:***
 ### 5 Conclusion and Future WorkTodo### Writing Skill:
 1. 《芝加哥大学论文写作指南》
-
 2. 《The-Science-of-Scientific-Writing》
