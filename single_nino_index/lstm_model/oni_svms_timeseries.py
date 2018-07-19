@@ -91,15 +91,15 @@ def fit_lstm(train, n_lag, n_seq, n_batch, nb_epoch, n_neurons):
     # model.add(LSTM(n_neurons, batch_input_shape=(n_batch, X.shape[1], X.shape[2]), stateful=True))
 
     # multi layer LSTM
-    # model.add(LSTM(n_neurons, return_sequences=True, batch_input_shape=(n_batch, X.shape[1], X.shape[2]), stateful=True))
-    # model.add(LSTM(n_neurons))
+    model.add(LSTM(n_neurons, return_sequences=True, batch_input_shape=(n_batch, X.shape[1], X.shape[2]), stateful=True))
+    model.add(LSTM(n_neurons))
 
     # MLP Model
-    model.add(Dense(n_neurons, batch_input_shape=(n_batch, X.shape[1], X.shape[2]), activation='relu'))
+    # model.add(Dense(n_neurons, batch_input_shape=(n_batch, X.shape[1], X.shape[2]), activation='relu'))
     
 	# multi layer
-    model.add(Dense(n_neurons))
-    model.add(Flatten())
+    # model.add(Dense(n_neurons))
+    # model.add(Flatten())
 
     model.add(Dense(y.shape[1]))
     model.compile(loss='mean_squared_error', optimizer='adam')
@@ -134,7 +134,7 @@ def make_forecasts(model, n_batch, train, test, n_lag, n_seq):
 	for i in range(len(test)):
 		X, y = test[i, 0:n_lag], test[i, n_lag:]
 		# make forecast
-		forecast = forecast_lstm(model, X, n_batch)
+		forecast = forecast_lfstm(model, X, n_batch)
 		# store the forecast
 		forecasts.append(forecast)
 	return forecasts
@@ -209,7 +209,7 @@ series = read_csv('../../data/oni/csv/nino3_4_anomaly.csv', header=0, parse_date
 n_lag = 12
 n_seq = 12
 n_test = 360
-n_epochs = 20
+n_epochs = 10
 n_batch = 1
 n_neurons = 10
 
