@@ -99,7 +99,7 @@ todo
 
 ***Ref:***
 
-1. [A Guide to Time Series Forecasting with ARIMA in Python 3](https://www.digitalocean.com/community/tutorials/a-guide-to-time-series-forecasting-with-arima-in-python-3) ()
+1. [A Guide to Time Series Forecasting with ARIMA in Python 3](https://www.digitalocean.com/community/tutorials/a-guide-to-time-series-forecasting-with-arima-in-python-3) (a good start of apply ARIMA quickly)
 
 
 2. [Time Series ARIMA Models](https://www.youtube.com/watch?v=Y2khrpVo6qI) (YouTube video for ARIMA, cover the basic structure of ARIMA model) 
