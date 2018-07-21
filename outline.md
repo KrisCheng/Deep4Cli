@@ -104,6 +104,8 @@ todo
 
 2. [Time Series ARIMA Models](https://www.youtube.com/watch?v=Y2khrpVo6qI) (YouTube video for ARIMA, cover the basic structure of ARIMA model) 
 
+
+
 #### 3.3 Hybrid Model
 
 ***Outline:***
