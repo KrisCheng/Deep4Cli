@@ -57,7 +57,7 @@ X = X.astype('float32')
 months_in_year = 12
 diff = difference(X, months_in_year)
 # fit model
-model = ARIMA(diff, order=(0,0,1))
+model = ARIMA(diff, order=(5,0,3))
 model_fit = model.fit(trend='nc', disp=0)
 # bias constant, could be calculated from in-sample mean residual
 bias = -0.128517

@@ -104,6 +104,7 @@ todo
 
 2. [Time Series ARIMA Models](https://www.youtube.com/watch?v=Y2khrpVo6qI) (YouTube video for ARIMA, cover the basic structure of ARIMA model) 
 
+3. [Time Series Forecast Study with Python: Monthly Sales of French Champagne](https://machinelearningmastery.com/time-series-forecast-study-python-monthly-sales-french-champagne/) (Complete step of ARIMA, including the data analysis part)
 
 
 #### 3.3 Hybrid Model
