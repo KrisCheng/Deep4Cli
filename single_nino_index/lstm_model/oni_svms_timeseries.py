@@ -76,7 +76,7 @@ def prepare_data(series, n_test, n_lag, n_seq):
 	supervised_values = supervised.values
 	# split into train and test sets
 	train, test = supervised_values[0:-n_test], supervised_values[-n_test:]
-	# print(train[0])
+	print(train[0])
 	return scaler, train, test
 
 # fit an LSTM network to training data
@@ -134,7 +134,7 @@ def make_forecasts(model, n_batch, train, test, n_lag, n_seq):
 	for i in range(len(test)):
 		X, y = test[i, 0:n_lag], test[i, n_lag:]
 		# make forecast
-		forecast = forecast_lfstm(model, X, n_batch)
+		forecast = forecast_lstm(model, X, n_batch)
 		# store the forecast
 		forecasts.append(forecast)
 	return forecasts
@@ -187,6 +187,7 @@ def evaluate_forecasts(test, forecasts, n_lag, n_seq):
 # plot the forecasts in the context of the original dataset
 def plot_forecasts(series, forecasts, n_test, linestyle = None):
     	# plot the entire dataset in blue
+	pyplot.figure(figsize=(30, 20))
 	pyplot.plot(series.values, label='observed')
 	pyplot.title("oni_singlevariate_multistep_timeseries")
 	pyplot.legend(loc='upper right')
@@ -209,11 +210,12 @@ series = read_csv('../../data/oni/csv/nino3_4_anomaly.csv', header=0, parse_date
 n_lag = 12
 n_seq = 12
 n_test = 360
-n_epochs = 10
+n_epochs = 20
 n_batch = 1
 n_neurons = 10
 
 # LSTM model
+
 # prepare data
 scaler, train, test = prepare_data(series, n_test, n_lag, n_seq)
 
