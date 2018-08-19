@@ -7,4 +7,5 @@ Deep4Cli.iml
 *.h5
 data
 record
+reference
 settings.json

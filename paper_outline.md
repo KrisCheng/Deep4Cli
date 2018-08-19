@@ -2,14 +2,14 @@
 
 ***Manuscript Version***Bin Mu, Cheng Peng and Shijin Yuan(✉) 
 School of Software Engineering, Tongji University, Shanghai 201804, China
-binmu@tongji.edu.cn,  tjupengcheng@163.com, yuanshijin2003@163.com### Abstract.
+binmu@tongji.edu.cn, tjupengcheng@163.com, yuanshijin2003@163.com### Abstract.
 
 Todo
 
 The abstract should summarize the contents of the paper in short terms, i.e. 150-250 words.
 ### Keywords: 
 
-time series prediction, LSTM, ARIMA, ENSO.
+time series prediction, LSTM Network, ENSO Case.
 ### 1	Introduction***Outline:***1. the reason (significance) of study ENSO, traditional methods (statistical methods && regular machine learning methods) and limitations.
 
 	* *"The dynamical models use physical equations of the ocean and atmosphere to forecast ENSO event, which are computationally very expensive and not available outside the atmospheric scientific community."*
