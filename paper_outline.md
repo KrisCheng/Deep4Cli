@@ -6,11 +6,10 @@ School of Software Engineering, Tongji University, Shanghai 201804, China
 
 Todo
 
-The abstract should summarize the contents of the paper in short terms, i.e. 150-250 words.
 ### Keywords: 
 
 time series prediction, LSTM Network, ENSO Case.
-### 1	Introduction***Outline:***1. the reason (significance) of study ENSO, traditional methods (statistical methods && regular machine learning methods) and limitations.
+### Introduction***Outline:***1. the reason (significance) of study ENSO, traditional methods (statistical methods && regular machine learning methods) and limitations.
 
 	* *"The dynamical models use physical equations of the ocean and atmosphere to forecast ENSO event, which are computationally very expensive and not available outside the atmospheric scientific community."*
 
@@ -81,7 +80,7 @@ time series prediction, LSTM Network, ENSO Case.
 
 14. 《Sequence to Sequence Weather Forecasting with Long Short-Term Memory Recurrent Neural Networks》
 
-### 2	Preliminaries 
+### Preliminaries 
 #### 2.1	Formulation of ENSO Prediction Problem
 ***Outline:***1.	Goal of ENSO prediction (NINO index and simulation pattern)2.	From the perspective of machine learning, this is a spatiotemporal regression prediction problem***Ref:***
 1. 《Convolutional LSTM Network - A Machine Learning Approach for Precipitation Nowcasting》#### ~~2.2	Special Neural Networks for Sequence Modeling~~
@@ -160,6 +159,6 @@ would achieve perfect performance."*
 12. [ARIMA Model](https://machinelearningmastery.com/arima-for-time-series-forecasting-with-python/)
 
 	* [Time Series Forecast Study with Python: Monthly Sales of French Champagne](https://machinelearningmastery.com/time-series-forecast-study-python-monthly-sales-french-champagne/)
-### 5 Conclusion and Future WorkTodo### Writing Skill:
+### ConclusionTodo### Writing Skill:
 1. 《芝加哥大学论文写作指南》
 2. 《The-Science-of-Scientific-Writing》

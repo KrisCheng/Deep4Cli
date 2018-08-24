@@ -1,7 +1,7 @@
 # Time Series Forecasting with Hybridization of LSTM Networks and ARIMA Models for ENSO Case
 
 ***Manuscript Version***Bin Mu, Cheng Peng and Shijin Yuan(✉) 
-School of Software Engineering, Tongji University, Shanghai 201804, China
+School of Software Engineering, Tongji University, Shanghai, 201804, China
 binmu@tongji.edu.cn,  tjupengcheng@163.com, yuanshijin2003@163.com### Abstract.
 
 Todo
