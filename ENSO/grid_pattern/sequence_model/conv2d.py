@@ -5,10 +5,10 @@ Data: https://www.esrl.noaa.gov/psd/data/gridded/data.cobe2.html
 Copyright (c) 2018 - Kris Peng <kris.dacpc@gmail.com>
 '''
 
-# from keras.models import Sequential
-# from keras.layers.convolutional import Conv3D
-# from keras.layers.convolutional_recurrent import ConvLSTM2D
-# from keras.layers.normalization import BatchNormalization
+from keras.models import Sequential
+from keras.layers.convolutional import Conv3D
+from keras.layers.convolutional_recurrent import ConvLSTM2D
+from keras.layers.normalization import BatchNormalization
 import pylab as plt
 from matplotlib import pyplot
 from netCDF4 import Dataset
@@ -17,32 +17,32 @@ import pandas as pd
 import matplotlib as mpl
 import scipy.io as sio 
 
-# seq = Sequential()
-# seq.add(ConvLSTM2D(filters=40, kernel_size=(3, 3),
-#                    input_shape=(None, 10, 50, 1),
-#                    padding='same', return_sequences=True))
-# seq.add(BatchNormalization())
+seq = Sequential()
+seq.add(ConvLSTM2D(filters=40, kernel_size=(3, 3),
+                   input_shape=(None, 10, 50, 1),
+                   padding='same', return_sequences=True))
+seq.add(BatchNormalization())
 
-# seq.add(ConvLSTM2D(filters=40, kernel_size=(3, 3),
-#                    padding='same', return_sequences=True))
-# seq.add(BatchNormalization())
+seq.add(ConvLSTM2D(filters=40, kernel_size=(3, 3),
+                   padding='same', return_sequences=True))
+seq.add(BatchNormalization())
 
-# seq.add(ConvLSTM2D(filters=40, kernel_size=(3, 3),
-#                    padding='same', return_sequences=True))
-# seq.add(BatchNormalization())
+seq.add(ConvLSTM2D(filters=40, kernel_size=(3, 3),
+                   padding='same', return_sequences=True))
+seq.add(BatchNormalization())
 
-# seq.add(ConvLSTM2D(filters=40, kernel_size=(3, 3),
-#                    padding='same', return_sequences=True))
-# seq.add(BatchNormalization())
+seq.add(ConvLSTM2D(filters=40, kernel_size=(3, 3),
+                   padding='same', return_sequences=True))
+seq.add(BatchNormalization())
 
-# seq.add(Conv3D(filters=1, kernel_size=(3, 3, 3),
-#                activation='sigmoid',
-#                padding='same', data_format='channels_last'))
-# seq.compile(loss='binary_crossentropy', optimizer='adadelta')
+seq.add(Conv3D(filters=1, kernel_size=(3, 3, 3),
+               activation='sigmoid',
+               padding='same', data_format='channels_last'))
+seq.compile(loss='binary_crossentropy', optimizer='adadelta')
 
 
 # data preprocessing
-sst = '../data/sst_grid/convert_sst.mon.mean_1850:01_2015:12.mat'  
+sst = '../../data/sst_grid/convert_sst.mon.mean_1850:01_2015:12.mat'  
 sst_data = sio.loadmat(sst) 
 
 sst_data = sst_data['sst'][:,:,:]
@@ -77,19 +77,19 @@ for i in range(166):
 noisy_movies = convert_sst
 shifted_movies = convert_sst
 
-# seq.fit(noisy_movies[:160], shifted_movies[:160], batch_size=10,
-#         epochs=1, validation_split=0.05)
+seq.fit(noisy_movies[:160], shifted_movies[:160], batch_size=10,
+        epochs=1, validation_split=0.05)
 
 # # Testing the network on one movie
-# # feed it with the first 7 positions and then
-# # predict the new positions
-# which = 100
-# track = noisy_movies[which][:7, ::, ::, ::]
+# feed it with the first 7 positions and then
+# predict the new positions
+which = 100
+track = noisy_movies[which][:7, ::, ::, ::]
 
-# for j in range(12):
-#     new_pos = seq.predict(track[np.newaxis, ::, ::, ::, ::])
-#     new = new_pos[::, -1, ::, ::, ::]
-#     track = np.concatenate((track, new), axis=0)
+for j in range(12):
+    new_pos = seq.predict(track[np.newaxis, ::, ::, ::, ::])
+    new = new_pos[::, -1, ::, ::, ::]
+    track = np.concatenate((track, new), axis=0)
 
 
 # # And then compare the predictions
@@ -98,17 +98,17 @@ track2 = noisy_movies[165][::, ::, ::, ::]
 for i in range(12):
     fig = plt.figure(figsize=(10, 5))
 
-#     ax = fig.add_subplot(121)
+    ax = fig.add_subplot(121)
 
-#     if i >= 7:
-#         ax.text(1, 3, 'Predictions !', fontsize=20, color='w')
-#     else:
-#         ax.text(1, 3, 'Initial trajectory', fontsize=20)
+    if i >= 7:
+        ax.text(1, 3, 'Predictions !', fontsize=20, color='w')
+    else:
+        ax.text(1, 3, 'Initial trajectory', fontsize=20)
 
-#     toplot = track[i, ::, ::, 0]
+    toplot = track[i, ::, ::, 0]
 
-#     plt.imshow(toplot)
-#     ax = fig.add_subplot(122)
+    plt.imshow(toplot)
+    ax = fig.add_subplot(122)
     plt.text(1, 3, 'Ground truth', fontsize=12)
 
     toplot = track2[i, ::, ::, 0]
