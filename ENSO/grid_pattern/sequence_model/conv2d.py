@@ -15,7 +15,11 @@ from netCDF4 import Dataset
 import numpy as np
 import pandas as pd
 import matplotlib as mpl
-import scipy.io as sio 
+import scipy.io as sio
+
+
+
+
 
 seq = Sequential()
 seq.add(ConvLSTM2D(filters=40, kernel_size=(3, 3),
@@ -42,8 +46,8 @@ seq.compile(loss='binary_crossentropy', optimizer='adadelta')
 
 
 # data preprocessing
-sst = '../../data/sst_grid/convert_sst.mon.mean_1850:01_2015:12.mat'  
-sst_data = sio.loadmat(sst) 
+sst = '../../../../dataset/sst_grid_1/convert_sst.mon.mean_185001_201512.mat'
+sst_data = sio.loadmat(sst)
 
 sst_data = sst_data['sst'][:,:,:]
 sst_data = np.array(sst_data, dtype=float)
@@ -78,7 +82,7 @@ noisy_movies = convert_sst
 shifted_movies = convert_sst
 
 seq.fit(noisy_movies[:160], shifted_movies[:160], batch_size=10,
-        epochs=1, validation_split=0.05)
+        epochs=30, validation_split=0.05)
 
 # # Testing the network on one movie
 # feed it with the first 7 positions and then
@@ -114,11 +118,10 @@ for i in range(12):
     toplot = track2[i, ::, ::, 0]
 #     if i >= 2:
     toplot = shifted_movies[165][i - 1, ::, ::, 0]
-    
+
     plt.imshow(toplot)
     cbar = plt.colorbar(plt.imshow(toplot), orientation='horizontal')
     cbar.set_label('°C',fontsize=12)
-    cbar.set_ticks(np.linspace(20,32,13)) 
+    cbar.set_ticks(np.linspace(20,32,13))
     cbar.set_ticklabels(('20','21','22','23','24','25','26','27','28','29','30','31','32'))
     plt.savefig('%i_animate.png' % (i + 1))
-
