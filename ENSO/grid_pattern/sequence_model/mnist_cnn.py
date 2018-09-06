@@ -13,7 +13,6 @@ from keras.datasets import mnist
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Flatten
 from keras.layers import Conv2D, MaxPooling2D
-from parrallel.model import ParallelModel
 from keras import backend as K
 
 batch_size = 128
@@ -59,9 +58,6 @@ model.add(Dense(128, activation='relu'))
 model.add(Dropout(0.5))
 model.add(Dense(num_classes, activation='softmax'))
 
-GPU_COUNT = 2 # 同时使用3个GPU
-model = keras.applications.densenet.DenseNet201() # 比如使用DenseNet-201
-model = ParallelModel(model, GPU_COUNT)
 
 model.compile(loss=keras.losses.categorical_crossentropy,
               optimizer=keras.optimizers.Adadelta(),

@@ -6,6 +6,7 @@ Copyright (c) 2018 - Kris Peng <kris.dacpc@gmail.com>
 '''
 
 from keras.models import Sequential
+from keras.utils import multi_gpu_model
 from keras.layers.convolutional import Conv3D
 from keras.layers.convolutional_recurrent import ConvLSTM2D
 from keras.layers.normalization import BatchNormalization
@@ -15,10 +16,8 @@ from netCDF4 import Dataset
 import numpy as np
 import pandas as pd
 import matplotlib as mpl
+# from parallel_model import ParallelModel
 import scipy.io as sio
-
-
-
 
 
 seq = Sequential()
@@ -42,6 +41,9 @@ seq.add(BatchNormalization())
 seq.add(Conv3D(filters=1, kernel_size=(3, 3, 3),
                activation='sigmoid',
                padding='same', data_format='channels_last'))
+
+seq = multi_gpu_model(seq, gpus=2)
+
 seq.compile(loss='binary_crossentropy', optimizer='adadelta')
 
 
@@ -82,7 +84,7 @@ noisy_movies = convert_sst
 shifted_movies = convert_sst
 
 seq.fit(noisy_movies[:160], shifted_movies[:160], batch_size=10,
-        epochs=30, validation_split=0.05)
+        epochs=300, validation_split=0.05)
 
 # # Testing the network on one movie
 # feed it with the first 7 positions and then
