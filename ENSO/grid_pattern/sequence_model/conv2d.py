@@ -1,24 +1,24 @@
 '''
-Desc: the Grid CNN model for ENSO Case
+Desc: the Grid ConvLSTM2D model for ENSO Case.
 Author: Kris Peng
 Data: https://www.esrl.noaa.gov/psd/data/gridded/data.cobe2.html
+Data Desc: 1850/01~2015/12; monthly SST
+           1.0 degree latitude x 1.0 degree longitude global grid (360x180).
 Copyright (c) 2018 - Kris Peng <kris.dacpc@gmail.com>
 '''
 
+import pylab as plt
+import numpy as np
+import pandas as pd
+import matplotlib as mpl
+import scipy.io as sio
+from matplotlib import pyplot
+from netCDF4 import Dataset
 from keras.models import Sequential
 from keras.utils import multi_gpu_model
 from keras.layers.convolutional import Conv3D
 from keras.layers.convolutional_recurrent import ConvLSTM2D
 from keras.layers.normalization import BatchNormalization
-import pylab as plt
-from matplotlib import pyplot
-from netCDF4 import Dataset
-import numpy as np
-import pandas as pd
-import matplotlib as mpl
-# from parallel_model import ParallelModel
-import scipy.io as sio
-
 
 seq = Sequential()
 seq.add(ConvLSTM2D(filters=40, kernel_size=(3, 3),
@@ -42,39 +42,26 @@ seq.add(Conv3D(filters=1, kernel_size=(3, 3, 3),
                activation='sigmoid',
                padding='same', data_format='channels_last'))
 
+# run on two gpus
 seq = multi_gpu_model(seq, gpus=2)
 
-seq.compile(loss='binary_crossentropy', optimizer='adadelta')
-
+seq.compile(loss='mse', optimizer='adadelta')
 
 # data preprocessing
 sst = '../../../../dataset/sst_grid_1/convert_sst.mon.mean_185001_201512.mat'
 sst_data = sio.loadmat(sst)
-
 sst_data = sst_data['sst'][:,:,:]
 sst_data = np.array(sst_data, dtype=float)
-
-
-# (180 * 360 * 2004)
-# print(sst_data.shape)
-# (180 * 360 * 2004) --> (10 * 50 * 2004)
+# (180 * 360 * 2004) --> (10 * 50 * 2004) NINO3.4 region (5W~5N, 170W~120W)
 sst_data = sst_data[85:95,190:240,:]
 
-# temp_sst = sst_data.reshape((50*10*2004))
-# series_sst_data = pd.Series(temp_sst)
-# print(series_sst_data.describe())
-# print(sst_data.shape)
-# print(sst_data[::,::,0])
-# print("Mean: %s" % sst_data.mean())
-# print("Max: %s , Loc: %s" % (sst_data.max(), sst_data.argmax()))
-# print("Min: %s , Loc: %s" % (sst_data.min(), sst_data.argmin()))
 # 1850.01~2015.01 (train)
 train_data = sst_data[::,::,0:-12]
 # 2015.01~2015.12 (test)
 test_data = sst_data[::,::,-12:]
 
-# print(train_data.shape)
-# print(test_data.shape)
+print(train_data.shape)
+print(test_data.shape)
 convert_sst = np.zeros((166,12,10,50,1), dtype = np.float)
 for i in range(166):
     for k in range(12):
