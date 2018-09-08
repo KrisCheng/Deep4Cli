@@ -44,7 +44,6 @@ seq.add(Conv3D(filters=1, kernel_size=(3, 3, 3),
 
 # run on two gpus
 seq = multi_gpu_model(seq, gpus=2)
-
 seq.compile(loss='mse', optimizer='adadelta')
 
 # data preprocessing
@@ -73,7 +72,7 @@ shifted_movies = convert_sst
 seq.fit(noisy_movies[:160], shifted_movies[:160], batch_size=10,
         epochs=300, validation_split=0.05)
 
-# # Testing the network on one movie
+# Testing the network on one movie
 # feed it with the first 7 positions and then
 # predict the new positions
 which = 100
@@ -84,9 +83,8 @@ for j in range(12):
     new = new_pos[::, -1, ::, ::, ::]
     track = np.concatenate((track, new), axis=0)
 
-
-# # And then compare the predictions
-# # to the ground truth
+# And then compare the predictions
+# to the ground truth
 track2 = noisy_movies[165][::, ::, ::, ::]
 for i in range(12):
     fig = plt.figure(figsize=(10, 5))
