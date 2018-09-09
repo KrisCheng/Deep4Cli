@@ -44,15 +44,29 @@ seq.add(Conv3D(filters=1, kernel_size=(3, 3, 3),
                activation='sigmoid',
                padding='same', data_format='channels_last'))
 # run on two gpus
-# seq = multi_gpu_model(seq, gpus=2)
+seq = multi_gpu_model(seq, gpus=2)
 
 seq.compile(loss='mse', optimizer='adadelta')
 print(seq.summary())
 
-# data preprocessing
-# sst = '../../../../dataset/sst_grid_1/convert_sst.mon.mean_185001_201512.mat'
+MAX = 31.18499947
+MIN = 20.33499908
+MEAN = 26.80007865
+def normalization(data):
+    for i in range(len(data)):
+        for j in range(len(data[0])):
+            data[i][j] = (data[i][j]- MIN)/(MAX - MIN)
+    return data
 
-sst = '../../data/sst_grid/convert_sst.mon.mean_1850_01_2015_12.mat'
+def inverse_normalization(data):
+    for i in range(len(data)):
+        for j in range(len(data[0])):
+            data[i][j] = data[i][j]*(MAX - MIN) + MIN
+    return data
+
+# data preprocessing
+sst = '../../../../dataset/sst_grid_1/convert_sst.mon.mean_185001_201512.mat'
+# sst = '../../data/sst_grid/convert_sst.mon.mean_1850_01_2015_12.mat'
 
 sst_data = sio.loadmat(sst)
 sst_data = sst_data['sst'][:,:,:]
@@ -71,7 +85,7 @@ convert_sst = np.zeros((167,12,10,50,1), dtype = np.float)
 for i in range(167):
     for k in range(12):
         # Year * 12 + currentMonth
-        convert_sst[i,k,::,::,0] = sst_data[::,::,i*12+k]
+        convert_sst[i,k,::,::,0] = normalization(sst_data[::,::,i*12+k])
 
 sst_grid = convert_sst
 
@@ -82,6 +96,7 @@ if not os.path.exists(file_path):
     history = seq.fit(sst_grid[:160], sst_grid[:160], batch_size=10, epochs=200, validation_split=0.05)
     seq.save(file_path)
     pyplot.plot(history.history['loss'])
+    pyplot.plot(history.history['val_loss'])
     pyplot.title('model loss')
     pyplot.ylabel('loss')
     pyplot.xlabel('epoch')
@@ -112,14 +127,14 @@ for i in range(12):
         ax.text(1, 3, 'Predictions', fontsize=20, color='w')
     else:
         ax.text(1, 3, 'Initial trajectory', fontsize=20)
-    toplot = track[i, ::, ::, 0]
+    toplot = inverse_normalization(track[i, ::, ::, 0])
     plt.imshow(toplot)
     cbar = plt.colorbar(plt.imshow(toplot), orientation='horizontal')
     cbar.set_label('°C',fontsize=12)
 
     ax = fig.add_subplot(122)
     plt.text(1, 3, 'Ground truth', fontsize=12)
-    toplot = track2[i, ::, ::, 0]
+    toplot = inverse_normalization(track2[i, ::, ::, 0])
     plt.imshow(toplot)
     cbar = plt.colorbar(plt.imshow(toplot), orientation='horizontal')
     cbar.set_label('°C',fontsize=12)
