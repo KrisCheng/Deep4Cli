@@ -44,12 +44,16 @@ seq.add(Conv3D(filters=1, kernel_size=(3, 3, 3),
                activation='sigmoid',
                padding='same', data_format='channels_last'))
 # run on two gpus
-seq = multi_gpu_model(seq, gpus=2)
+# seq = multi_gpu_model(seq, gpus=2)
+
 seq.compile(loss='mse', optimizer='adadelta')
 print(seq.summary())
 
 # data preprocessing
-sst = '../../../../dataset/sst_grid_1/convert_sst.mon.mean_185001_201512.mat'
+# sst = '../../../../dataset/sst_grid_1/convert_sst.mon.mean_185001_201512.mat'
+
+sst = '../../data/sst_grid/convert_sst.mon.mean_1850_01_2015_12.mat'
+
 sst_data = sio.loadmat(sst)
 sst_data = sst_data['sst'][:,:,:]
 sst_data = np.array(sst_data, dtype=float)
