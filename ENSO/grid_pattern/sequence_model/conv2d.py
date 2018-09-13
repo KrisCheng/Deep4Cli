@@ -90,10 +90,10 @@ for i in range(167):
 sst_grid = convert_sst
 
 # fit model
-file_path = '200epoch.h5'
+file_path = '40000epoch.h5'
 
 if not os.path.exists(file_path):
-    history = seq.fit(sst_grid[:160], sst_grid[:160], batch_size=10, epochs=200, validation_split=0.05)
+    history = seq.fit(sst_grid[:160], sst_grid[:160], batch_size=10, epochs=40000, validation_split=0.05)
     seq.save(file_path)
     pyplot.plot(history.history['loss'])
     pyplot.plot(history.history['val_loss'])
@@ -124,9 +124,9 @@ for i in range(12):
 
     ax = fig.add_subplot(121)
     if i >= 7:
-        ax.text(1, 3, 'Predictions', fontsize=20, color='w')
+        ax.text(1, 3, 'Predictions', fontsize=12, color='w')
     else:
-        ax.text(1, 3, 'Initial trajectory', fontsize=20)
+        ax.text(1, 3, 'Initial trajectory', fontsize=12)
     toplot = inverse_normalization(track[i, ::, ::, 0])
     plt.imshow(toplot)
     cbar = plt.colorbar(plt.imshow(toplot), orientation='horizontal')
