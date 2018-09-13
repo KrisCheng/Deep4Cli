@@ -1,5 +1,5 @@
 '''
-Desc: the Grid ConvLSTM2D model for ENSO Case.
+Desc: result analysis of training model.
 Author: Kris Peng
 Data: https://www.esrl.noaa.gov/psd/data/gridded/data.cobe2.html
 Data Desc: 1850/01~2015/12; monthly SST
@@ -16,42 +16,40 @@ import os.path
 from matplotlib import pyplot
 from netCDF4 import Dataset
 from keras.models import Sequential
-from keras.utils import multi_gpu_model
 from keras.layers.convolutional import Conv3D
 from keras.layers.convolutional_recurrent import ConvLSTM2D
 from keras.layers.normalization import BatchNormalization
 from keras.models import load_model
 
-seq = Sequential()
-seq.add(ConvLSTM2D(filters=40, kernel_size=(3, 3),
-                   input_shape=(None, 10, 50, 1),
-                   padding='same', return_sequences=True))
-seq.add(BatchNormalization())
+# seq = Sequential()
+# seq.add(ConvLSTM2D(filters=40, kernel_size=(3, 3),
+#                    input_shape=(None, 10, 50, 1),
+#                    padding='same', return_sequences=True))
+# seq.add(BatchNormalization())
 
-seq.add(ConvLSTM2D(filters=40, kernel_size=(3, 3),
-                   padding='same', return_sequences=True))
-seq.add(BatchNormalization())
+# seq.add(ConvLSTM2D(filters=40, kernel_size=(3, 3),
+#                    padding='same', return_sequences=True))
+# seq.add(BatchNormalization())
 
-seq.add(ConvLSTM2D(filters=40, kernel_size=(3, 3),
-                   padding='same', return_sequences=True))
-seq.add(BatchNormalization())
+# seq.add(ConvLSTM2D(filters=40, kernel_size=(3, 3),
+#                    padding='same', return_sequences=True))
+# seq.add(BatchNormalization())
 
-seq.add(ConvLSTM2D(filters=40, kernel_size=(3, 3),
-                   padding='same', return_sequences=True))
-seq.add(BatchNormalization())
+# seq.add(ConvLSTM2D(filters=40, kernel_size=(3, 3),
+#                    padding='same', return_sequences=True))
+# seq.add(BatchNormalization())
 
-seq.add(Conv3D(filters=1, kernel_size=(3, 3, 3),
-               activation='sigmoid',
-               padding='same', data_format='channels_last'))
-# run on two gpus
-# seq = multi_gpu_model(seq, gpus=2)
+# seq.add(Conv3D(filters=1, kernel_size=(3, 3, 3),
+#                activation='sigmoid',
+#                padding='same', data_format='channels_last'))
 
-seq.compile(loss='mse', optimizer='adadelta')
-print(seq.summary())
+# seq.compile(loss='mse', optimizer='adadelta')
+# print(seq.summary())
 
 MAX = 31.18499947
 MIN = 20.33499908
 MEAN = 26.80007865
+
 def normalization(data):
     for i in range(len(data)):
         for j in range(len(data[0])):
@@ -65,7 +63,7 @@ def inverse_normalization(data):
     return data
 
 # data preprocessing
-sst = '../../../../dataset/sst_grid_1/convert_sst.mon.mean_185001_201512.mat'
+# sst = '../../../../dataset/sst_grid_1/convert_sst.mon.mean_185001_201512.mat'
 sst = '../../data/sst_grid/convert_sst.mon.mean_1850_01_2015_12.mat'
 
 sst_data = sio.loadmat(sst)
@@ -90,25 +88,11 @@ for i in range(167):
 sst_grid = convert_sst
 
 # fit model
+file_path = '../../record/grid_pattern/models/40000withNormalization/40000epoch.h5'
 file_path = '40000epoch.h5'
 
-if not os.path.exists(file_path):
-    pass
-    # history = seq.fit(sst_grid[:160], sst_grid[:160], batch_size=10, epochs=40000, validation_split=0.05)
-    # seq.save(file_path)
-    # pyplot.plot(history.history['loss'])
-    # pyplot.plot(history.history['val_loss'])
-    # pyplot.title('model loss')
-    # pyplot.ylabel('loss')
-    # pyplot.xlabel('epoch')
-    # pyplot.legend(['train', 'validation'], loc='upper left')
-    # pyplot.show()
-else:
-    seq = load_model(file_path)
+seq = load_model(file_path)
 
-# Testing the network on new monthly SST distribution
-# feed it with the first 7 patterns
-# predict the new patterns
 which_year = 166
 track = sst_grid[which_year][:7, ::, ::, ::]
 
@@ -117,7 +101,6 @@ for j in range(12):
     new = new_pos[::, -1, ::, ::, ::]
     track = np.concatenate((track, new), axis=0)
 
-# And then compare the predictions
 # to the ground truth
 track2 = sst_grid[which_year][::, ::, ::, ::]
 for i in range(12):

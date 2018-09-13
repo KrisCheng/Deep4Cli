@@ -76,7 +76,6 @@ def prepare_data(series, n_test, n_lag, n_seq):
 	supervised_values = supervised.values
 	# split into train and test sets
 	train, test = supervised_values[0:-n_test], supervised_values[-n_test:]
-	print(train[0])
 	return scaler, train, test
 
 # fit an LSTM network to training data
