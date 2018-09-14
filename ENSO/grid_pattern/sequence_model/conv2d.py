@@ -44,7 +44,7 @@ seq.add(Conv3D(filters=1, kernel_size=(3, 3, 3),
                activation='sigmoid',
                padding='same', data_format='channels_last'))
 # run on two gpus
-# seq = multi_gpu_model(seq, gpus=2)
+seq = multi_gpu_model(seq, gpus=2)
 
 seq.compile(loss='mse', optimizer='adadelta')
 print(seq.summary())
@@ -66,7 +66,7 @@ def inverse_normalization(data):
 
 # data preprocessing
 sst = '../../../../dataset/sst_grid_1/convert_sst.mon.mean_185001_201512.mat'
-sst = '../../data/sst_grid/convert_sst.mon.mean_1850_01_2015_12.mat'
+# sst = '../../data/sst_grid/convert_sst.mon.mean_1850_01_2015_12.mat'
 
 sst_data = sio.loadmat(sst)
 sst_data = sst_data['sst'][:,:,:]
@@ -93,16 +93,15 @@ sst_grid = convert_sst
 file_path = '40000epoch.h5'
 
 if not os.path.exists(file_path):
-    pass
-    # history = seq.fit(sst_grid[:160], sst_grid[:160], batch_size=10, epochs=40000, validation_split=0.05)
-    # seq.save(file_path)
-    # pyplot.plot(history.history['loss'])
-    # pyplot.plot(history.history['val_loss'])
-    # pyplot.title('model loss')
-    # pyplot.ylabel('loss')
-    # pyplot.xlabel('epoch')
-    # pyplot.legend(['train', 'validation'], loc='upper left')
-    # pyplot.show()
+    history = seq.fit(sst_grid[:160], sst_grid[:160], batch_size=10, epochs=40000, validation_split=0.05)
+    seq.save(file_path)
+    pyplot.plot(history.history['loss'])
+    pyplot.plot(history.history['val_loss'])
+    pyplot.title('model loss')
+    pyplot.ylabel('loss')
+    pyplot.xlabel('epoch')
+    pyplot.legend(['train', 'validation'], loc='upper left')
+    pyplot.show()
 else:
     seq = load_model(file_path)
 
@@ -110,7 +109,7 @@ else:
 # feed it with the first 7 patterns
 # predict the new patterns
 which_year = 166
-track = sst_grid[which_year][:7, ::, ::, ::]
+track = sst_grid[which_year][:6, ::, ::, ::]
 
 for j in range(12):
     new_pos = seq.predict(track[np.newaxis, ::, ::, ::, ::])
@@ -124,8 +123,8 @@ for i in range(12):
     fig = plt.figure(figsize=(10, 5))
 
     ax = fig.add_subplot(121)
-    if i >= 7:
-        ax.text(1, 3, 'Predictions', fontsize=12, color='w')
+    if i >= 6:
+        ax.text(1, 3, 'Prediction', fontsize=12, color='w')
     else:
         ax.text(1, 3, 'Initial trajectory', fontsize=12)
     toplot = inverse_normalization(track[i, ::, ::, 0])
