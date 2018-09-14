@@ -96,7 +96,7 @@ file_path = '20000epoch.h5'
 
 seq = load_model(file_path)
 
-which_year = 166
+which_year = 165
 
 # precitction
 track1 = sst_grid[which_year][:6, ::, ::, ::]
@@ -110,7 +110,7 @@ for j in range(12):
 track2 = sst_grid[which_year][::, ::, ::, ::]
 
 for i in range(12):
-    fig = plt.figure(figsize=(20, 6))
+    fig = plt.figure(figsize=(20, 8))
     ax = fig.add_subplot(221)
     if i >= 6:
         ax.text(1, 3, 'Prediction', fontsize=12, color='w')

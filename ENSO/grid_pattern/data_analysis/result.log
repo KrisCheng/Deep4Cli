@@ -71,6 +71,19 @@ MSE:
 2015_11_month total loss: 0.795964
 2015_12_month total loss: 0.674833
 
+2014_1_month total loss: 0.000000
+2014_2_month total loss: 0.000000
+2014_3_month total loss: 0.000000
+2014_4_month total loss: 0.000000
+2014_5_month total loss: 0.000000
+2014_6_month total loss: 0.000000
+2014_7_month total loss: 0.120170
+2014_8_month total loss: 0.510743
+2014_9_month total loss: 1.173997
+2014_10_month total loss: 2.542550
+2014_11_month total loss: 5.285012
+2014_12_month total loss: 5.043147
+
 40000 epochs:
 2015_1_month total loss: 0.000000
 2015_2_month total loss: 0.000000
