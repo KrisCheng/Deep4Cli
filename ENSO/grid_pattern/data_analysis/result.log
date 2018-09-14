@@ -1,0 +1,88 @@
+Desc: the log file. record all the data.
+
+---
+Net Structure:
+Layer (type)                 Output Shape              Param #
+=================================================================
+conv_lst_m2d_1 (ConvLSTM2D)  (None, None, 10, 50, 40)  59200
+_________________________________________________________________
+batch_normalization_1 (Batch (None, None, 10, 50, 40)  160
+_________________________________________________________________
+conv_lst_m2d_2 (ConvLSTM2D)  (None, None, 10, 50, 40)  115360
+_________________________________________________________________
+batch_normalization_2 (Batch (None, None, 10, 50, 40)  160
+_________________________________________________________________
+conv_lst_m2d_3 (ConvLSTM2D)  (None, None, 10, 50, 40)  115360
+_________________________________________________________________
+batch_normalization_3 (Batch (None, None, 10, 50, 40)  160
+_________________________________________________________________
+conv_lst_m2d_4 (ConvLSTM2D)  (None, None, 10, 50, 40)  115360
+_________________________________________________________________
+batch_normalization_4 (Batch (None, None, 10, 50, 40)  160
+_________________________________________________________________
+conv3d_1 (Conv3D)            (None, None, 10, 50, 1)   1081
+=================================================================
+Total params: 407,001
+Trainable params: 406,681
+Non-trainable params: 320
+_________________________________________________________________
+
+MSE:
+
+200 epoches:
+2015_1_month total loss: 0.000000
+2015_2_month total loss: 0.000000
+2015_3_month total loss: 0.000000
+2015_4_month total loss: 0.000000
+2015_5_month total loss: 0.000000
+2015_6_month total loss: 0.000000
+2015_7_month total loss: 1.358763
+2015_8_month total loss: 2.571954
+2015_9_month total loss: 3.739474
+2015_10_month total loss: 4.079036
+2015_11_month total loss: 4.278092
+2015_12_month total loss: 4.752266
+
+2000 epoches:
+2015_1_month total loss: 0.000000
+2015_2_month total loss: 0.000000
+2015_3_month total loss: 0.000000
+2015_4_month total loss: 0.000000
+2015_5_month total loss: 0.000000
+2015_6_month total loss: 0.000000
+2015_7_month total loss: 0.561150
+2015_8_month total loss: 1.262741
+2015_9_month total loss: 1.537833
+2015_10_month total loss: 1.994385
+2015_11_month total loss: 2.028640
+2015_12_month total loss: 1.718509
+
+20000 epoches:
+2015_1_month total loss: 0.000000
+2015_2_month total loss: 0.000000
+2015_3_month total loss: 0.000000
+2015_4_month total loss: 0.000000
+2015_5_month total loss: 0.000000
+2015_6_month total loss: 0.000000
+2015_7_month total loss: 0.400644
+2015_8_month total loss: 0.876662
+2015_9_month total loss: 0.702460
+2015_10_month total loss: 0.916204
+2015_11_month total loss: 0.795964
+2015_12_month total loss: 0.674833
+
+40000 epochs:
+2015_1_month total loss: 0.000000
+2015_2_month total loss: 0.000000
+2015_3_month total loss: 0.000000
+2015_4_month total loss: 0.000000
+2015_5_month total loss: 0.000000
+2015_6_month total loss: 0.000000
+2015_7_month total loss: 0.512277
+2015_8_month total loss: 1.304641
+2015_9_month total loss: 1.353509
+2015_10_month total loss: 1.821789
+2015_11_month total loss: 1.603620
+2015_12_month total loss: 1.342053
+
+---
