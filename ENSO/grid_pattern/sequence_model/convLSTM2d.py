@@ -45,9 +45,13 @@ seq.add(Conv3D(filters=1, kernel_size=(3, 3, 3),
                padding='same', data_format='channels_last'))
 # run on two gpus
 seq = multi_gpu_model(seq, gpus=2)
-
 seq.compile(loss='mse', optimizer='adadelta')
 print(seq.summary())
+
+# parameters setting
+epochs = 20
+batch_size = 10
+validation_split = 0.05
 
 MAX = 31.18499947
 MIN = 20.33499908
@@ -93,8 +97,8 @@ sst_grid = convert_sst
 file_path = '40000epoch.h5'
 
 if not os.path.exists(file_path):
-    history = seq.fit(sst_grid[:160], sst_grid[:160], batch_size=10, epochs=40000, validation_split=0.05)
-    seq.save(file_path)
+    history = seq.fit(sst_grid[:160], sst_grid[:160], batch_size=batch_size, epochs=epochs, validation_split=validation_split)
+    # seq.save(file_path)
     pyplot.plot(history.history['loss'])
     pyplot.plot(history.history['val_loss'])
     pyplot.title('model loss')
