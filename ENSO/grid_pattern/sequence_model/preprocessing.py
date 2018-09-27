@@ -8,6 +8,7 @@ import numpy as np
 
 DATA_PATH = '../../../../dataset/sst_grid_1/convert_sst.mon.mean_185001_201512.mat'
 # DATA_PATH = '../../data/sst_grid/convert_sst.mon.mean_1850_01_2015_12.mat'
+
 len_train = 167
 map_height, map_width = 10, 50
 MAX = 31.18499947
@@ -31,9 +32,13 @@ def load_data():
     sst_data = sio.loadmat(DATA_PATH)
     sst_data = sst_data['sst'][:,:,:]
     sst_data = np.array(sst_data, dtype=float)
+
     # (180 * 360 * 2004) --> (10 * 50 * 2004) NINO3.4 region (5W~5N, 170W~120W)
     sst_data = sst_data[85:95,190:240,:]
 
+    min = sst_data.min()
+    max = sst_data.max()
+    print("min:", min, "max:", max)
     # todo
     # # 1850.01~2015.01 (train)
     # train_data = sst_data[::,::,0:-12]

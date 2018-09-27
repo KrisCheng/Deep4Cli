@@ -1,5 +1,5 @@
 '''
-Desc: the Grid ConvLSTM2D model for ENSO Case.
+Desc: the entrance of the whole project.
 Author: Kris Peng
 Data: https://www.esrl.noaa.gov/psd/data/gridded/data.cobe2.html
 Data Desc: 1850/01~2015/12; monthly SST
@@ -27,6 +27,7 @@ def build_model():
 epochs = 2
 batch_size = 10
 validation_split = 0.05
+which_year = 166 # year to visulization
 
 sst_grid = pp.load_data()
 
@@ -51,7 +52,6 @@ else:
 # Testing the network on new monthly SST distribution
 # feed it with the first 7 patterns
 # predict the new patterns
-which_year = 166
 track = sst_grid[which_year][:6, ::, ::, ::]
 
 for j in range(12):
@@ -81,4 +81,4 @@ for i in range(12):
     cbar = plt.colorbar(plt.imshow(toplot), orientation='horizontal')
     cbar.set_label('°C',fontsize=12)
 
-    plt.savefig('%i_animate.png' % (i + 1))
+    # plt.savefig('%i_animate.png' % (i + 1))
