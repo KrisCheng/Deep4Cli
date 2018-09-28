@@ -27,7 +27,7 @@ def inverse_normalization(data):
             data[i][j] = data[i][j]*(MAX - MIN) + MIN
     return data
 
-def load_data():
+def load_data_convlstm():
     # load data
     sst_data = sio.loadmat(DATA_PATH)
     sst_data = sst_data['sst'][:,:,:]
@@ -38,6 +38,7 @@ def load_data():
 
     min = sst_data.min()
     max = sst_data.max()
+    print('=' * 10)
     print("min:", min, "max:", max)
     # todo
     # # 1850.01~2015.01 (train)
@@ -51,4 +52,26 @@ def load_data():
         for k in range(12):
             # Year * 12 + currentMonth
             convert_sst[i,k,::,::,0] = normalization(sst_data[::,::,i*12+k])
+    return convert_sst
+
+def load_data_resnet():
+    # load data
+    sst_data = sio.loadmat(DATA_PATH)
+    sst_data = sst_data['sst'][:,:,:]
+    sst_data = np.array(sst_data, dtype=float)
+
+    # (180 * 360 * 2004) --> (10 * 50 * 2004) NINO3.4 region (5W~5N, 170W~120W)
+    sst_data = sst_data[85:95,190:240,:]
+
+    min = sst_data.min()
+    max = sst_data.max()
+    print('=' * 10)
+    print("min:", min, "max:", max)
+
+    # sst min:20.33 / max:31.18
+    convert_sst = np.zeros((len_train,12,map_height,map_width), dtype = np.float)
+    for i in range(len_train):
+        for k in range(12):
+            # Year * 12 + currentMonth
+            convert_sst[i,k,::,::] = normalization(sst_data[::,::,i*12+k])
     return convert_sst
