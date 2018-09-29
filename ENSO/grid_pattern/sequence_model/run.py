@@ -15,6 +15,7 @@ import ConvLSTM2D
 import STResNet
 import os.path
 from matplotlib import pyplot
+from keras.models import load_model
 from keras.utils import multi_gpu_model
 
 def CovLSTM2D_model():
@@ -40,17 +41,17 @@ which_year = 166 # year to visulization
 
 def main():
     # data preparation
-    # sst_grid = pp.load_data_convlstm()
-    sst_grid = pp.load_data_resnet()
-    
+    sst_grid = pp.load_data_convlstm()
+    # sst_grid = pp.load_data_resnet()
+
     print("Whole Dataset Shape: %s " % str(sst_grid.shape))
 
     # fit model
     file_path = '40000epoch.h5'
 
     # model setting
-    # seq = CovLSTM2D_model()
-    seq = STResNet_model()
+    seq = CovLSTM2D_model()
+    # seq = STResNet_model()
 
     seq = multi_gpu_model(seq, gpus=2)
     seq.compile(loss='mse', optimizer='adadelta')
@@ -73,34 +74,43 @@ def main():
     # Testing the network on new monthly SST distribution
     # feed it with the first 7 patterns
     # predict the new patterns
-    track = sst_grid[which_year][:6, ::, ::, ::]
+    track1 = sst_grid[which_year][:6, ::, ::, ::]
 
     for j in range(12):
-        new_pos = seq.predict(track[np.newaxis, ::, ::, ::, ::])
+        new_pos = seq.predict(track1[np.newaxis, ::, ::, ::, ::])
         new = new_pos[::, -1, ::, ::, ::]
-        track = np.concatenate((track, new), axis=0)
+        track1 = np.concatenate((track1, new), axis=0)
 
     # And then compare the predictions
     # to the ground truth
     track2 = sst_grid[which_year][::, ::, ::, ::]
     for i in range(12):
-        fig = plt.figure(figsize=(10, 5))
+        fig = plt.figure(figsize=(10, 10))
 
-        ax = fig.add_subplot(121)
+        ax = fig.add_subplot(311)
         if i >= 6:
-            ax.text(1, 3, 'Prediction', fontsize=12, color='w')
+            ax.text(1, 3, 'Prediction', fontsize=12)
         else:
             ax.text(1, 3, 'Initial trajectory', fontsize=12)
-        toplot = pp.inverse_normalization(track[i, ::, ::, 0])
-        plt.imshow(toplot)
-        cbar = plt.colorbar(plt.imshow(toplot), orientation='horizontal')
+        toplot1 = pp.inverse_normalization(track1[i, ::, ::, 0])
+        plt.imshow(toplot1)
+        cbar = plt.colorbar(plt.imshow(toplot1), orientation='horizontal')
         cbar.set_label('°C',fontsize=12)
-        ax = fig.add_subplot(122)
+
+        ax = fig.add_subplot(312)
         plt.text(1, 3, 'Ground truth', fontsize=12)
-        toplot = pp.inverse_normalization(track2[i, ::, ::, 0])
-        plt.imshow(toplot)
-        cbar = plt.colorbar(plt.imshow(toplot), orientation='horizontal')
+        toplot2 = pp.inverse_normalization(track2[i, ::, ::, 0])
+        plt.imshow(toplot2)
+        cbar = plt.colorbar(plt.imshow(toplot2), orientation='horizontal')
         cbar.set_label('°C',fontsize=12)
+
+        ax = fig.add_subplot(313)
+        plt.text(1, 3, 'Difference', fontsize=12)
+        toplot3 = toplot2 - toplot1
+        plt.imshow(toplot3)
+        cbar = plt.colorbar(plt.imshow(toplot3), orientation='horizontal')
+        cbar.set_label('°C',fontsize=12)
+
         plt.savefig('%i_animate.png' % (i + 1))
 
 if __name__ == '__main__':
