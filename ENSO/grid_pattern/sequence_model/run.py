@@ -47,7 +47,7 @@ def main():
     print("Whole Dataset Shape: %s " % str(sst_grid.shape))
 
     # fit model
-    file_path = '40000epoch.h5'
+    file_path = '20000epoch.h5'
 
     # model setting
     seq = CovLSTM2D_model()
@@ -72,18 +72,18 @@ def main():
         seq = load_model(file_path)
 
     # Testing the network on new monthly SST distribution
-    # feed it with the first 7 patterns
+    # feed it with the first 6 patterns
     # predict the new patterns
-    track1 = sst_grid[which_year][:6, ::, ::, ::]
+    pred_sequence = sst_grid[which_year][:6, ::, ::, ::]
 
     for j in range(12):
-        new_pos = seq.predict(track1[np.newaxis, ::, ::, ::, ::])
+        new_pos = seq.predict(pred_sequence[np.newaxis, ::, ::, ::, ::])
         new = new_pos[::, -1, ::, ::, ::]
-        track1 = np.concatenate((track1, new), axis=0)
+        pred_sequence = np.concatenate((pred_sequence, new), axis=0)
 
-    # And then compare the predictions
-    # to the ground truth
-    track2 = sst_grid[which_year][::, ::, ::, ::]
+    # And then compare the predictions with the ground truth
+    act_sequence = sst_grid[which_year][::, ::, ::, ::]
+ 
     for i in range(12):
         fig = plt.figure(figsize=(10, 10))
 
@@ -92,14 +92,14 @@ def main():
             ax.text(1, 3, 'Prediction', fontsize=12)
         else:
             ax.text(1, 3, 'Initial trajectory', fontsize=12)
-        toplot1 = pp.inverse_normalization(track1[i, ::, ::, 0])
+        toplot1 = pp.inverse_normalization(pred_sequence[i, ::, ::, 0])
         plt.imshow(toplot1)
         cbar = plt.colorbar(plt.imshow(toplot1), orientation='horizontal')
         cbar.set_label('°C',fontsize=12)
 
         ax = fig.add_subplot(312)
         plt.text(1, 3, 'Ground truth', fontsize=12)
-        toplot2 = pp.inverse_normalization(track2[i, ::, ::, 0])
+        toplot2 = pp.inverse_normalization(act_sequence[i, ::, ::, 0])
         plt.imshow(toplot2)
         cbar = plt.colorbar(plt.imshow(toplot2), orientation='horizontal')
         cbar.set_label('°C',fontsize=12)

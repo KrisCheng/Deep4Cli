@@ -15,6 +15,7 @@ MAX = 31.18499947
 MIN = 20.33499908
 MEAN = 26.80007865
 
+# 0~1 Normalization
 def normalization(data):
     for i in range(len(data)):
         for j in range(len(data[0])):
@@ -40,6 +41,7 @@ def load_data_convlstm():
     max = sst_data.max()
     print('=' * 10)
     print("min:", min, "max:", max)
+
     # todo
     # # 1850.01~2015.01 (train)
     # train_data = sst_data[::,::,0:-12]
