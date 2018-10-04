@@ -1,5 +1,8 @@
-Desc: the log file. record all the data.
+Desc:
+the log file. record all the experiment record.
 
+==========
+Model: ConvLSTM2D
 ---
 Net Structure:
 Layer (type)                 Output Shape              Param #
@@ -26,10 +29,12 @@ Total params: 407,001
 Trainable params: 406,681
 Non-trainable params: 320
 _________________________________________________________________
+compile(loss='mse', optimizer='adadelta')
+
 
 MSE:
 
-200 epoches:
+200 epochs:
 2015_1_month total loss: 0.000000
 2015_2_month total loss: 0.000000
 2015_3_month total loss: 0.000000
@@ -43,7 +48,7 @@ MSE:
 2015_11_month total loss: 4.278092
 2015_12_month total loss: 4.752266
 
-2000 epoches:
+2000 epochs:
 2015_1_month total loss: 0.000000
 2015_2_month total loss: 0.000000
 2015_3_month total loss: 0.000000
@@ -57,7 +62,7 @@ MSE:
 2015_11_month total loss: 2.028640
 2015_12_month total loss: 1.718509
 
-20000 epoches:
+20000 epochs:
 2015_1_month total loss: 0.000000
 2015_2_month total loss: 0.000000
 2015_3_month total loss: 0.000000
@@ -99,3 +104,5 @@ MSE:
 2015_12_month total loss: 1.342053
 
 ---
+
+==========
