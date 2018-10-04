@@ -53,7 +53,7 @@ def main():
     seq = CovLSTM2D_model()
     # seq = STResNet_model()
 
-    seq = multi_gpu_model(seq, gpus=2)
+
     seq.compile(loss='mse', optimizer='adadelta')
 
     if not os.path.exists(file_path):
@@ -83,7 +83,7 @@ def main():
 
     # And then compare the predictions with the ground truth
     act_sequence = sst_grid[which_year][::, ::, ::, ::]
- 
+
     for i in range(12):
         fig = plt.figure(figsize=(10, 10))
 
