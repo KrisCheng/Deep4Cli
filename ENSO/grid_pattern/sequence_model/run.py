@@ -17,6 +17,8 @@ import os.path
 from matplotlib import pyplot
 from keras.models import load_model
 from keras.utils import multi_gpu_model
+from sklearn.metrics import mean_squared_error
+from math import sqrt
 
 def CovLSTM2D_model():
     seq = ConvLSTM2D.model()
@@ -33,18 +35,13 @@ def STResNet_model():
     return seq
 
 # parameters setting
-epochs = 2
+epochs = 20000
 batch_size = 10
 validation_split = 0.05
 train_length = 160
-which_year = 166 # year to visulization
+which_year = 163 # year to visulization
 
 def main():
-    # data preparation
-    sst_grid = pp.load_data_convlstm()
-    # sst_grid = pp.load_data_resnet()
-
-    print("Whole Dataset Shape: %s " % str(sst_grid.shape))
 
     # fit model
     file_path = '20000epoch.h5'
@@ -52,15 +49,14 @@ def main():
     # model setting
     seq = CovLSTM2D_model()
     # seq = STResNet_model()
+    sst_grid, train_X, train_Y= pp.load_data_convlstm(train_length)
 
-
+    seq = multi_gpu_model(seq, gpus=2)
     seq.compile(loss='mse', optimizer='adadelta')
-
     if not os.path.exists(file_path):
         # ConLSTM
-        history = seq.fit(sst_grid[:train_length], sst_grid[:train_length], batch_size=batch_size, epochs=epochs, validation_split=validation_split)
-
-        # seq.save(file_path)
+        history = seq.fit(train_X, train_Y, batch_size=batch_size, epochs=epochs, validation_split=validation_split)
+        seq.save(file_path)
         pyplot.plot(history.history['loss'])
         pyplot.plot(history.history['val_loss'])
         pyplot.title('model loss')
@@ -76,7 +72,8 @@ def main():
     # predict the new patterns
     pred_sequence = sst_grid[which_year][:6, ::, ::, ::]
 
-    for j in range(12):
+    for j in range(6):
+        print(pred_sequence[np.newaxis, ::, ::, ::, ::].shape)
         new_pos = seq.predict(pred_sequence[np.newaxis, ::, ::, ::, ::])
         new = new_pos[::, -1, ::, ::, ::]
         pred_sequence = np.concatenate((pred_sequence, new), axis=0)
@@ -86,7 +83,6 @@ def main():
 
     for i in range(12):
         fig = plt.figure(figsize=(10, 10))
-
         ax = fig.add_subplot(311)
         if i >= 6:
             ax.text(1, 3, 'Prediction', fontsize=12)
@@ -110,7 +106,8 @@ def main():
         plt.imshow(toplot3)
         cbar = plt.colorbar(plt.imshow(toplot3), orientation='horizontal')
         cbar.set_label('°C',fontsize=12)
-
+        rmse = sqrt(mean_squared_error(toplot2, toplot1))
+        print("RMSE: %s" % rmse)
         plt.savefig('%i_animate.png' % (i + 1))
 
 if __name__ == '__main__':

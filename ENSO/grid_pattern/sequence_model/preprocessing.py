@@ -9,7 +9,7 @@ import numpy as np
 DATA_PATH = '../../../../dataset/sst_grid_1/convert_sst.mon.mean_185001_201512.mat'
 # DATA_PATH = '../../data/sst_grid/convert_sst.mon.mean_1850_01_2015_12.mat'
 
-len_train = 167
+len_year = 167
 map_height, map_width = 10, 50
 MAX = 31.18499947
 MIN = 20.33499908
@@ -28,7 +28,7 @@ def inverse_normalization(data):
             data[i][j] = data[i][j]*(MAX - MIN) + MIN
     return data
 
-def load_data_convlstm():
+def load_data_convlstm(train_length):
     # load data
     sst_data = sio.loadmat(DATA_PATH)
     sst_data = sst_data['sst'][:,:,:]
@@ -49,12 +49,26 @@ def load_data_convlstm():
     # test_data = sst_data[::,::,-12:]
 
     # sst min:20.33 / max:31.18
-    convert_sst = np.zeros((len_train,12,map_height,map_width,1), dtype = np.float)
-    for i in range(len_train):
+    convert_sst = np.zeros((len_year,12,map_height,map_width,1), dtype = np.float)
+    for i in range(len_year):
         for k in range(12):
             # Year * 12 + currentMonth
             convert_sst[i,k,::,::,0] = normalization(sst_data[::,::,i*12+k])
-    return convert_sst
+
+    train_X = convert_sst[:train_length]
+    train_Y = np.zeros((train_length,12,map_height,map_width,1), dtype = np.float)
+    for i in range(train_length):
+        for k in range(12):
+            if k != 11:
+                train_Y[i,k,::,::,0] = train_X[i,k+1,::,::,0]
+            # 下一年的1月
+            else:
+                if (i != train_length -1):
+                    train_Y[i,k,::,::,0] = train_X[i+1,0,::,::,0]
+                else:
+                    train_Y[i,k,::,::,0] = train_X[i,k,::,::,0]
+
+    return convert_sst, train_X, train_Y
 
 def load_data_resnet():
     # load data
@@ -71,8 +85,8 @@ def load_data_resnet():
     print("min:", min, "max:", max)
 
     # sst min:20.33 / max:31.18
-    convert_sst = np.zeros((len_train,12,map_height,map_width), dtype = np.float)
-    for i in range(len_train):
+    convert_sst = np.zeros((len_year,12,map_height,map_width), dtype = np.float)
+    for i in range(len_year):
         for k in range(12):
             # Year * 12 + currentMonth
             convert_sst[i,k,::,::] = normalization(sst_data[::,::,i*12+k])
