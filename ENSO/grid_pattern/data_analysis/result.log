@@ -2,7 +2,7 @@ Desc:
 the log file. record all the experiment record.
 
 ==========
-Model: ConvLSTM2D
+Model: ConvLSTM2D  -- Wrong Experiment!!！
 ---
 Net Structure:
 Layer (type)                 Output Shape              Param #
@@ -104,5 +104,4 @@ MSE:
 2015_12_month total loss: 1.342053
 
 ---
-
 ==========
