@@ -2,7 +2,10 @@ Desc:
 the log file. record all the experiment record.
 
 ==========
-Model: ConvLSTM2D  -- Wrong Experiment!!！
+Model: ConvLSTM2D
+
+=====
+当前帧为输入，当前帧为输出。
 ---
 Net Structure:
 Layer (type)                 Output Shape              Param #
@@ -30,10 +33,7 @@ Trainable params: 406,681
 Non-trainable params: 320
 _________________________________________________________________
 compile(loss='mse', optimizer='adadelta')
-
-
 MSE:
-
 200 epochs:
 2015_1_month total loss: 0.000000
 2015_2_month total loss: 0.000000
@@ -104,4 +104,7 @@ MSE:
 2015_12_month total loss: 1.342053
 
 ---
+=====
+
+
 ==========
