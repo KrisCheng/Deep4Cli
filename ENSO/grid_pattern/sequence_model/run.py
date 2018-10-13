@@ -35,16 +35,18 @@ def STResNet_model():
     return seq
 
 # parameters setting
-epochs = 20000
+epochs = 5000
 batch_size = 10
-validation_split = 0.05
+validation_split = 0.1
 train_length = 160
-which_year = 163 # year to visulization
+len_year = 167
+start_year = 160
+# which_year = 161 # year to visulization
 
 def main():
 
     # fit model
-    file_path = '20000epoch.h5'
+    file_path = '5000epoch.h5'
 
     # model setting
     seq = CovLSTM2D_model()
@@ -53,8 +55,10 @@ def main():
 
     seq = multi_gpu_model(seq, gpus=2)
     seq.compile(loss='mse', optimizer='adadelta')
+
     if not os.path.exists(file_path):
-        # ConLSTM
+
+        # ConvLSTM Model
         history = seq.fit(train_X, train_Y, batch_size=batch_size, epochs=epochs, validation_split=validation_split)
         seq.save(file_path)
         pyplot.plot(history.history['loss'])
@@ -67,48 +71,63 @@ def main():
     else:
         seq = load_model(file_path)
 
+    # Evaluation part
     # Testing the network on new monthly SST distribution
     # feed it with the first 6 patterns
-    # predict the new patterns
-    pred_sequence = sst_grid[which_year][:6, ::, ::, ::]
+    # predict the next 6 pattern
 
-    for j in range(6):
-        print(pred_sequence[np.newaxis, ::, ::, ::, ::].shape)
-        new_pos = seq.predict(pred_sequence[np.newaxis, ::, ::, ::, ::])
-        new = new_pos[::, -1, ::, ::, ::]
-        pred_sequence = np.concatenate((pred_sequence, new), axis=0)
+    model_sum_loss = 0
+    base_sum_loss = 0
 
-    # And then compare the predictions with the ground truth
-    act_sequence = sst_grid[which_year][::, ::, ::, ::]
+    for k in range(start_year,len_year):
+        pred_sequence = sst_grid[k][:6, ::, ::, ::]
+        for j in range(6):
+            new_pos = seq.predict(pred_sequence[np.newaxis, ::, ::, ::, ::])
+            new = new_pos[::, -1, ::, ::, ::]
+            pred_sequence = np.concatenate((pred_sequence, new), axis=0)
+        # And then compare the predictions with the ground truth
+        act_sequence = sst_grid[k][::, ::, ::, ::]
 
-    for i in range(12):
-        fig = plt.figure(figsize=(10, 10))
-        ax = fig.add_subplot(311)
-        if i >= 6:
+        for i in range(6,12):
+            fig = plt.figure(figsize=(10, 10))
+            ax = fig.add_subplot(411)
             ax.text(1, 3, 'Prediction', fontsize=12)
-        else:
-            ax.text(1, 3, 'Initial trajectory', fontsize=12)
-        toplot1 = pp.inverse_normalization(pred_sequence[i, ::, ::, 0])
-        plt.imshow(toplot1)
-        cbar = plt.colorbar(plt.imshow(toplot1), orientation='horizontal')
-        cbar.set_label('°C',fontsize=12)
 
-        ax = fig.add_subplot(312)
-        plt.text(1, 3, 'Ground truth', fontsize=12)
-        toplot2 = pp.inverse_normalization(act_sequence[i, ::, ::, 0])
-        plt.imshow(toplot2)
-        cbar = plt.colorbar(plt.imshow(toplot2), orientation='horizontal')
-        cbar.set_label('°C',fontsize=12)
+            pred_toplot = pp.inverse_normalization(pred_sequence[i, ::, ::, 0])
+            plt.imshow(pred_toplot)
+            cbar = plt.colorbar(plt.imshow(pred_toplot), orientation='horizontal')
+            cbar.set_label('°C',fontsize=12)
 
-        ax = fig.add_subplot(313)
-        plt.text(1, 3, 'Difference', fontsize=12)
-        toplot3 = toplot2 - toplot1
-        plt.imshow(toplot3)
-        cbar = plt.colorbar(plt.imshow(toplot3), orientation='horizontal')
-        cbar.set_label('°C',fontsize=12)
-        rmse = sqrt(mean_squared_error(toplot2, toplot1))
-        print("RMSE: %s" % rmse)
-        plt.savefig('%i_animate.png' % (i + 1))
+            ax = fig.add_subplot(412)
+            plt.text(1, 3, 'Ground truth', fontsize=12)
+            act_toplot = pp.inverse_normalization(act_sequence[i, ::, ::, 0])
+            plt.imshow(act_toplot)
+            cbar = plt.colorbar(plt.imshow(act_toplot), orientation='horizontal')
+            cbar.set_label('°C',fontsize=12)
+
+            ax = fig.add_subplot(413)
+            plt.text(1, 3, 'Difference', fontsize=12)
+            diff_toplot = act_toplot - pred_toplot
+            plt.imshow(diff_toplot)
+            cbar = plt.colorbar(plt.imshow(diff_toplot), orientation='horizontal')
+            cbar.set_label('°C',fontsize=12)
+
+            # use the last frame as the baseline
+            baseline_frame = pp.inverse_normalization(act_sequence[5, ::, ::, 0])
+            ax = fig.add_subplot(414)
+            plt.text(1, 3, 'Baseline', fontsize=12)
+            plt.imshow(baseline_frame)
+            cbar = plt.colorbar(plt.imshow(baseline_frame), orientation='horizontal')
+            cbar.set_label('°C',fontsize=12)
+
+            model_rmse = sqrt(mean_squared_error(act_toplot, pred_toplot))
+            baseline_rmse = sqrt(mean_squared_error(act_toplot, baseline_frame))
+            model_sum_loss,base_sum_loss = model_sum_loss + model_rmse,base_sum_loss + baseline_rmse
+            # plt.savefig('%i_animate.png' % (i + 1))
+
+    print("="*10)
+    print("Total Model RMSE: %s" % (model_sum_loss/(6*(len_year-start_year))))
+    print("Total Baseline RMSE: %s" % (base_sum_loss/(6*(len_year-start_year))))
 
 if __name__ == '__main__':
     main()

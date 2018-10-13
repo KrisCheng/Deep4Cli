@@ -10,6 +10,7 @@ DATA_PATH = '../../../../dataset/sst_grid_1/convert_sst.mon.mean_185001_201512.m
 # DATA_PATH = '../../data/sst_grid/convert_sst.mon.mean_1850_01_2015_12.mat'
 
 len_year = 167
+len_seq = 12
 map_height, map_width = 10, 50
 MAX = 31.18499947
 MIN = 20.33499908
@@ -17,16 +18,18 @@ MEAN = 26.80007865
 
 # 0~1 Normalization
 def normalization(data):
+    temp_data = np.zeros((map_height, map_width), dtype=np.float)
     for i in range(len(data)):
         for j in range(len(data[0])):
-            data[i][j] = (data[i][j]- MIN)/(MAX - MIN)
-    return data
+            temp_data[i][j] = (data[i][j]- MIN)/(MAX - MIN)
+    return temp_data
 
 def inverse_normalization(data):
+    temp_data = np.zeros((map_height, map_width), dtype=np.float)
     for i in range(len(data)):
         for j in range(len(data[0])):
-            data[i][j] = data[i][j]*(MAX - MIN) + MIN
-    return data
+            temp_data[i][j] = data[i][j]*(MAX - MIN) + MIN
+    return temp_data
 
 def load_data_convlstm(train_length):
     # load data
@@ -49,17 +52,17 @@ def load_data_convlstm(train_length):
     # test_data = sst_data[::,::,-12:]
 
     # sst min:20.33 / max:31.18
-    convert_sst = np.zeros((len_year,12,map_height,map_width,1), dtype = np.float)
+    convert_sst = np.zeros((len_year,len_seq,map_height,map_width,1), dtype = np.float)
     for i in range(len_year):
-        for k in range(12):
+        for k in range(len_seq):
             # Year * 12 + currentMonth
-            convert_sst[i,k,::,::,0] = normalization(sst_data[::,::,i*12+k])
+            convert_sst[i,k,::,::,0] = normalization(sst_data[::,::,i*len_seq+k])
 
     train_X = convert_sst[:train_length]
-    train_Y = np.zeros((train_length,12,map_height,map_width,1), dtype = np.float)
+    train_Y = np.zeros((train_length,len_seq,map_height,map_width,1), dtype = np.float)
     for i in range(train_length):
-        for k in range(12):
-            if k != 11:
+        for k in range(len_seq):
+            if k != len_seq-1:
                 train_Y[i,k,::,::,0] = train_X[i,k+1,::,::,0]
             # 下一年的1月
             else:
@@ -67,7 +70,6 @@ def load_data_convlstm(train_length):
                     train_Y[i,k,::,::,0] = train_X[i+1,0,::,::,0]
                 else:
                     train_Y[i,k,::,::,0] = train_X[i,k,::,::,0]
-
     return convert_sst, train_X, train_Y
 
 def load_data_resnet():
@@ -91,3 +93,6 @@ def load_data_resnet():
             # Year * 12 + currentMonth
             convert_sst[i,k,::,::] = normalization(sst_data[::,::,i*12+k])
     return convert_sst
+
+# the evaluate function, based on RMSE, TODO
+# def evaluate():
