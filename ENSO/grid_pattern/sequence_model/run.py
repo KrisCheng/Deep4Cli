@@ -38,7 +38,7 @@ def STResNet_model():
     return seq
 
 # parameters setting
-epochs = 20000
+epochs = 50000
 batch_size = 10
 validation_split = 0.05
 train_length = 160
@@ -66,12 +66,12 @@ def main():
     sst_grid, train_X, train_Y= pp.load_data_convlstm(train_length)
 
     seq = multi_gpu_model(seq, gpus=2)
-    sgd = optimizers.SGD(lr=0.001, decay=1e-6, momentum=0.9, nesterov=True)
-    seq.compile(loss='mse', optimizer=sgd)
+    # sgd = optimizers.SGD(lr=0.001, decay=1e-6, momentum=0.9, nesterov=True)
+    seq.compile(loss='mse', optimizer='adam')
 
     if not os.path.exists(file_path):
         # ConvLSTM Model
-        history = seq.fit(train_X, train_Y, batch_size=batch_size, epochs=epochs, validation_split=validation_split)
+        history = seq.fit(train_X, train_X, batch_size=batch_size, epochs=epochs, validation_split=validation_split)
         seq.save(file_path)
         pyplot.plot(history.history['loss'])
         pyplot.plot(history.history['val_loss'])

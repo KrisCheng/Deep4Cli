@@ -10,15 +10,15 @@ Copyright (c) 2018 - Kris Peng <kris.dacpc@gmail.com>
 import pylab as plt
 import numpy as np
 import pandas as pd
-import matplotlib as mpl
+import matplotlib.pyplot as plt
 import scipy.io as sio
-from matplotlib import pyplot
 
 # data preprocessing
 sst = '../../../../dataset/sst_grid_1/convert_sst.mon.mean_185001_201512.mat'
 sst_data = sio.loadmat(sst)
 sst_data = sst_data['sst'][:,:,:]
 sst_data = np.array(sst_data, dtype=float)
+
 
 # (180 * 360 * 2004) --> (10 * 50 * 2004) / NINO3.4 region (5W~5N, 170W~120W)
 sst_data = sst_data[85:95, 190:240, :]
@@ -27,18 +27,24 @@ print("Mean: %s" % sst_data.mean())
 print("Max: %s , Loc: %s" % (sst_data.max(), sst_data.argmax()))
 print("Min: %s , Loc: %s" % (sst_data.min(), sst_data.argmin()))
 
-# visualization
-vis_sst = sst_data[:,:,1]
-print(vis_sst)
-plt.imshow(vis_sst)
-cbar = plt.colorbar(plt.imshow(vis_sst), orientation='horizontal')
-cbar.set_ticklabels(('20','21','22','23','24','25','26','27','28','29','30','31','32'))
-plt.show()
+# trend analysis
+x = []
+y = []
+sst_avg = []
+for i in range(2004):
+    x.append(i)
+    y.append(25)
+    sst_avg.append(np.mean(sst_data[:,:,i]))
+    # fig = plt.figure(figsize=(10, 4))
+    # plt.imshow(sst_data[::,::,i])
+    # cbar = plt.colorbar(plt.imshow(sst_data[::,::,i]), orientation='horizontal')
+    # cbar.set_label('°C',fontsize=12)
+    # plt.savefig('%i_sst.png' % i)
 
-
-# # 1850.01~2015.01 (train)
-# train_data = sst_data[::,::,0:-12]
-# # 2015.01~2015.12 (test)
-# test_data = sst_data[::,::,-12:]
-# print(train_data.shape)
-# print(test_data.shape)
+fig = plt.figure(figsize=(20, 5))
+plt.title("All monthly SST(1850.01~2015.12)")
+plt.xlabel("month")
+plt.ylabel("SST")
+plt.plot(x[:-12*7],sst_avg[:-12*7])
+plt.plot(x[-12*7:],sst_avg[-12*7:])
+plt.savefig('sst_plot.png')
