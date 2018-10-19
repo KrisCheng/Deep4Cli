@@ -9,25 +9,27 @@ from keras.layers.convolutional_recurrent import ConvLSTM2D
 from keras.layers.normalization import BatchNormalization
 from keras.models import load_model
 
+height, width = 40, 200
+
 def model():
     # Model
     seq = Sequential()
     seq.add(ConvLSTM2D(filters=40, kernel_size=(3, 3),
-                       input_shape=(None, 10, 50, 1),
+                       input_shape=(None, height, width, 1),
                        padding='same', return_sequences=True))
     seq.add(BatchNormalization())
 
     seq.add(ConvLSTM2D(filters=40, kernel_size=(3, 3),
                        padding='same', return_sequences=True))
     seq.add(BatchNormalization())
-    #
-    # seq.add(ConvLSTM2D(filters=40, kernel_size=(3, 3),
-    #                    padding='same', return_sequences=True))
-    # seq.add(BatchNormalization())
-    #
-    # seq.add(ConvLSTM2D(filters=40, kernel_size=(3, 3),
-    #                    padding='same', return_sequences=True))
-    # seq.add(BatchNormalization())
+
+    seq.add(ConvLSTM2D(filters=40, kernel_size=(3, 3),
+                       padding='same', return_sequences=True))
+    seq.add(BatchNormalization())
+
+    seq.add(ConvLSTM2D(filters=40, kernel_size=(3, 3),
+                       padding='same', return_sequences=True))
+    seq.add(BatchNormalization())
 
     seq.add(Conv3D(filters=1, kernel_size=(3, 3, 3),
                    activation='sigmoid',

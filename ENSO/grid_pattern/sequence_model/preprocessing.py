@@ -6,15 +6,26 @@ Copyright (c) 2018 - Kris Peng <kris.dacpc@gmail.com>
 import scipy.io as sio
 import numpy as np
 
+# monthly sst
 DATA_PATH = '../../../../dataset/sst_grid_1/convert_sst.mon.mean_185001_201512.mat'
-# DATA_PATH = '../../data/sst_grid/convert_sst.mon.mean_1850_01_2015_12.mat'
 
+# daily ssta
+# DATA_PATH = 'ssta_daily_1982_2017_nino34.npy'
+
+# monthly sst setting
 len_year = 167
 len_seq = 12
 map_height, map_width = 10, 50
 MAX = 31.18499947
 MIN = 20.33499908
 MEAN = 26.80007865
+
+# # daily ssta setting
+# len_year = 6
+# len_seq = 365
+# map_height, map_width = 40, 200
+# MAX = 7.7300
+# MIN = -6.3199
 
 # 0~1 Normalization
 def normalization(data):
@@ -31,7 +42,7 @@ def inverse_normalization(data):
             inverse_data[i][j] = data[i][j]*(MAX - MIN) + MIN
     return inverse_data
 
-def load_data_convlstm(train_length):
+def load_data_convlstm_monthly(train_length):
     # load data
     sst_data = sio.loadmat(DATA_PATH)
     sst_data = sst_data['sst'][::,::,::]
@@ -73,6 +84,41 @@ def load_data_convlstm(train_length):
     print("Train_X Shape: ", train_X.shape)
     print("Train_Y Shape: ", train_Y.shape)
     return normalized_sst, train_X, train_Y
+
+def load_data_convlstm_daily(train_length):
+    # load data
+    ssta_data = np.load(DATA_PATH)
+    min = ssta_data.min()
+    max = ssta_data.max()
+    print('=' * 10)
+    print("min:", min, "max:", max)
+    # min: -6.319999694824219 max: 7.730000019073486
+
+    normalized_ssta = np.zeros((len_year,len_seq,map_height,map_width,1), dtype = np.float)
+    for i in range(len_year):
+        for k in range(len_seq):
+            # Year * 12 + currentMonth
+            normalized_ssta[i,k,::,::,0] = normalization(ssta_data[i,k,::])
+
+    train_X = normalized_ssta[:train_length]
+    train_Y = np.zeros((train_length,len_seq,map_height,map_width,1), dtype = np.float)
+
+    for i in range(train_length):
+        for k in range(len_seq):
+            if(k != len_seq-1):
+                train_Y[i,k,::,::,0] = train_X[i,k+1,::,::,0]
+            # 每一年的12月31日以下一年的1月1日为输出
+            else:
+                if(i != train_length-1):
+                    train_Y[i,k,::,::,0] = train_X[i+1,0,::,::,0]
+                else:
+                # 最后一年的最后一天以当前帧为输出
+                    train_Y[i,k,::,::,0] = train_X[i,k,::,::,0]
+    print("Whole Shape: ", normalized_ssta.shape)
+    print("Train_X Shape: ", train_X.shape)
+    print("Train_Y Shape: ", train_Y.shape)
+    return normalized_ssta, train_X, train_Y
+
 
 # TODO
 def load_data_resnet():
