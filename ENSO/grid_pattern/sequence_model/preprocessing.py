@@ -71,7 +71,6 @@ def load_data_convlstm_monthly(train_length):
         for k in range(len_seq):
             if(k != len_seq-1):
                 train_Y[i,k,::,::,0] = train_X[i,k+1,::,::,0]
-
             # 每一年的12月以下一年的1月为输出
             else:
                 if(i != train_length-1):
@@ -92,7 +91,7 @@ def load_data_convlstm_daily(train_length):
     max = ssta_data.max()
     print('=' * 10)
     print("min:", min, "max:", max)
-    # min: -6.319999694824219 max: 7.730000019073486
+    # min: -6.319999694824219 / max: 7.730000019073486
 
     normalized_ssta = np.zeros((len_year,len_seq,map_height,map_width,1), dtype = np.float)
     for i in range(len_year):
@@ -118,7 +117,6 @@ def load_data_convlstm_daily(train_length):
     print("Train_X Shape: ", train_X.shape)
     print("Train_Y Shape: ", train_Y.shape)
     return normalized_ssta, train_X, train_Y
-
 
 # TODO
 def load_data_resnet():
