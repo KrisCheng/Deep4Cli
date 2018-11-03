@@ -14,6 +14,7 @@ import preprocessing as pp
 import ConvLSTM2D
 import STResNet
 import FNN
+import CNN
 import os
 import os.path
 from matplotlib import pyplot
@@ -46,8 +47,15 @@ def FNN_model():
     print('=' * 10)
     return seq
 
+def CNN_model():
+    seq = CNN.model()
+    print('=' * 10)
+    print(seq.summary())
+    print('=' * 10)
+    return seq
+
 # monthly sst parameters setting
-epochs = 99
+epochs = 199
 batch_size = 100
 validation_split = 0.1
 train_length = 1800
@@ -57,18 +65,6 @@ start_seq = 1801
 end_seq = 1968
 begin_pred_seq = 12
 end_pred_seq = 24
-# which_seq = 161 # year to visulization
-
-# # daily ssta parameters setting TODO
-# epochs = 2
-# batch_size = 1
-# validation_split = 0.5
-# train_length = 4
-# len_year = 36
-# start_year = 32
-# begin_pred_month = 320
-# end_pred_month = 365
-# # which_year = 161 # year to visulization
 
 fold_name = "model_"+str(epochs)+"_epochs"
 # DATA_PATH = '../../../../dataset/sst_grid_1/sst_monthly_185001_201512.npy'
@@ -86,7 +82,7 @@ def main():
     # with redirect_stdout(log):
     #     seq.summary()
 
-    seq = FNN_model()
+    seq = CNN_model()
     with redirect_stdout(log):
         seq.summary()
 
@@ -108,7 +104,17 @@ def main():
     for m in range(len_frame):
         sst_grid[len_seq,m,::,::,0] = pp.normalization(sst_grid_raw[len_seq,m,::,::,0])
 
-
+    # # normalization, data for CNN Model
+    # train_X = np.zeros((len_seq, len_frame, 10, 50), dtype=np.float)
+    # train_Y = np.zeros((len_seq, len_frame, 10, 50), dtype=np.float)
+    # sst_grid = np.zeros((len_seq+12, len_frame, 10, 50), dtype=np.float)
+    # for i in range(len_seq):
+    #     for k in range(len_frame):
+    #         train_X[i,k,::,::] = pp.normalization(train_X_raw[i,k,::,::,0])
+    #         train_Y[i,k,::,::] = pp.normalization(train_Y_raw[i,k,::,::,0])
+    #         sst_grid[i,k,::,::] = pp.normalization(sst_grid_raw[i,k,::,::,0])
+    # for m in range(len_frame):
+    #     sst_grid[len_seq,m,::,::] = pp.normalization(sst_grid_raw[len_seq,m,::,::,0])
 
 
     seq = multi_gpu_model(seq, gpus=2)
