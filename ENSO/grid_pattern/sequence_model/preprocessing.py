@@ -42,6 +42,10 @@ def inverse_normalization(data):
             inverse_data[i][j] = data[i][j]*(MAX - MIN) + MIN
     return inverse_data
 
+def mean_absolute_percentage_error(y_true, y_pred):
+    # print(y_true)
+    return np.mean(np.abs((y_true - y_pred) / y_true))
+
 def load_data_convlstm_monthly(train_length):
     # load data
     sst_data = sio.loadmat(DATA_PATH)

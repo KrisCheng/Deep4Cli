@@ -14,15 +14,19 @@ height, width = 10, 50
 def model():
     # Model
     seq = Sequential()
-    seq.add(ConvLSTM2D(filters=40, kernel_size=(3, 3),
+    seq.add(ConvLSTM2D(filters=60, kernel_size=(3, 3),
                        input_shape=(None, height, width, 1),
                        padding='same', return_sequences=True))
     seq.add(BatchNormalization())
-
-    seq.add(ConvLSTM2D(filters=40, kernel_size=(3, 3),
+    seq.add(ConvLSTM2D(filters=60, kernel_size=(3, 3),
                        padding='same', return_sequences=True))
     seq.add(BatchNormalization())
-
+    seq.add(ConvLSTM2D(filters=60, kernel_size=(3, 3),
+                       padding='same', return_sequences=True))
+    seq.add(BatchNormalization())
+    seq.add(ConvLSTM2D(filters=60, kernel_size=(3, 3),
+                       padding='same', return_sequences=True))
+    seq.add(BatchNormalization())
     seq.add(Conv3D(filters=1, kernel_size=(3, 3, 3),
                    activation='relu',
                    padding='same', data_format='channels_last'))
