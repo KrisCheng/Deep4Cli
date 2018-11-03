@@ -11,5 +11,5 @@ record
 reference
 paper
 imgs
-model
+model_*
 settings.json
