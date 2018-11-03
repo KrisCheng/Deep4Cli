@@ -13,7 +13,7 @@ import numpy as np
 import preprocessing as pp
 import ConvLSTM2D
 import STResNet
-import LSTM
+import FNN
 import os
 import os.path
 from matplotlib import pyplot
@@ -39,15 +39,15 @@ def STResNet_model():
     print('=' * 10)
     return seq
 
-def LSTM_model():
-    seq = LSTM.model()
+def FNN_model():
+    seq = FNN.model()
     print('=' * 10)
     print(seq.summary())
     print('=' * 10)
     return seq
 
 # monthly sst parameters setting
-epochs = 2
+epochs = 99
 batch_size = 100
 validation_split = 0.1
 train_length = 1800
@@ -81,14 +81,14 @@ def main():
     log_file_path = fold_name+'/'+fold_name +".log"
     log = open(log_file_path,'w')
 
-    # model setting
-    seq = CovLSTM2D_model()
-    with redirect_stdout(log):
-        seq.summary()
-
-    # seq = LSTM_model()
+    # # model setting
+    # seq = CovLSTM2D_model()
     # with redirect_stdout(log):
     #     seq.summary()
+
+    seq = FNN_model()
+    with redirect_stdout(log):
+        seq.summary()
 
     # TODO
     # seq = STResNet_model()
@@ -96,9 +96,7 @@ def main():
     # sst_grid, train_X, train_Y= pp.load_data_convlstm_monthly(train_length) # From .mat file
     train_X_raw, train_Y_raw, sst_grid_raw = np.load(DATA_PATH) # from .npy file
 
-    # sst_grid, train_X, train_Y= pp.load_data_convlstm_daily(train_length) TODO
-
-    # normalization
+    # normalization, data for ConvLSTM Model
     train_X = np.zeros((len_seq, len_frame, 10, 50, 1), dtype=np.float)
     train_Y = np.zeros((len_seq, len_frame, 10, 50, 1), dtype=np.float)
     sst_grid = np.zeros((len_seq+12, len_frame, 10, 50, 1), dtype=np.float)
@@ -110,21 +108,25 @@ def main():
     for m in range(len_frame):
         sst_grid[len_seq,m,::,::,0] = pp.normalization(sst_grid_raw[len_seq,m,::,::,0])
 
+
+
+
     seq = multi_gpu_model(seq, gpus=2)
     # sgd = optimizers.SGD(lr=0.001, decay=1e-6, momentum=0.9, nesterov=True)
     seq.compile(loss='mse', optimizer='adam')
 
     if not os.path.exists(file_path):
-        # ConvLSTM Model
-        history = seq.fit(train_X[:train_length], train_Y[:train_length],
-                    batch_size=batch_size,
-                    epochs=epochs,
-                    validation_split=validation_split)
-        # # FC-LSTM Model
+        # # ConvLSTM Model
         # history = seq.fit(train_X[:train_length], train_Y[:train_length],
         #             batch_size=batch_size,
         #             epochs=epochs,
         #             validation_split=validation_split)
+
+        # FC-LSTM Model
+        history = seq.fit(train_X[:train_length], train_Y[:train_length],
+                    batch_size=batch_size,
+                    epochs=epochs,
+                    validation_split=validation_split)
 
         seq.save(file_path)
         pyplot.plot(history.history['loss'])
@@ -137,11 +139,6 @@ def main():
     else:
         seq = load_model(file_path)
 
-    # Evaluation part (SST, monthly)
-    # Testing the network on new monthly SST distribution
-    # feed it with the first 6 patterns
-    # predict the next 6 pattern
-
     model_sum_rmse_12 = 0
     base_sum_rmse_12 = 0
     model_sum_mae_12 = 0
@@ -150,6 +147,7 @@ def main():
     base_sum_mape_12 = 0
 
     for k in range(start_seq, end_seq):
+
         # # direct multi-step forecasting
         # pred_sequence_raw = sst_grid[k][::, ::, ::, ::]
         # new_frame = seq.predict(pred_sequence_raw[np.newaxis, ::, ::, ::, ::])
@@ -208,7 +206,6 @@ def main():
     print("Total Baseline MAE: %s" % (base_sum_mae_12/(12*(end_seq-start_seq))))
     print("Model MAPE: %s" % (model_sum_mape_12/(12*(end_seq-start_seq))))
     print("Baseline MAPE: %s" % (base_sum_mape_12/(12*(end_seq-start_seq))))
-
 
     log.write("\nTotal Model RMSE: %s" % (sqrt(model_sum_rmse_12/(12*(end_seq-start_seq)))))
     log.write("\nTotal Baseline RMSE: %s" % (sqrt(base_sum_rmse_12/(12*(end_seq-start_seq)))))
@@ -278,13 +275,6 @@ def main():
             cbar = plt.colorbar(plt.imshow(diff_toplot), orientation='horizontal')
             cbar.set_label('°C',fontsize=12)
             plt.savefig(fold_name + '/%i_%i_animate.png' % ((k + 1), (i + 1)))
-
-    # Evaluation part (SSTA ,daily)
-    # Testing the network on new monthly SSTA distribution
-    # feed it with the first 320 patterns
-    # predict the next 45 pattern TODO
-
-
 
 if __name__ == '__main__':
     main()
