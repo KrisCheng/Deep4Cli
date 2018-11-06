@@ -5,6 +5,7 @@ Deep4Cli.iml
 *.pkl
 *.npy
 *.h5
+*.mat
 *.png
 data
 record

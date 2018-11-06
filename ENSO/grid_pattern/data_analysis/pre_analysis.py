@@ -15,6 +15,7 @@ import scipy.io as sio
 
 # data preprocessing
 sst = '../../../../dataset/sst_grid_1/convert_sst.mon.mean_185001_201512.mat'
+sst = 'convert_sst.mon.mean_1850_01_2015_12.mat'
 sst_data = sio.loadmat(sst)
 sst_data = sst_data['sst'][:,:,:]
 sst_data = np.array(sst_data, dtype=float)
@@ -33,7 +34,6 @@ y = []
 sst_avg = []
 for i in range(2004):
     x.append(i)
-    y.append(25)
     sst_avg.append(np.mean(sst_data[:,:,i]))
     # fig = plt.figure(figsize=(10, 4))
     # plt.imshow(sst_data[::,::,i])

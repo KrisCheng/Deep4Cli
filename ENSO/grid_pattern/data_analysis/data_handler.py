@@ -1,5 +1,5 @@
 '''
-Desc: the construction of daily ssta dataset from .nc file.
+Desc: the construction of dataset from .nc file.
 Author: Kris Peng
 Copyright (c) 2018 - Kris Peng <kris.dacpc@gmail.com>
 '''
@@ -10,6 +10,7 @@ import pandas as pd
 import scipy.io as sio
 from netCDF4 import Dataset
 
+# # === daily ssta
 # 1.读取数据并截取nino34区域，存储为.npy
 # for year in range(1982, 2018):
 #     file_path = "ssta_0.25_0.25/sst.day.anom."+str(year)+".nc"
@@ -42,12 +43,44 @@ from netCDF4 import Dataset
 #     print(r.shape)
 #     np.save("data/ssta_"+str(year)+".npy", r)
 
-# 3.合并成一个文件
-all_daily_ssta = []
-for year in range(1982,2018):
-    yearly_ssta = np.load("data/ssta_"+str(year)+".npy")
-    yearly_ssta = yearly_ssta.tolist()
-    all_daily_ssta.append(yearly_ssta)
-all_daily_ssta = np.array(all_daily_ssta, dtype=float)
-np.save("data/ssta_daily_1982_2017_nino34.npy", all_daily_ssta)
-print(all_daily_ssta.shape)
+# # 3.合并成一个文件
+# all_daily_ssta = []
+# for year in range(1982,2018):
+#     yearly_ssta = np.load("data/ssta_"+str(year)+".npy")
+#     yearly_ssta = yearly_ssta.tolist()
+#     all_daily_ssta.append(yearly_ssta)
+# all_daily_ssta = np.array(all_daily_ssta, dtype=float)
+# np.save("data/ssta_daily_1982_2017_nino34.npy", all_daily_ssta)
+# print(all_daily_ssta.shape)
+
+
+# monthly sst
+DATA_PATH = "convert_sst.mon.mean_1850_01_2015_12.mat"
+
+# load data
+sst_data = sio.loadmat(DATA_PATH)
+sst_data = sst_data['sst'][::,::,::]
+sst_data = sst_data[85:95,190:240,::]
+sst_data = np.array(sst_data, dtype=float)
+train_sst = np.zeros((1980,12,10,50,1), dtype=np.float)
+test_sst = np.zeros((1980,12,10,50,1), dtype=np.float)
+all_sst = np.zeros((1992,12,10,50,1), dtype=np.float)
+
+# 12->12
+for i in range(1980):
+    for k in range(12):
+        train_sst[i,k,::,::,0] = sst_data[::,::,i+k]
+        test_sst[i,k,::,::,0] = sst_data[::,::,i+k+12]
+        all_sst[i,k,::,::,0] = sst_data[::,::,i+k]
+
+# 补齐最后12帧
+for n in range(1981,1992):       
+    for m in range(12):
+        all_sst[n,m,::,::,0] = sst_data[::,::,n+m]
+print(test_sst)
+
+# np.save("monthly_sst+12.npy", [train_sst,test_sst,all_sst])
+
+# sst_data = np.load('monthly_sst.npy')
+# print(sst_data[0].shape)
+# print("Shape of origin Dataset: ", sst_data.shape)
