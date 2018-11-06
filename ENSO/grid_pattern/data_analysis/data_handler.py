@@ -70,16 +70,15 @@ all_sst = np.zeros((1992,12,10,50,1), dtype=np.float)
 for i in range(1980):
     for k in range(12):
         train_sst[i,k,::,::,0] = sst_data[::,::,i+k]
-        test_sst[i,k,::,::,0] = sst_data[::,::,i+k+12]
+        test_sst[i,k,::,::,0] = sst_data[::,::,i+k+1]
         all_sst[i,k,::,::,0] = sst_data[::,::,i+k]
 
 # 补齐最后12帧
 for n in range(1981,1992):       
     for m in range(12):
         all_sst[n,m,::,::,0] = sst_data[::,::,n+m]
-print(test_sst)
 
-# np.save("monthly_sst+12.npy", [train_sst,test_sst,all_sst])
+np.save("monthly_sst+12.npy", [train_sst,test_sst,all_sst])
 
 # sst_data = np.load('monthly_sst.npy')
 # print(sst_data[0].shape)
