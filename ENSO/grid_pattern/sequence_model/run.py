@@ -15,7 +15,6 @@ import ConvLSTM2D
 import STResNet
 import FNN
 import CNN
-import LSTM
 import os
 import os.path
 from matplotlib import pyplot
@@ -55,24 +54,15 @@ def CNN_model():
     print('=' * 10)
     return seq
 
-def LSTM_model():
-    seq = LSTM.model()
-    print('=' * 10)
-    print(seq.summary())
-    print('=' * 10)
-    return seq
-
 # monthly sst parameters setting
-epochs = 1000
+epochs = 999
 batch_size = 100
 validation_split = 0.1
 train_length = 1800
 len_seq = 1980
-len_frame = 9
+len_frame = 12
 start_seq = 1801
 end_seq = 1968
-# begin_pred_seq = 6
-# end_pred_seq = 12
 
 fold_name = "model_"+str(epochs)+"_epochs"
 # DATA_PATH = '../../../../dataset/sst_grid_1/sst_monthly_185001_201512.npy'
@@ -86,13 +76,9 @@ def main():
     log = open(log_file_path,'w')
 
     # model setting
-    seq = CovLSTM2D_model()
+    seq = FNN_model()
     with redirect_stdout(log):
         seq.summary()
-
-    # seq = LSTM_model()
-    # with redirect_stdout(log):
-    #     seq.summary()
 
     # TODO
     # seq = STResNet_model()
@@ -103,7 +89,7 @@ def main():
     # normalization, data for ConvLSTM Model -9 ahead
     train_X = np.zeros((len_seq, len_frame, 10, 50, 1), dtype=np.float)
     train_Y = np.zeros((len_seq, len_frame, 10, 50, 1), dtype=np.float)
-    sst_grid = np.zeros((len_seq+9, len_frame, 10, 50, 1), dtype=np.float)
+    sst_grid = np.zeros((len_seq+len_frame, len_frame, 10, 50, 1), dtype=np.float)
     for i in range(len_seq):
         for k in range(len_frame):
             train_X[i,k,::,::,0] = pp.normalization(train_X_raw[i,k,::,::,0])
@@ -113,21 +99,8 @@ def main():
     for m in range(len_frame):
         sst_grid[len_seq,m,::,::,0] = pp.normalization(sst_grid_raw[len_seq,m,::,::,0])
 
-    # # normalization, data for CNN Model
-    # train_X = np.zeros((len_seq, len_frame, 10, 50), dtype=np.float)
-    # train_Y = np.zeros((len_seq, len_frame, 10, 50), dtype=np.float)
-    # sst_grid = np.zeros((len_seq+12, len_frame, 10, 50), dtype=np.float)
-    # for i in range(len_seq):
-    #     for k in range(len_frame):
-    #         train_X[i,k,::,::] = pp.normalization(train_X_raw[i,k,::,::,0])
-    #         train_Y[i,k,::,::] = pp.normalization(train_Y_raw[i,k,::,::,0])
-    #         sst_grid[i,k,::,::] = pp.normalization(sst_grid_raw[i,k,::,::,0])
-    # for m in range(len_frame):
-    #     sst_grid[len_seq,m,::,::] = pp.normalization(sst_grid_raw[len_seq,m,::,::,0])
-
-
     seq = multi_gpu_model(seq, gpus=2)
-    # sgd = optimizers.SGD(lr=0.001, decay=1e-6, momentum=0.9, nesterov=True)
+    # sgd = optimizers.SGD(lr=0.1, decay=1e-6, momentum=0.9, nesterov=True)
     seq.compile(loss='mse', optimizer='adam')
 
     if not os.path.exists(file_path):
@@ -138,12 +111,6 @@ def main():
                     epochs=epochs,
                     validation_split=validation_split)
 
-        # # FC-LSTM Model
-        # print(train_X[:train_length].shape)
-        # history = seq.fit(train_X[:train_length], train_Y[:train_length],
-        #             batch_size=batch_size,
-        #             epochs=epochs)
-        #
         seq.save(file_path)
         pyplot.plot(history.history['loss'])
         pyplot.plot(history.history['val_loss'])
@@ -155,43 +122,20 @@ def main():
     else:
         seq = load_model(file_path)
 
-    model_sum_rmse_12 = 0
-    base_sum_rmse_12 = 0
-    model_sum_mae_12 = 0
-    base_sum_mae_12 = 0
-    model_sum_mape_12 = 0
-    base_sum_mape_12 = 0
+    model_sum_rmse = 0
+    base_sum_rmse = 0
+    model_sum_mae = 0
+    base_sum_mae = 0
+    model_sum_mape = 0
+    base_sum_mape = 0
 
     for k in range(start_seq, end_seq):
 
-        # # direct multi-step forecasting
-        # pred_sequence_raw = sst_grid[k][::, ::, ::, ::]
-        # new_frame = seq.predict(pred_sequence_raw[np.newaxis, ::, ::, ::, ::])
-        # pred_sequence = new_frame[0]
-        # act_sequence = sst_grid[k+12][::, ::, ::, ::]
-        # for i in range(12):
-        #     baseline_frame = pp.inverse_normalization(pred_sequence_raw[i, ::, ::, 0])
-        #     pred_toplot = pp.inverse_normalization(pred_sequence[i, ::, ::, 0])
-        #     act_toplot = pp.inverse_normalization(act_sequence[i, ::, ::, 0])
-        #
-        #     model_rmse = mean_squared_error(act_toplot, pred_toplot)
-        #     baseline_rmse = mean_squared_error(act_toplot, baseline_frame)
-        #
-        #     model_mae = mean_absolute_error(act_toplot, pred_toplot)
-        #     baseline_mae = mean_absolute_error(act_toplot, baseline_frame)
-        #
-        #     model_mape = pp.mean_absolute_percentage_error(act_toplot, pred_toplot)
-        #     baseline_mape = pp.mean_absolute_percentage_error(act_toplot, baseline_frame)
-        #
-        #     model_sum_rmse_12, base_sum_rmse_12 = model_sum_rmse_12 + model_rmse, base_sum_rmse_12 + baseline_rmse
-        #     model_sum_mae_12, base_sum_mae_12 = model_sum_mae_12 + model_mae, base_sum_mae_12 + baseline_mae
-        #     model_sum_mape_12, base_sum_mape_12 = model_sum_mape_12 + model_mape, base_sum_mape_12 + baseline_mape
-
-        # rolling-forecasting with -6 steps
+        # rolling-forecasting with -12 steps
         pred_sequence_raw = sst_grid[k][::, ::, ::, ::]
         pred_sequence = sst_grid[k][::, ::, ::, ::]
-        act_sequence = sst_grid[k+9][::, ::, ::, ::]
-        for j in range(9):
+        act_sequence = sst_grid[k+len_frame][::, ::, ::, ::]
+        for j in range(len_frame):
             new_frame = seq.predict(pred_sequence[np.newaxis, ::, ::, ::, ::])
             # TODO why?? ref: keras conv_lstm.py demo
             new = new_frame[::, -1, ::, ::, ::]
@@ -200,7 +144,7 @@ def main():
             baseline_frame = pp.inverse_normalization(pred_sequence_raw[j, ::, ::, 0])
             pred_toplot = pp.inverse_normalization(pred_sequence[-1, ::, ::, 0])
             act_toplot = pp.inverse_normalization(act_sequence[j, ::, ::, 0])
-            pred_sequence = pred_sequence[1:10, ::, ::, ::]
+            pred_sequence = pred_sequence[1:len_frame+1, ::, ::, ::]
 
             model_rmse = mean_squared_error(act_toplot, pred_toplot)
             baseline_rmse = mean_squared_error(act_toplot, baseline_frame)
@@ -211,24 +155,24 @@ def main():
             model_mape = pp.mean_absolute_percentage_error(act_toplot, pred_toplot)
             baseline_mape = pp.mean_absolute_percentage_error(act_toplot, baseline_frame)
 
-            model_sum_rmse_12, base_sum_rmse_12 = model_sum_rmse_12 + model_rmse, base_sum_rmse_12 + baseline_rmse
-            model_sum_mae_12, base_sum_mae_12 = model_sum_mae_12 + model_mae, base_sum_mae_12 + baseline_mae
-            model_sum_mape_12, base_sum_mape_12 = model_sum_mape_12 + model_mape, base_sum_mape_12 + baseline_mape
+            model_sum_rmse, base_sum_rmse = model_sum_rmse + model_rmse, base_sum_rmse + baseline_rmse
+            model_sum_mae, base_sum_mae = model_sum_mae + model_mae, base_sum_mae + baseline_mae
+            model_sum_mape, base_sum_mape = model_sum_mape + model_mape, base_sum_mape + baseline_mape
 
     print("="*10)
-    print("Total Model RMSE: %s" % (sqrt(model_sum_rmse_12/(9*(end_seq-start_seq)))))
-    print("Total Baseline RMSE: %s" % (sqrt(base_sum_rmse_12/(9*(end_seq-start_seq)))))
-    print("Total Model MAE: %s" % (model_sum_mae_12/(9*(end_seq-start_seq))))
-    print("Total Baseline MAE: %s" % (base_sum_mae_12/(9*(end_seq-start_seq))))
-    print("Model MAPE: %s" % (model_sum_mape_12/(9*(end_seq-start_seq))))
-    print("Baseline MAPE: %s" % (base_sum_mape_12/(9*(end_seq-start_seq))))
+    print("Total Model RMSE: %s" % (sqrt(model_sum_rmse/(len_frame*(end_seq-start_seq)))))
+    print("Total Baseline RMSE: %s" % (sqrt(base_sum_rmse/(len_frame*(end_seq-start_seq)))))
+    print("Total Model MAE: %s" % (model_sum_mae/(len_frame*(end_seq-start_seq))))
+    print("Total Baseline MAE: %s" % (base_sum_mae/(len_frame*(end_seq-start_seq))))
+    print("Model MAPE: %s" % (model_sum_mape/(len_frame*(end_seq-start_seq))))
+    print("Baseline MAPE: %s" % (base_sum_mape/(len_frame*(end_seq-start_seq))))
 
-    log.write("\nTotal Model RMSE: %s" % (sqrt(model_sum_rmse_12/(9*(end_seq-start_seq)))))
-    log.write("\nTotal Baseline RMSE: %s" % (sqrt(base_sum_rmse_12/(9*(end_seq-start_seq)))))
-    log.write("\nTotal Model MAE: %s" % (model_sum_mae_12/(9*(end_seq-start_seq))))
-    log.write("\nTotal Baseline MAE: %s" % (base_sum_mae_12/(9*(end_seq-start_seq))))
-    log.write("\nModel MAPE: %s" % (model_sum_mape_12/(9*(end_seq-start_seq))))
-    log.write("\nBaseline MAPE: %s" % (base_sum_mape_12/(9*(end_seq-start_seq))))
+    log.write("\nTotal Model RMSE: %s" % (sqrt(model_sum_rmse/(len_frame*(end_seq-start_seq)))))
+    log.write("\nTotal Baseline RMSE: %s" % (sqrt(base_sum_rmse/(len_frame*(end_seq-start_seq)))))
+    log.write("\nTotal Model MAE: %s" % (model_sum_mae/(len_frame*(end_seq-start_seq))))
+    log.write("\nTotal Baseline MAE: %s" % (base_sum_mae/(len_frame*(end_seq-start_seq))))
+    log.write("\nModel MAPE: %s" % (model_sum_mape/(len_frame*(end_seq-start_seq))))
+    log.write("\nBaseline MAPE: %s" % (base_sum_mape/(len_frame*(end_seq-start_seq))))
 
     log.close()
 
@@ -240,13 +184,12 @@ def main():
     #     new = new_frame[::, -1, ::, ::, ::]
     #     pred_sequence = np.concatenate((pred_sequence, new), axis=0)
 
-    for k in range(end_seq-10, end_seq):
+    for k in range(end_seq-3, end_seq):
         pred_sequence_raw = sst_grid[k][::, ::, ::, ::]
         new_frame = seq.predict(pred_sequence_raw[np.newaxis, ::, ::, ::, ::])
         pred_sequence = new_frame[0]
-        act_sequence = sst_grid[k+9][::, ::, ::, ::]
-        for i in range(9):
-        # for i in range(begin_pred_seq, end_pred_seq):
+        act_sequence = sst_grid[k+len_frame][::, ::, ::, ::]
+        for i in range(len_frame):
             fig = plt.figure(figsize=(16, 8))
             ax = fig.add_subplot(321)
             ax.text(1, 3, 'Prediction', fontsize=12)

@@ -88,7 +88,6 @@ def main():
             pred_toplot[where_are_nan] = MEAN
             pred_toplot[where_are_inf] = MEAN
 
-            # log.write(str(pred_toplot))
             # abandon the first frame
             pred_sequence = pred_sequence[1:7, ::, ::, ::]
             baseline_frame = pred_sequence_raw[j, ::, ::, 0]
