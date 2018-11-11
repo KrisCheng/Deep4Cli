@@ -23,27 +23,28 @@ from math import sqrt
 from contextlib import redirect_stdout
 sys.setrecursionlimit(100000000)
 
-def model():
-    # Model
-    seq = Sequential()
-    seq.add(LSTM(units = 300, input_shape=(12,1), activation='relu', return_sequences=True))
-    seq.add(LSTM(300, return_sequences=True))
-    seq.add(Dense(1))
-    return seq
-
 # monthly sst parameters setting
-epochs = 200
+epochs = 1000
 batch_size = 100*500
 validation_split = 0.1
 train_length = 1800
 len_seq = 1980
-len_frame = 12
+len_frame = 6
 start_seq = 1801
 end_seq = 1968
 height, width = 10, 50
 
 DATA_PATH = 'monthly_sst+1.npy'
-fold_name = "model_"+str(epochs)+"_epochs"
+fold_name = "model_"+str(epochs)+"_epochs_"+str(len_frame)
+
+
+def model():
+    # Model
+    seq = Sequential()
+    seq.add(LSTM(units = 300, input_shape=(len_frame,1), activation='relu', return_sequences=True))
+    seq.add(LSTM(300, return_sequences=True))
+    seq.add(Dense(1))
+    return seq
 
 def main():
     os.makedirs(fold_name)
@@ -54,22 +55,22 @@ def main():
 
     train_X_raw, train_Y_raw, sst_grid = np.load(DATA_PATH)  # from .npy file
 
-    # LSTM Model -12 ahead
+    # LSTM Model -n ahead
     train_X = np.zeros((train_length*height*width, len_frame, 1), dtype=np.float)
     train_Y = np.zeros((train_length*height*width, len_frame, 1), dtype=np.float)
 
     for i in range(train_length):
         for m in range(width):
             for n in range(height):
-                train_X[i+m+n,::,0] = sst_grid[i,::,n,m,0]
-                train_Y[i+m+n,::,0] = sst_grid[i+1,::,n,m,0]
+                train_X[i+m+n,::,0] = sst_grid[i,0:len_frame,n,m,0]
+                train_Y[i+m+n,::,0] = sst_grid[i+1,0:len_frame,n,m,0]
 
-    model_sum_rmse_12 = 0
-    base_sum_rmse_12 = 0
-    model_sum_mae_12 = 0
-    base_sum_mae_12 = 0
-    model_sum_mape_12 = 0
-    base_sum_mape_12 = 0
+    model_sum_rmse = 0
+    base_sum_rmse = 0
+    model_sum_mae = 0
+    base_sum_mae = 0
+    model_sum_mape = 0
+    base_sum_mape = 0
 
     seq = model()
     print('=' * 10)
@@ -101,10 +102,10 @@ def main():
 
     for k in range(start_seq, end_seq):
         print(k)
-        # rolling-forecasting with -12 steps
-        pred_sequence_raw = sst_grid[k][::, ::, ::, ::]
-        pred_sequence = sst_grid[k][::, ::, ::, ::]
-        act_sequence = sst_grid[k+len_frame][::, ::, ::, ::]
+        # rolling-forecasting with -N steps
+        pred_sequence_raw = sst_grid[k][0:len_frame, ::, ::, ::]
+        pred_sequence = sst_grid[k][0:len_frame, ::, ::, ::]
+        act_sequence = sst_grid[k+len_frame][0:len_frame, ::, ::, ::]
         for j in range(len_frame):
             pred_toplot = np.zeros((1,10,50,1), dtype=np.float)
             # single point prediction
@@ -131,25 +132,25 @@ def main():
             model_mape = pp.mean_absolute_percentage_error(act_toplot, pred_toplot)
             baseline_mape = pp.mean_absolute_percentage_error(act_toplot, baseline_frame)
 
-            model_sum_rmse_12, base_sum_rmse_12 = model_sum_rmse_12 + model_rmse, base_sum_rmse_12 + baseline_rmse
-            model_sum_mae_12, base_sum_mae_12 = model_sum_mae_12 + model_mae, base_sum_mae_12 + baseline_mae
-            model_sum_mape_12, base_sum_mape_12 = model_sum_mape_12 + model_mape, base_sum_mape_12 + baseline_mape
+            model_sum_rmse, base_sum_rmse = model_sum_rmse + model_rmse, base_sum_rmse + baseline_rmse
+            model_sum_mae, base_sum_mae = model_sum_mae + model_mae, base_sum_mae + baseline_mae
+            model_sum_mape, base_sum_mape = model_sum_mape + model_mape, base_sum_mape + baseline_mape
 
         log.write("\n ============")
         log.write("\n Round: %s" % k)
-        log.write("\nTotal Model RMSE: %s" % (sqrt(model_sum_rmse_12/(len_frame*(k-start_seq+1)))))
-        log.write("\nTotal Baseline RMSE: %s" % (sqrt(base_sum_rmse_12/(len_frame*(k-start_seq+1)))))
-        log.write("\nTotal Model MAE: %s" % (model_sum_mae_12/(len_frame*(k-start_seq+1))))
-        log.write("\nTotal Baseline MAE: %s" % (base_sum_mae_12/(len_frame*(k-start_seq+1))))
-        log.write("\nModel MAPE: %s" % (model_sum_mape_12/(len_frame*(k-start_seq+1))))
-        log.write("\nBaseline MAPE: %s" % (base_sum_mape_12/(len_frame*(k-start_seq+1))))
+        log.write("\nTotal Model RMSE: %s" % (sqrt(model_sum_rmse/(len_frame*(k-start_seq+1)))))
+        log.write("\nTotal Baseline RMSE: %s" % (sqrt(base_sum_rmse/(len_frame*(k-start_seq+1)))))
+        log.write("\nTotal Model MAE: %s" % (model_sum_mae/(len_frame*(k-start_seq+1))))
+        log.write("\nTotal Baseline MAE: %s" % (base_sum_mae/(len_frame*(k-start_seq+1))))
+        log.write("\nModel MAPE: %s" % (model_sum_mape/(len_frame*(k-start_seq+1))))
+        log.write("\nBaseline MAPE: %s" % (base_sum_mape/(len_frame*(k-start_seq+1))))
 
-        print("Total Model RMSE: %s" % (sqrt(model_sum_rmse_12/(len_frame*(k-start_seq+1)))))
-        print("Total Baseline RMSE: %s" % (sqrt(base_sum_rmse_12/(len_frame*(k-start_seq+1)))))
-        print("Total Model MAE: %s" % (model_sum_mae_12/(len_frame*(k-start_seq+1))))
-        print("Total Baseline MAE: %s" % (base_sum_mae_12/(len_frame*(k-start_seq+1))))
-        print("Model MAPE: %s" % (model_sum_mape_12/(len_frame*(k-start_seq+1))))
-        print("Baseline MAPE: %s" % (base_sum_mape_12/(len_frame*(k-start_seq+1))))
+        print("Total Model RMSE: %s" % (sqrt(model_sum_rmse/(len_frame*(k-start_seq+1)))))
+        print("Total Baseline RMSE: %s" % (sqrt(base_sum_rmse/(len_frame*(k-start_seq+1)))))
+        print("Total Model MAE: %s" % (model_sum_mae/(len_frame*(k-start_seq+1))))
+        print("Total Baseline MAE: %s" % (base_sum_mae/(len_frame*(k-start_seq+1))))
+        print("Model MAPE: %s" % (model_sum_mape/(len_frame*(k-start_seq+1))))
+        print("Baseline MAPE: %s" % (base_sum_mape/(len_frame*(k-start_seq+1))))
 
         fig = plt.figure(figsize=(16, 8))
         ax = fig.add_subplot(321)
@@ -158,7 +159,7 @@ def main():
         cbar = plt.colorbar(plt.imshow(pred_toplot), orientation='horizontal')
         cbar.set_label('°C',fontsize=12)
 
-        # 将预测seq-12数据作为baseline
+        # 将预测seq-n数据作为baseline
         ax = fig.add_subplot(322)
         plt.text(1, 3, 'Baseline', fontsize=12)
         plt.imshow(baseline_frame)
@@ -193,20 +194,20 @@ def main():
         plt.savefig(fold_name + '/%i_%i_animate.png' % ((k + 1), (j + 1)))
 
     print("="*10)
-    print("Total Model RMSE: %s" % (sqrt(model_sum_rmse_12/(len_frame*(end_seq-start_seq)))))
-    print("Total Baseline RMSE: %s" % (sqrt(base_sum_rmse_12/(len_frame*(end_seq-start_seq)))))
-    print("Total Model MAE: %s" % (model_sum_mae_12/(len_frame*(end_seq-start_seq))))
-    print("Total Baseline MAE: %s" % (base_sum_mae_12/(len_frame*(end_seq-start_seq))))
-    print("Model MAPE: %s" % (model_sum_mape_12/(len_frame*(end_seq-start_seq))))
-    print("Baseline MAPE: %s" % (base_sum_mape_12/(len_frame*(end_seq-start_seq))))
+    print("Total Model RMSE: %s" % (sqrt(model_sum_rmse/(len_frame*(end_seq-start_seq)))))
+    print("Total Baseline RMSE: %s" % (sqrt(base_sum_rmse/(len_frame*(end_seq-start_seq)))))
+    print("Total Model MAE: %s" % (model_sum_mae/(len_frame*(end_seq-start_seq))))
+    print("Total Baseline MAE: %s" % (base_sum_mae/(len_frame*(end_seq-start_seq))))
+    print("Model MAPE: %s" % (model_sum_mape/(len_frame*(end_seq-start_seq))))
+    print("Baseline MAPE: %s" % (base_sum_mape/(len_frame*(end_seq-start_seq))))
 
     log.write("\n ============")
-    log.write("\nTotal Model RMSE: %s" % (sqrt(model_sum_rmse_12/(len_frame*(end_seq-start_seq)))))
-    log.write("\nTotal Baseline RMSE: %s" % (sqrt(base_sum_rmse_12/(len_frame*(end_seq-start_seq)))))
-    log.write("\nTotal Model MAE: %s" % (model_sum_mae_12/(len_frame*(end_seq-start_seq))))
-    log.write("\nTotal Baseline MAE: %s" % (base_sum_mae_12/(len_frame*(end_seq-start_seq))))
-    log.write("\nModel MAPE: %s" % (model_sum_mape_12/(len_frame*(end_seq-start_seq))))
-    log.write("\nBaseline MAPE: %s" % (base_sum_mape_12/(len_frame*(end_seq-start_seq))))
+    log.write("\nTotal Model RMSE: %s" % (sqrt(model_sum_rmse/(len_frame*(end_seq-start_seq)))))
+    log.write("\nTotal Baseline RMSE: %s" % (sqrt(base_sum_rmse/(len_frame*(end_seq-start_seq)))))
+    log.write("\nTotal Model MAE: %s" % (model_sum_mae/(len_frame*(end_seq-start_seq))))
+    log.write("\nTotal Baseline MAE: %s" % (base_sum_mae/(len_frame*(end_seq-start_seq))))
+    log.write("\nModel MAPE: %s" % (model_sum_mape/(len_frame*(end_seq-start_seq))))
+    log.write("\nBaseline MAPE: %s" % (base_sum_mape/(len_frame*(end_seq-start_seq))))
     log.close()
 
 if __name__ == '__main__':

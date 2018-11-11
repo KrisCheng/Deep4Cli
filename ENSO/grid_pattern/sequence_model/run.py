@@ -11,11 +11,11 @@ Copyright (c) 2018 - Kris Peng <kris.dacpc@gmail.com>
 import pylab as plt
 import numpy as np
 import preprocessing as pp
+import metric
 import ConvLSTM2D
 import STResNet
 import FNN
 import CNN
-import os
 import os.path
 from matplotlib import pyplot
 from keras.models import load_model
@@ -55,7 +55,7 @@ def CNN_model():
     return seq
 
 # monthly sst parameters setting
-epochs = 999
+epochs = 100
 batch_size = 100
 validation_split = 0.1
 train_length = 1800
@@ -76,7 +76,7 @@ def main():
     log = open(log_file_path,'w')
 
     # model setting
-    seq = FNN_model()
+    seq = CovLSTM2D_model()
     with redirect_stdout(log):
         seq.summary()
 
@@ -101,7 +101,8 @@ def main():
 
     seq = multi_gpu_model(seq, gpus=2)
     # sgd = optimizers.SGD(lr=0.1, decay=1e-6, momentum=0.9, nesterov=True)
-    seq.compile(loss='mse', optimizer='adam')
+    # rmsprop = optimizers.RMSprop(lr=0.1)
+    seq.compile(loss="mse", optimizer='Nadam')
 
     if not os.path.exists(file_path):
 
