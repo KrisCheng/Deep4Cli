@@ -9,6 +9,7 @@ Deep4Cli.iml
 *.png
 *.numbers
 *.log
+*.txt
 data
 record
 reference
