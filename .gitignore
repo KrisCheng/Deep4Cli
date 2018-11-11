@@ -8,6 +8,7 @@ Deep4Cli.iml
 *.mat
 *.png
 *.numbers
+*.log
 data
 record
 reference

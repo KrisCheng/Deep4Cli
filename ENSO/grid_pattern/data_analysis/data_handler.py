@@ -79,7 +79,3 @@ for n in range(1981,1992):
         all_sst[n,m,::,::,0] = sst_data[::,::,n+m]
 
 np.save("monthly_sst+12.npy", [train_sst,test_sst,all_sst])
-
-# sst_data = np.load('monthly_sst.npy')
-# print(sst_data[0].shape)
-# print("Shape of origin Dataset: ", sst_data.shape)

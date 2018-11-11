@@ -1,18 +1,26 @@
 ## Deep Convolutional LSTM Network with Different Optimization Algorithms for ENSO Forecasting
 
+***Manuscript Version***
 
 1. different optimizers
 
 2. data fusion methods
 
 3. XXX preprocessing
-
-***Manuscript Version***### Abstract
+### Abstract
 
 TBD
+
+
+
+---
+
+
+
+---
 ### Keywords
 
-Spatiotemporal Sequence Forecasting, Convolutional LSTM, Optimization Algorithms, ENSO.
+Spatiotemporal Sequence Forecasting, Convolutional LSTM, Optimization Algorithm, ENSO.
 ### 1. Introduction
 
 Approximately every 4 years, the sea surface temperature (SST) is higher than average in the eastern equatorial Pacific. This phenomenon is called El Niño-Southern Oscillation (ENSO) and is considered as the dominant mode of interannual climate variability observed globally (Wunsch 1990). ENSO is associated with many climate changes (Fraedrich 1994; Wilkinson et al.1999), affecting climate of much of the tropics and subtropics, then cause enormous damage worldwide, so a skillful forecasting of ENSO is strongly needed.
@@ -52,10 +60,12 @@ In summary, The contributions of our work are 2 (or 3)-fold:
 
 #### 2.1 Machine Learning for ENSO Forecasting
 
+
 TBD
 
 
 #### 2.2 STSF with Deep Learning
+
 
 TBD---
 
@@ -68,6 +78,7 @@ TBD---
 
 TBD---
 
+A multi-channel image like grid pattern, and the specified value stand for concrete physical information.
 
 
 ---
@@ -84,21 +95,19 @@ RMSE / MAE / MAPE
 1. Comparision between different methods
 
 	Historical Average
-
-	ARIMA (todo) (grid-point)
-
+	ARIMA
 	FNN
-
 	CNN 
-
 	FC-LSTM
-
 	ConvLSTM
-
 	ConvLSTM + XXX (TBD)
 
+2. Compared with different ConvLSTM structures (kernel size, layer and other hyperparameters ,or with(out) BN); 
 
-2. Comparison between ConvLSTM with inner structures ( with(out) BN ) or  different optimizers
+3. Comparison between different Optimizers of Fixed ConvLSTM with inner structures (with(out) BN)
+
+
+4. The generated SST pattern 
 
 
 
