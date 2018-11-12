@@ -19,15 +19,13 @@ def model():
                        input_shape=(None, height, width, 1),
                        padding='same', return_sequences=True))
     seq.add(BatchNormalization())
-    seq.add(ConvLSTM2D(filters=60, kernel_size=(3, 3),
-                       padding='same', return_sequences=True))
-    # seq.add(Dropout(0.2))
-    seq.add(BatchNormalization())
-    seq.add(ConvLSTM2D(filters=60, kernel_size=(3, 3),
+    seq.add(ConvLSTM2D(filters=40, kernel_size=(3, 3),
                        padding='same', return_sequences=True))
     seq.add(BatchNormalization())
-    # seq.add(Dropout(0.2))
-    seq.add(ConvLSTM2D(filters=60, kernel_size=(3, 3),
+    seq.add(ConvLSTM2D(filters=40, kernel_size=(3, 3),
+                       padding='same', return_sequences=True))
+    seq.add(BatchNormalization())
+    seq.add(ConvLSTM2D(filters=40, kernel_size=(3, 3),
                        padding='same', return_sequences=True))
     seq.add(BatchNormalization())
     seq.add(Conv3D(filters=1, kernel_size=(3, 3, 3),
