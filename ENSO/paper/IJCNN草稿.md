@@ -1,4 +1,4 @@
-## Deep Convolutional LSTM Network with Different Optimization Algorithms for ENSO Forecasting
+## ENSO Forecasting Using ~~Deep~~ Convolutional LSTM Network with Different Optimization Algorithms
 
 ***Manuscript Version***
 
@@ -10,14 +10,6 @@
 ### Abstract
 
 TBD
-
-
-
----
-
-
-
----
 ### Keywords
 
 Spatiotemporal Sequence Forecasting, Convolutional LSTM, Optimization Algorithm, ENSO.
@@ -59,29 +51,17 @@ In summary, The contributions of our work are 3-fold:
 
 #### 2.1 Machine Learning for ENSO Forecasting
 
-
 TBD
-
 
 #### 2.2 STSF with Deep Learning
 
-
-TBD---
-
-
-
----
+TBD
 ### 3. Methodology
 
-#### 3.1 Formulation of ENSO Forecasting ProblemTBD#### 3.2 Convolutional LSTM Network
+#### 3.1 Formulation of ENSO Forecasting ProblemA multi-channel image like grid pattern, and the specified value stand for concrete physical information.
+#### 3.2 Convolutional LSTM Network
 
-TBD---
-
-A multi-channel image like grid pattern, and the specified value stand for concrete physical information.
-
-
----
-### 4. Experiment
+TBD### 4. Experiment
 
 #### 4.1 Experiment Setting
 
@@ -99,12 +79,12 @@ We use 0-1 normalization to scale the input SST data before training. In the fol
 
 We compare ConvLSTM based network with other widely used time series regression models, including (1) HA: Historical Average, which models the development of SST as a seasonal process, and uses the passed sequence as the prediction; (2) ARIMA: Auto-Regression Integrated Moving Average, which is a well-known model for understanding and forecasting future; (3) SVR: Support Vector Regression, which applies linear support vector machine for regression task. The following deep neural network based models are also included: (4) Feed forward Neural Network (FNN): Feed forward neural network with equal magnitude of parameters for comparision; (5) Convolutional Neural Network (CNN) with 3 hidden layers; (6) Fully connected LSTM with 3 hidden layers and similar parameter magnitude. 
 
-Table 1 shows the result of 
+Table 1 shows the result of different approaches for -6 months, -9 months and -12 months ahead forecasting.
 
 
 - Table1: Performance comparision of different approaches, -6, -9, -12 months ahead
 
-| *T* | Metric | HA | ARIMA | SVR | FNN | CNN | FC-LSTM | ConvLSTM |
+|  *T* | Metric | HA | ARIMA | SVR | FNN | CNN | FC-LSTM | ConvLSTM |
 | ---- | ---- | ---- | ---- |---- | ---- | ---- | ---- | ---- |
 |             | RMSE |  |  |  |  |  |  |  |
 | *-6 Month*  | MAE  |  |  |  |  |  |  |  |
@@ -127,11 +107,5 @@ TBD
 #### 4.5 Model Interpretation with Generated SST Patterns
 
 TBD
-### 5. Conclusion and Future WorkTBD---
-
-1.TBD
-
----
-
-### Reference[1] TBD
+### 5. Conclusion and Future WorkTBD### Reference[1] TBD
 
