@@ -14,11 +14,11 @@ height, width = 10, 50
 def model():
     # Model
     seq = Sequential()
-    seq.add(Dense(units = 100, input_shape=(None, height, width, 1)))
-    seq.add(Conv3D(filters=160, kernel_size=(3, 3, 3),
+    seq.add(Dense(units = 50, input_shape=(None, height, width, 1)))
+    seq.add(Conv3D(filters=40, kernel_size=(3, 3, 3),
                    activation='relu',
                    padding='same', data_format='channels_last'))
-    seq.add(Conv3D(filters=160, kernel_size=(3, 3, 3),
+    seq.add(Conv3D(filters=40, kernel_size=(3, 3, 3),
                    activation='relu',
                    padding='same', data_format='channels_last'))
     seq.add(Conv3D(filters=1, kernel_size=(3, 3, 3),

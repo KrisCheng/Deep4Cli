@@ -14,8 +14,8 @@ height, width = 10, 50
 def model():
     # Model
     seq = Sequential()
-    seq.add(Dense(units = 1000, input_shape=(None, height, width, 1)))
-    seq.add(Dense(units = 1000, activation='relu'))
+    seq.add(Dense(units = 300, input_shape=(None, height, width, 1)))
+    seq.add(Dense(units = 300, activation='relu'))
     seq.add(Conv3D(filters=1, kernel_size=(3, 3, 3),
                    activation='relu',
                    padding='same', data_format='channels_last'))

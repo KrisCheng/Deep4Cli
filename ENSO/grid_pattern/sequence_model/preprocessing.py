@@ -20,13 +20,6 @@ MAX = 31.18499947
 MIN = 20.33499908
 MEAN = 26.80007865
 
-# # daily ssta setting
-# len_year = 6
-# len_seq = 365
-# map_height, map_width = 40, 200
-# MAX = 7.7300
-# MIN = -6.3199
-
 # 0~1 Normalization
 def normalization(data):
     normalized_data = np.zeros((map_height, map_width), dtype=np.float)
@@ -43,7 +36,6 @@ def inverse_normalization(data):
     return inverse_data
 
 def mean_absolute_percentage_error(y_true, y_pred):
-    # print(y_true)
     return np.mean(np.abs((y_true - y_pred) / y_true))
 
 def load_data_convlstm_monthly(train_length):

@@ -55,7 +55,7 @@ def CNN_model():
     return seq
 
 # monthly sst parameters setting
-epochs = 80
+epochs = 300
 batch_size = 100
 validation_split = 0.1
 train_length = 1800
@@ -63,8 +63,9 @@ len_seq = 1980
 len_frame = 12
 start_seq = 1801
 end_seq = 1968
+point_x, point_y = 2, 2
 
-fold_name = "model_"+str(epochs)+"_epochs"
+fold_name = "model_"+str(epochs)+"_epochs_"+str(len_frame)
 # DATA_PATH = '../../../../dataset/sst_grid_1/sst_monthly_185001_201512.npy'
 DATA_PATH = 'monthly_sst+1.npy'
 
@@ -76,7 +77,7 @@ def main():
     log = open(log_file_path,'w')
 
     # model setting
-    seq = CNN_model()
+    seq = CovLSTM2D_model()
     with redirect_stdout(log):
         seq.summary()
 
@@ -140,6 +141,9 @@ def main():
     model_sum_mape = 0
     base_sum_mape = 0
 
+    single_point_model_sum_rmse = 0
+    single_point_base_sum_rmse = 0
+
     for k in range(start_seq, end_seq):
         # rolling-forecasting with -n steps
         model_sum_rmse_current = 0
@@ -183,6 +187,12 @@ def main():
             model_sum_mae_current, base_sum_mae_current = model_sum_mae_current + model_mae, base_sum_mae_current + baseline_mae
             model_sum_mape_current, base_sum_mape_current = model_sum_mape_current + model_mape, base_sum_mape_current + baseline_mape
 
+            single_model_rmse = (act_toplot[point_x, point_y]-pred_toplot[point_x, point_y])**2
+            single_base_rmse = (act_toplot[point_x, point_y]-baseline_frame[point_x, point_y])**2
+
+            single_point_model_sum_rmse = single_point_model_sum_rmse + single_model_rmse
+            single_point_base_sum_rmse = single_point_base_sum_rmse + single_base_rmse
+
         log.write("\n\n ============")
         log.write("\n Round: %s" % str(k+1))
         log.write("\nTotal Model RMSE: %s" % (sqrt(model_sum_rmse_current/len_frame)))
@@ -209,13 +219,16 @@ def main():
     print("Model MAPE: %s" % (model_sum_mape/(len_frame*(end_seq-start_seq))))
     print("Baseline MAPE: %s" % (base_sum_mape/(len_frame*(end_seq-start_seq))))
 
+    print("Single Model RMSE: %s" % (sqrt(single_point_model_sum_rmse/(len_frame*(end_seq-start_seq)))))
+    print("Single Baseline RMSE: %s" % (sqrt(single_point_base_sum_rmse/(len_frame*(end_seq-start_seq)))))
+
     log.write("\n\n Total:")
     log.write("\nTotal Model RMSE: %s" % (sqrt(model_sum_rmse/(len_frame*(end_seq-start_seq)))))
     log.write("\nTotal Baseline RMSE: %s" % (sqrt(base_sum_rmse/(len_frame*(end_seq-start_seq)))))
     log.write("\nTotal Model MAE: %s" % (model_sum_mae/(len_frame*(end_seq-start_seq))))
     log.write("\nTotal Baseline MAE: %s" % (base_sum_mae/(len_frame*(end_seq-start_seq))))
     log.write("\nModel MAPE: %s" % (model_sum_mape/(len_frame*(end_seq-start_seq))))
-    log.write("\nBaseline MAPE: %s" % (base_sum_mape/(len_frame*(end_seq-start_seq))))
+    log.write("\nBaseline MAPE: %s" % (single_point_base_sum_rmse/(len_frame*(end_seq-start_seq))))
     log.close()
 
     # # visulize one seq (Rolling -forecast)
