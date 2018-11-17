@@ -6,10 +6,12 @@ Deep4Cli.iml
 *.npy
 *.h5
 *.png
+.log
 data
 record
 reference
 paper
 imgs
 model_*
+*month_model
 settings.json
