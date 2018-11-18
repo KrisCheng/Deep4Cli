@@ -1,4 +1,4 @@
-## Deep Convolutional LSTM Network with Rolling Mechanism and Wavelet Transform for ENSO Forecasting Over Multiple Time Horizons
+## Deep Convolutional LSTM Network with Rolling Mechanism for ENSO Forecasting Over Multiple Time Horizons
 
 ***Manuscript Version***
 
@@ -89,12 +89,12 @@ Table 1 shows the result of different approaches for 6-, 9- and 12-month lead ti
 
 |  *T* | Metric | HA | ARIMA | SVR | FNN | CNN | FC-LSTM | ConvLSTM | ConvLSTM-RM |
 | ---- | ---- | ---- | ---- |---- | ---- | ---- | ---- | ---- | ---- |
-|         | RMSE | 1.555 | 1.300  | 2.056 | 1.261 | 0.896 | 1.341 | 0.947 |  |
-| 6-Month | MAE  | 1.271 | 1.053  | 1.767 | 0.860 | 0.688 | 1.004 | 0.749 |  |
-|         | MAPE | 4.78% | 3.95%  | 6.44% | 3.15% | 2.59% | 3.85% | 2.72% |  |
-|         | RMSE | 1.506 | 1.314  | 2.056 | 1.248 | 1.147 | 1.313 |  | 0.807 |
-| 9-Month | MAE  | 1.224 | 1.051  | 1.791 | 0.997 | 0.920 | 0.981 |  | 0.605 |
-|         | MAPE | 4.59% | 3.95%  | 6.54% | 3.73% | 3.38% | 3.75% |  | 2.27% |
+|         | RMSE | 1.555 | 1.300  | 2.056 | 1.261 | 0.896 | 1.341 |0.947|0.729|
+| 6-Month | MAE  | 1.271 | 1.053  | 1.767 | 0.860 | 0.688 | 1.004 |0.749|0.555|
+|         | MAPE | 4.78% | 3.95%  | 6.44% | 3.15% | 2.59% | 3.85% |2.72%|1.45%|
+|         | RMSE | 1.506 | 1.314  | 2.056 | 1.248 | 1.147 | 1.313 |0.976|0.807|
+| 9-Month | MAE  | 1.224 | 1.051  | 1.791 | 0.997 | 0.920 | 0.981 |0.769|0.605|
+|         | MAPE | 4.59% | 3.95%  | 6.54% | 3.73% | 3.38% | 3.75% |2.86%|2.27%|
 |         | RMSE | 1.251 | 1.158  | 2.119 | 1.295 | 1.039 |1.079|1.033| 0.789 |
 | 12-Month| MAE  | 0.969 | 0.905  | 1.882 | 1.034 | 0.801 |0.814|0.805| 0.607 |
 |         | MAPE | 3.64% | 3.39%  | 6.86% | 3.86% | 3.00% |3.06%|2.98%| 2.25% |
@@ -113,12 +113,12 @@ Layers
 
 |  *T* | Metric | 1 | 2 | 3 | 4 | 5 |
 | ---- | ---- | ---- | ---- |---- | ---- | ---- |
-|         | RMSE |   |   |   |   |   | 
-| 6-Month | MAE  |   |   |   |   |   | 
-|         | MAPE |   |   |   |   |   | 
-|         | RMSE |   |   |   | 0.807  |   | 
-| 9-Month | MAE  |   |   |   | 0.605 |   |
-|         | MAPE |   |   |   | 2.27%  |   | 
+|         | RMSE | 0.878  | 0.823  | 0.737  | 0.729  | 0.812  | 
+| 6-Month | MAE  | 0.681  | 0.627  | 0.562  | 0.555  | 0.615  | 
+|         | MAPE | 2.54%  | 2.36%  | 2.11%  | 1.45%  | 1.93%  | 
+|         | RMSE | 0.931 | 0.892 | 0.879  | 0.807  | 0.883  | 
+| 9-Month | MAE  | 0.729 | 0.682 | 0.691  | 0.605  |  0.673 |
+|         | MAPE | 2.71% | 2.55% | 2.56%  | 2.27%  | 2.49%  | 
 |         | RMSE | 0.888  |  0.844 | 0.828  | 0.789  | 1.035  | 
 | 12-Month| MAE  | 0.681  |  0.649 | 0.633  | 0.607  | 0.780  | 
 |         | MAPE | 2.53%  |  2.42% | 2.34%  | 2.25%  | 2.86%  | 
@@ -144,7 +144,13 @@ Kernel Size with 4 Layer and 8 kernel
 
 #### 4.4 Model Interpretation with Generated SST Patterns
 
-To better understand the behavior of model, we visualize the generated SST pattern. Fig 3 shows the visualization of 12-month lead forecasting. We have the following observation: (1) ConvLSTM has improved the performance of single point. 
+To better understand the behavior of model, we take the ENSO occured during 2015/2016 as the case to this study, which is considered as the most extreme ENSO so far and its divided into our testing dataset. We visualize the generated SST pattern for 2015.01~2016.01. Fig 3 shows the visualization of 12-month lead forecasting. and we calculate the NINO3.4 index during this period, and compared it with Climate Model Prediction 
+
+(https://iri.columbia.edu/our-expertise/climate/forecasts/enso/2015-January-quick-look/) 
+
+(https://iri.columbia.edu/our-expertise/climate/forecasts/enso/2015-January-quick-look/?enso_tab=enso-sst_table)
+
+We have the following observation: (1) ConvLSTM has improved the performance of single point. 
 
 
 - Fig 2: The generated SST pattern from ..., which indicate a strong ENSO and predictly the time accuracy.
