@@ -55,12 +55,12 @@ def CNN_model():
     return seq
 
 # monthly sst parameters setting
-epochs = 300
+epochs = 4000
 batch_size = 100
 validation_split = 0.1
 train_length = 1800
 len_seq = 1980
-len_frame = 12
+len_frame = 6
 start_seq = 1801
 end_seq = 1968
 point_x, point_y = 2, 2

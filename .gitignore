@@ -13,5 +13,6 @@ reference
 paper
 imgs
 model_*
+model
 *month_model
 settings.json

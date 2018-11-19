@@ -1,5 +1,5 @@
 '''
-Desc: the entrance of the whole project.
+Desc: the entrance of the whole project, direct forecasting.
 Author: Kris Peng
 Data: https://www.esrl.noaa.gov/psd/data/gridded/data.cobe2.html
 Data Desc: 1850/01~2015/12; monthly SST
@@ -55,7 +55,7 @@ def CNN_model():
     return seq
 
 # monthly sst parameters setting
-epochs = 300
+epochs = 8000
 batch_size = 100
 validation_split = 0.1
 train_length = 1800
@@ -65,7 +65,7 @@ start_seq = 1801
 end_seq = 1968
 point_x, point_y = 2, 2
 
-fold_name = "model_"+str(epochs)+"_epochs_"+str(len_frame)
+fold_name = "direct_model_"+str(epochs)+"_epochs_"+str(len_frame)
 # DATA_PATH = '../../../../dataset/sst_grid_1/sst_monthly_185001_201512.npy'
 DATA_PATH = 'monthly_sst+1.npy'
 
@@ -92,21 +92,9 @@ def main():
     sst_grid = np.zeros((len_seq+len_frame, len_frame, 10, 50, 1), dtype=np.float)
     for i in range(len_seq):
         for k in range(len_frame):
-            train_X[i,k,::,::,0] = pp.normalization(train_X_raw[i,k,::,::,0])
-            train_Y[i,k,::,::,0] = pp.normalization(train_Y_raw[i,k,::,::,0])
+            train_X[i,k,::,::,0] = pp.normalization(sst_grid_raw[i,k,::,::,0])
+            train_Y[i,k,::,::,0] = pp.normalization(sst_grid_raw[i+len_frame,k,::,::,0])
             sst_grid[i,k,::,::,0] = pp.normalization(sst_grid_raw[i,k,::,::,0])
-
-    # # normalization, data for ConvLSTM Model -n ahead -4 dimension
-    # train_X = np.zeros((len_seq, len_frame, 10, 50), dtype=np.float)
-    # train_Y = np.zeros((len_seq, len_frame, 10, 50), dtype=np.float)
-    # sst_grid = np.zeros((len_seq+len_frame, len_frame, 10, 50), dtype=np.float)
-    # for i in range(len_seq):
-    #     for k in range(len_frame):
-    #         train_X[i,k,::,::] = pp.normalization(train_X_raw[i,k,::,::])
-    #         train_Y[i,k,::,::] = pp.normalization(train_Y_raw[i,k,::,::])
-    #         sst_grid[i,k,::,::] = pp.normalization(sst_grid_raw[i,k,::,::])
-    # for m in range(len_frame):
-    #     sst_grid[len_seq,m,::,::] = pp.normalization(sst_grid_raw[len_seq,m,::,::])
 
     seq = multi_gpu_model(seq, gpus=2)
     # sgd = optimizers.SGD(lr=0.1, decay=1e-6, momentum=0.9, nesterov=True)
@@ -145,7 +133,7 @@ def main():
     single_point_base_sum_rmse = 0
 
     for k in range(start_seq, end_seq):
-        # rolling-forecasting with -n steps
+        # direct with -n steps
         model_sum_rmse_current = 0
         base_sum_rmse_current = 0
         model_sum_mae_current = 0
@@ -154,23 +142,15 @@ def main():
         base_sum_mape_current = 0
 
         pred_sequence_raw = sst_grid[k][::, ::, ::, ::]
-        pred_sequence = sst_grid[k][::, ::, ::, ::]
         act_sequence = sst_grid[k+len_frame][::, ::, ::, ::]
-
+        pred_sequence = seq.predict(pred_sequence_raw[np.newaxis, ::, ::, ::, ::])
+        pred_sequence = pred_sequence[0,::,::,::,::]
         for j in range(len_frame):
-            new_frame = seq.predict(pred_sequence[np.newaxis, ::, ::, ::, ::])
-            # TODO why?? ref: keras conv_lstm.py demo
-            new = new_frame[::, -1, ::, ::, ::]
-            pred_sequence = np.concatenate((pred_sequence, new), axis=0)
-
             baseline_frame = pp.inverse_normalization(pred_sequence_raw[j, ::, ::, 0])
-            pred_toplot = pp.inverse_normalization(pred_sequence[-1, ::, ::, 0])
+            pred_toplot = pp.inverse_normalization(pred_sequence[j, ::, ::, 0])
             act_toplot = pp.inverse_normalization(act_sequence[j, ::, ::, 0])
 
-            pred_sequence = pred_sequence[1:len_frame+1, ::, ::, ::]
-
             model_rmse = mean_squared_error(act_toplot, pred_toplot)
-            # print(model_rmse)
             baseline_rmse = mean_squared_error(act_toplot, baseline_frame)
 
             model_mae = mean_absolute_error(act_toplot, pred_toplot)
@@ -231,13 +211,6 @@ def main():
     log.write("\nBaseline MAPE: %s" % (single_point_base_sum_rmse/(len_frame*(end_seq-start_seq))))
     log.close()
 
-    # # visulize one seq (Rolling -forecast)
-    # pred_sequence = sst_grid[which_seq][:12, ::, ::, ::]
-    # for j in range(12):
-    #     new_frame = seq.predict(pred_sequence[np.newaxis, ::, ::, ::, ::])
-    #     # TODO why?? ref: keras conv_lstm.py demo
-    #     new = new_frame[::, -1, ::, ::, ::]
-    #     pred_sequence = np.concatenate((pred_sequence, new), axis=0)
 
     for k in range(start_seq, end_seq, 80):
         pred_sequence_raw = sst_grid[k][::, ::, ::, ::]
