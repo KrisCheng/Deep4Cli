@@ -135,7 +135,7 @@ Layers
 
 Next, we explore the chose of different number of kernel and kernel size. Fig 1 shows final result with layer X. K roughtly corresponds to the size of filters' reception field while the number of units corresponds to the number of filters. Larger K enables the model to capture broader spatial dependency at the cost of increasing learning complexity. We observe that with the increase of K, the error on the testing dataset first quickly decrease, and then slightly increase. Similar behavior is observed for varying the number of units.
 
-- Fig 2: Performance comparision of different kernel number .
+- Fig 2: Performance comparision of different kernel number.
 
 Histogram (kernel num and kernel size) or Box-Whisker Plot is better (many models).
 
