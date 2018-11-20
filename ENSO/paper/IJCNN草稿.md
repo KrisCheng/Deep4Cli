@@ -1,4 +1,4 @@
-## Deep Convolutional LSTM Network with Rolling Mechanism for ENSO Forecasting Over Multiple Time Horizons
+## ENSO Forecasting Over Multiple Time Horizons Using Deep Convolutional LSTM Network and Rolling Mechanism
 
 ***Manuscript Version***
 
@@ -17,6 +17,8 @@ TBD
 Spatiotemporal Sequence Forecasting, Convolutional LSTM, Rolling Mechanism, ENSO.
 ### 1. Introduction
 
+"fully coupled models are computationally expensive and only just starting to become publicly available. From a practical point of view, it remains challenging for the typhoon community to replace existing operational forecast systems with coupled models at this stage."
+
 Approximately every 4 years, the sea surface temperature (SST) is higher than average in the eastern equatorial Pacific. This phenomenon is called El Niño-Southern Oscillation (ENSO) and is considered as the dominant mode of interannual climate variability observed globally (Wunsch 1990). ENSO is associated with many climate changes (Fraedrich 1994; Wilkinson et al.1999), affecting climate of much of the tropics and subtropics, then cause enormous damage worldwide, so a skillful forecasting of ENSO is strongly needed.
 
 1. What is ENSO and its extremely impacts (why a skillful forecasting is very important);
@@ -34,6 +36,8 @@ Approximately every 4 years, the sea surface temperature (SST) is higher than av
 * Temporal dependencies
 
 
+Why Rolling? Direct is not good and rolling is a better choice for multi-step forecasting.
+
 we formulize the grid SST pattern problem and use the Convolutional LSTM model to capture the spatial and temporal information of ENSO development simultaneously,
 
 In summary, The contributions of our work are 3-fold: 
@@ -41,6 +45,11 @@ In summary, The contributions of our work are 3-fold:
 * We formulize the ENSO SST pattern forecasting problem, a I * J grid map based on longitude and latitude where a grid donates a region of NINO3.4, which can be converted as a multi-channels physical parameters setting spatiotemporal sequence forecasting problem;
 
 * We apply Convolutional LSTM network, which can capture the spatial and temporal information of SST data effectively, to predict ENSO with -6, -9, -12 monthly ahead respectively, the result show that our model outperform other neural network models and conventional statistical model.
+
+
+* Visualization of ENSO Pattern
+
+The remainder of the paper is structured as follow:  
 
 ### 2. Related Work
 
@@ -54,9 +63,10 @@ TBD
 ### 3. Methodology
 
 #### 3.1 Formulation of ENSO Forecasting ProblemA multi-channel image like grid pattern, and the specified value stand for concrete physical information.
-#### 3.2 Convolutional LSTM with Rolling Mechanism (ConvLSTM-RM)
+#### 3.2 Convolutional LSTM and Rolling Mechanism (ConvLSTM-RM)
 
 Each ConvLSTM block is composed of a convolutional LSTM layer and a batch normalization layer.
+
 We use 0-1 normalization to scale the input SST data before training. 
 then use rolling mechanism to generate new forecasting sequence.
 
@@ -73,15 +83,15 @@ We conduct experiments on the real-world monthly (1850.01~2015.12) SST grid data
 
 	Formulas of RMSE/MAE/MAPE 
 
-In the following experiments, we first compare different forecasting methods to validate the effect of our model, then discuss the influence of different hyperparameters settings to the final result. Finally, we explore the model interpretation with the generated SST patterns. All neural network based approaches are implemented using Keras, and all the codes are available on GitHub[2]. We run all the experiments on a computer with two NVIDIA 1080Ti GPUs.
+In the following experiments, we first compare different forecasting methods to validate the effect of our model, then discuss the influence of different hyperparameters settings to the final result. Finally, we take the ENSO during 2015/16 as the case, explore the model interpretation with the generated SST patterns. All neural network based approaches are implemented using Keras, and all the codes are available on GitHub[2]. We run all the experiments on a computer with two NVIDIA 1080Ti GPUs.
 
 [1] https://www.esrl.noaa.gov/psd/data/gridded/data.cobe2.html
 
 [2] https://github.com/KrisCheng/Deep4Cli
 
-#### 4.2 Effect of Spatiotempoal Modeling
+#### 4.2 Effect of Spatiotemporal Modeling
 
-We compare ConvLSTM based network with other widely used time series regression models, including (1) HA: Historical Average, which models the development of SST as a periodic variation, and uses the passed observation as the prediction; (2) ARIMA: Auto-Regression Integrated Moving Average, which is a well-known model for understanding and forecasting future; (3) SVR: Support Vector Regression, which applies linear support vector machine for regression task. The following deep neural network based models are also included: (4) Feed forward Neural Network (FNN): Feed forward neural network with equal magnitude of parameters; (5) Convolutional Neural Network (CNN); (6) Fully connected LSTM (FC-LSTM). Those deep neural networks with 3 hidden layers and roughly same amount of parameters, and they are fully trained with a fixed number of epochs (e.g., 10000 epochs) for fair comparision.
+We compare ConvLSTM-RM network with other widely used time series regression models, including (1) HA: Historical Average, which models the development of SST as a periodic variation, and uses the passed observation as the prediction; (2) ARIMA: Auto-Regression Integrated Moving Average, which is a well-known model for understanding and forecasting future; (3) SVR: Support Vector Regression, which applies linear support vector machine for regression task. The following deep neural network based models are also included: (4) Feed forward Neural Network (FNN): Feed forward neural network with equal magnitude of parameters; (5) Convolutional Neural Network (CNN); (6) Fully connected LSTM (FC-LSTM). Those deep neural networks with 3 hidden layers and roughly same amount of parameters, and they are fully trained with a fixed number of epochs (e.g., 10000 epochs) for fair comparision.
 
 Table 1 shows the result of different approaches for 6-, 9- and 12-month lead time forecasting. we observe the following phenomenon on this process: (1) ConvLSTM outperforms all other baselines regarding all the metrics for all forecasting horizon, which suggests the effectiveness of handling spatiotemporal dependencies. (2) Deep neural network based methods, especially CNN and ConvLSTM, tend to have a better performance than other baselines. One intuitive reason is that the development of SST is irregular and highly spatial- correlated, so it is hard for a model to give accurate predictions on test set without learning the inner dynamics development of the climate system. (3) The performance of different models did not show consistently tendency with the growth of forecasting horizon, and the performance of CNN is better than FC-LSTM. The intuition is that the temporal dependencies of ENSO is hard to capture than spatial dependencies in this experiment.
 
@@ -90,24 +100,24 @@ Table 1 shows the result of different approaches for 6-, 9- and 12-month lead ti
 |  *T* | Metric | HA | ARIMA | SVR | FNN | CNN | FC-LSTM | ConvLSTM | ConvLSTM-RM |
 | ---- | ---- | ---- | ---- |---- | ---- | ---- | ---- | ---- | ---- |
 |         | RMSE | 1.555 | 1.300  | 2.056 | 1.261 | 0.896 | 1.341 |0.947|0.729|
-| 6-Month | MAE  | 1.271 | 1.053  | 1.767 | 0.860 | 0.688 | 1.004 |0.749|0.555|
+| 6-month | MAE  | 1.271 | 1.053  | 1.767 | 0.860 | 0.688 | 1.004 |0.749|0.555|
 |         | MAPE | 4.78% | 3.95%  | 6.44% | 3.15% | 2.59% | 3.85% |2.72%|1.45%|
 |         | RMSE | 1.506 | 1.314  | 2.056 | 1.248 | 1.147 | 1.313 |0.976|0.807|
-| 9-Month | MAE  | 1.224 | 1.051  | 1.791 | 0.997 | 0.920 | 0.981 |0.769|0.605|
+| 9-month | MAE  | 1.224 | 1.051  | 1.791 | 0.997 | 0.920 | 0.981 |0.769|0.605|
 |         | MAPE | 4.59% | 3.95%  | 6.54% | 3.73% | 3.38% | 3.75% |2.86%|2.27%|
 |         | RMSE | 1.251 | 1.158  | 2.119 | 1.295 | 1.039 |1.079|1.033| 0.789 |
-| 12-Month| MAE  | 0.969 | 0.905  | 1.882 | 1.034 | 0.801 |0.814|0.805| 0.607 |
+| 12-month| MAE  | 0.969 | 0.905  | 1.882 | 1.034 | 0.801 |0.814|0.805| 0.607 |
 |         | MAPE | 3.64% | 3.39%  | 6.86% | 3.86% | 3.00% |3.06%|2.98%| 2.25% |
 
 
 #### 4.3 Different ConvLSTM-RM Structures Comparison
 
-To further investigate the influence of different network structures to the final result, we compare ConvLSTM with the following two aspects: (1) Num of Layer, which is a fundamental setting for deep neural network structure. (2) Num of kernel and kernel size, which can stand for the collectors of spatial correlation between SST grid data. We apply grid search strategy in this experiment, all with Adam optimizer.
+To further investigate the influence of different network structures to the final result and figure out the best network structure, we compare ConvLSTM with the following two aspects: (1) Num of Layer, which is a fundamental setting for deep neural network structure. (2) Num of kernel and kernel size, which can stand for the collectors of spatial correlation between SST grid data. We apply grid search strategy in this experiment, all with Adam optimizer during training process to accelerate learning process.
 
-Table 2 shows the comparison between different number of ConvLSTM block. We found that (1) deeper models can produce better results with fewer parameters; (2) More layer and more filters does not always reach better performance.
+Fig 1 shows the comparison between different number of ConvLSTM block. We found that (1) deeper models can produce better results with fewer parameters; (2) More layer and more filters does not always reach better performance.
 
 
-- Table 2: Performance comparision of different network layers, 6-, 9- and 12-month lead.
+- Fig 1: Performance comparision of different network layers, 6-, 9- and 12-month lead.
 
 Layers
 
@@ -123,9 +133,9 @@ Layers
 | 12-Month| MAE  | 0.681  |  0.649 | 0.633  | 0.607  | 0.780  | 
 |         | MAPE | 2.53%  |  2.42% | 2.34%  | 2.25%  | 2.86%  | 
 
-Next, we explore the chose of different number of kernel and kernel size. Fig 1 shows final result with layer X. K roughtly corresponds to the size of filters' reception field while the number of units corresponds to the number of filters. Larger K enables the model to capture broader spatial dependency at the cost of increasing learning complexity. We observe that with the increase of K, ~~the error on the testing dataset first quickly decrease, and then slightly increase. Similar behavior is observed for varying the number of units.~~
+Next, we explore the chose of different number of kernel and kernel size. Fig 1 shows final result with layer X. K roughtly corresponds to the size of filters' reception field while the number of units corresponds to the number of filters. Larger K enables the model to capture broader spatial dependency at the cost of increasing learning complexity. We observe that with the increase of K, the error on the testing dataset first quickly decrease, and then slightly increase. Similar behavior is observed for varying the number of units.
 
-- Fig 1: Performance comparision of different kernel number and kernel size.
+- Fig 2: Performance comparision of different kernel number .
 
 Histogram (kernel num and kernel size) or Box-Whisker Plot is better (many models).
 
@@ -136,7 +146,10 @@ Kernel Num with 4 Layer
 | 12-Month | RMSE  | 1.070  |  0.789 | 0.861  |  1.007 |
 
 
-Kernel Size with 4 Layer and 8 kernel
+
+Kernel Num with 4 Layer and 8 Kernels
+
+- Fig 3: Performance comparision of different kernel size.
 
 |  *T* | Metric | 1 | 2 | 3 | 4 | 5 |
 | ---- | ---- | ---- | ---- |---- | ---- | ---- |
@@ -144,28 +157,48 @@ Kernel Size with 4 Layer and 8 kernel
 
 #### 4.4 Model Interpretation with Generated SST Patterns
 
-To better understand the behavior of model, we take the ENSO occured during 2015/2016 as the case to this study, which is considered as the most extreme ENSO so far and its divided into our testing dataset. We visualize the generated SST pattern for 2015.01~2016.01. Fig 3 shows the visualization of 12-month lead forecasting. and we calculate the NINO3.4 index during this period, and compared it with Climate Model Prediction 
+Why ENSO 15/16?
+
+To better understand the behavior of our model, In this part, we take the ENSO occured during 2015/2016 as the case, which is considered as the most extreme ENSO since records began, and the fluctuation of SST is a good candidate for investigate. We visualize the generated SST patterns from 2015.01 to 2016.01. Fig 3 shows the visualization of 12-month lead forecasting. We have the following observations: 
+
+(1) ...
+
+(2) we calculate the NINO3.4 index during this period, and compared it with Climate Model Prediction From IRI CPC.
+
+(3) .... which can be considered as a successful prediction of ENSO.
+
+
+Outline:
+
+pattern of ENSO during 2015/2016 --> our model capture the development of SST pattern --> regression result, predict the peak value and can be considered as a successful prediction of ENSO 15/16.	
 
 (https://iri.columbia.edu/our-expertise/climate/forecasts/enso/2015-January-quick-look/) 
 
 (https://iri.columbia.edu/our-expertise/climate/forecasts/enso/2015-January-quick-look/?enso_tab=enso-sst_table)
 
-We have the following observation: (1) ConvLSTM has improved the performance of single point. 
 
 
-- Fig 2: The generated SST pattern from ..., which indicate a strong ENSO and predictly the time accuracy.
+- Fig 4: The generated SST pattern from ..., which indicate a strong ENSO and predictly the time accuracy.
+
+
+- Fig 5: Nino index with Model Comparision.
 
 
 ~~~
 
-#### 4.4 Different Optimization Algorithms Comparison
+Experiment Can Be Done (TBD)
 
-The optimizer of 
+1. Different Optimization Algorithms Comparison
 
-SGD/RMSprop/Adagrad/Adadelta/Adam/Nadam
+The optimizer of SGD/RMSprop/Adagrad/Adadelta/Adam/Nadam during training process.
 
 Adam is the most stable one.
 
-- Fig 2: Learning curve of different optimization algorithms in validation set.~~~
+- Fig 2: Learning curve of different optimization algorithms in validation set.
+
+
+2. Robustness of the Network Structure
+
+different data split, a lot of experiment to figure out the RMSE dictribution with different time horizons.~~~
 ### 5. Conclusion and Future WorkTBD### Reference[1] TBD
 
