@@ -62,20 +62,11 @@ sst_data = sio.loadmat(DATA_PATH)
 sst_data = sst_data['sst'][::,::,::]
 sst_data = sst_data[85:95,190:240,::]
 sst_data = np.array(sst_data, dtype=float)
-train_sst = np.zeros((1980,12,10,50,1), dtype=np.float)
-test_sst = np.zeros((1980,12,10,50,1), dtype=np.float)
-all_sst = np.zeros((1992,12,10,50,1), dtype=np.float)
+all_sst = np.zeros((24,12,10,50,1), dtype=np.float)
 
-# 12->12
-for i in range(1980):
+# [0,12]->[1,13]
+for i in range(24):
     for k in range(12):
-        train_sst[i,k,::,::,0] = sst_data[::,::,i+k]
-        test_sst[i,k,::,::,0] = sst_data[::,::,i+k+1]
-        all_sst[i,k,::,::,0] = sst_data[::,::,i+k]
-
-# 补齐最后12帧
-for n in range(1981,1992):       
-    for m in range(12):
-        all_sst[n,m,::,::,0] = sst_data[::,::,n+m]
-
-np.save("monthly_sst+12.npy", [train_sst,test_sst,all_sst])
+        all_sst[i,k,::,::,0] = sst_data[::,::,i+k+1969]
+print(all_sst.shape)
+np.save("enso_monthly_sst_last_24.npy", [all_sst])
