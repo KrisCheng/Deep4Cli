@@ -64,6 +64,7 @@ def main():
     pred_sequence_raw = sst_grid[11][::, ::, ::, ::]
     pred_sequence = sst_grid[0][::, ::, ::, ::]
     act_sequence = sst_grid[23][::, ::, ::, ::]
+
     model_sum_rmse = 0
     base_sum_rmse = 0
     model_sum_mae = 0
@@ -140,7 +141,12 @@ def main():
         plt.imshow(diff_toplot)
         cbar = plt.colorbar(plt.imshow(diff_toplot), orientation='horizontal')
         cbar.set_label('°C',fontsize=12)
-        plt.savefig(fold_name + '/%s_animate.png' % (str(j+1)))
+        # plt.savefig(fold_name + '/%s_animate.png' % (str(j+1)))
+
+    MIN_TEMP_pre = 25
+    MAX_TEMP_pre = 28
+    MIN_TEMP_act = 25
+    MAX_TEMP_act = 28
 
     for i in range(2):
         fig = plt.figure(figsize=(6, 12))
@@ -152,30 +158,40 @@ def main():
         plt.xticks([0,10,20,30,40,49],[r'$170W$',r'$160W$',r'$150W$',r'$140W$',r'$130W$',r'$120W$'])
         plt.yticks([0,5,9],[r'$5N$',r'$0$',r'$5S$'])
         plt.imshow(pred_toplot)
+        # cbar = plt.colorbar(plt.imshow(pred_toplot), orientation='horizontal')
+        plt.clim(MIN_TEMP_pre,MAX_TEMP_pre)
 
         pred_toplot = inverse_normalization(pred_sequence[6*i+1, ::, ::, 0])
         ax = fig.add_subplot(612)
         plt.xticks([0,10,20,30,40,49],[r'$170W$',r'$160W$',r'$150W$',r'$140W$',r'$130W$',r'$120W$'])
         plt.yticks([0,5,9],[r'$5N$',r'$0$',r'$5S$'])
         plt.imshow(pred_toplot)
+        # cbar = plt.colorbar(plt.imshow(pred_toplot), orientation='horizontal')
+        plt.clim(MIN_TEMP_pre,MAX_TEMP_pre)
 
         pred_toplot = inverse_normalization(pred_sequence[6*i+2, ::, ::, 0])
         ax = fig.add_subplot(613)
         plt.xticks([0,10,20,30,40,49],[r'$170W$',r'$160W$',r'$150W$',r'$140W$',r'$130W$',r'$120W$'])
         plt.yticks([0,5,9],[r'$5N$',r'$0$',r'$5S$'])
         plt.imshow(pred_toplot)
+        # cbar = plt.colorbar(plt.imshow(pred_toplot), orientation='horizontal')
+        plt.clim(MIN_TEMP_pre,MAX_TEMP_pre)
 
         pred_toplot = inverse_normalization(pred_sequence[6*i+3, ::, ::, 0])
         ax = fig.add_subplot(614)
         plt.xticks([0,10,20,30,40,49],[r'$170W$',r'$160W$',r'$150W$',r'$140W$',r'$130W$',r'$120W$'])
         plt.yticks([0,5,9],[r'$5N$',r'$0$',r'$5S$'])
         plt.imshow(pred_toplot)
+        # cbar = plt.colorbar(plt.imshow(pred_toplot), orientation='horizontal')
+        plt.clim(MIN_TEMP_pre,MAX_TEMP_pre)
 
         pred_toplot = inverse_normalization(pred_sequence[6*i+4, ::, ::, 0])
         ax = fig.add_subplot(615)
         plt.xticks([0,10,20,30,40,49],[r'$170W$',r'$160W$',r'$150W$',r'$140W$',r'$130W$',r'$120W$'])
         plt.yticks([0,5,9],[r'$5N$',r'$0$',r'$5S$'])
         plt.imshow(pred_toplot)
+        # cbar = plt.colorbar(plt.imshow(pred_toplot), orientation='horizontal')
+        plt.clim(MIN_TEMP_pre,MAX_TEMP_pre)
 
         pred_toplot = inverse_normalization(pred_sequence[6*i+5, ::, ::, 0])
         ax = fig.add_subplot(616)
@@ -183,6 +199,8 @@ def main():
         plt.yticks([0,5,9],[r'$5N$',r'$0$',r'$5S$'])
         plt.imshow(pred_toplot)
         cbar = plt.colorbar(plt.imshow(pred_toplot), orientation='horizontal')
+        plt.clim(MIN_TEMP_pre,MAX_TEMP_pre)
+
         cbar.set_label('°C',fontsize=12)
         plt.savefig(fold_name + '/%s_all_animate_pred.png' % i)
 
@@ -196,38 +214,49 @@ def main():
         plt.xticks([0,10,20,30,40,49],[r'$170W$',r'$160W$',r'$150W$',r'$140W$',r'$130W$',r'$120W$'])
         plt.yticks([0,5,9],[r'$5N$',r'$0$',r'$5S$'])
         plt.imshow(act_toplot)
+        # cbar = plt.colorbar(plt.imshow(act_toplot), orientation='horizontal')
+        plt.clim(MIN_TEMP_act,MAX_TEMP_act)
 
         act_toplot = inverse_normalization(act_sequence[6*m+1, ::, ::, 0])
         ax = fig.add_subplot(612)
         plt.xticks([0,10,20,30,40,49],[r'$170W$',r'$160W$',r'$150W$',r'$140W$',r'$130W$',r'$120W$'])
         plt.yticks([0,5,9],[r'$5N$',r'$0$',r'$5S$'])
         plt.imshow(act_toplot)
+        # cbar = plt.colorbar(plt.imshow(act_toplot), orientation='horizontal')
+        plt.clim(MIN_TEMP_act,MAX_TEMP_act)
 
         act_toplot = inverse_normalization(act_sequence[6*m+2, ::, ::, 0])
         ax = fig.add_subplot(613)
         plt.xticks([0,10,20,30,40,49],[r'$170W$',r'$160W$',r'$150W$',r'$140W$',r'$130W$',r'$120W$'])
         plt.yticks([0,5,9],[r'$5N$',r'$0$',r'$5S$'])
         plt.imshow(act_toplot)
+        # cbar = plt.colorbar(plt.imshow(act_toplot), orientation='horizontal')
+        plt.clim(MIN_TEMP_act,MAX_TEMP_act)
 
         act_toplot = inverse_normalization(act_sequence[6*m+3, ::, ::, 0])
         ax = fig.add_subplot(614)
         plt.xticks([0,10,20,30,40,49],[r'$170W$',r'$160W$',r'$150W$',r'$140W$',r'$130W$',r'$120W$'])
         plt.yticks([0,5,9],[r'$5N$',r'$0$',r'$5S$'])
         plt.imshow(act_toplot)
+        # cbar = plt.colorbar(plt.imshow(act_toplot), orientation='horizontal')
+        plt.clim(MIN_TEMP_act,MAX_TEMP_act)
 
         act_toplot = inverse_normalization(act_sequence[6*m+4, ::, ::, 0])
         ax = fig.add_subplot(615)
         plt.xticks([0,10,20,30,40,49],[r'$170W$',r'$160W$',r'$150W$',r'$140W$',r'$130W$',r'$120W$'])
         plt.yticks([0,5,9],[r'$5N$',r'$0$',r'$5S$'])
         plt.imshow(act_toplot)
+        # cbar = plt.colorbar(plt.imshow(act_toplot), orientation='horizontal')
+        plt.clim(MIN_TEMP_act,MAX_TEMP_act)
 
         act_toplot = inverse_normalization(act_sequence[6*m+5, ::, ::, 0])
         ax = fig.add_subplot(616)
         plt.xticks([0,10,20,30,40,49],[r'$170W$',r'$160W$',r'$150W$',r'$140W$',r'$130W$',r'$120W$'])
         plt.yticks([0,5,9],[r'$5N$',r'$0$',r'$5S$'])
         plt.imshow(act_toplot)
-
         cbar = plt.colorbar(plt.imshow(act_toplot), orientation='horizontal')
+        plt.clim(MIN_TEMP_act,MAX_TEMP_act)
+
         cbar.set_label('°C',fontsize=12)
         plt.savefig(fold_name + '/%s_all_animate_act.png' % m)
 
