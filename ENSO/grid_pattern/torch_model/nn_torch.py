@@ -1,5 +1,5 @@
 '''
-Desc: Test Code of PyTorch
+Desc: Test Code of PyTorch.
 Author: Kris Peng
 Copyright (c) 2018 - Kris Peng <kris.dacpc@gmail.com>
 '''
