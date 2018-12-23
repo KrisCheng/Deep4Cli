@@ -136,6 +136,3 @@ def load_data_resnet():
             # Year * 12 + currentMonth
             normalized_sst[i,k,::,::] = normalization(sst_data[::,::,i*12+k])
     return normalized_sst
-
-# the evaluate function, based on RMSE, TODO
-# def evaluate():

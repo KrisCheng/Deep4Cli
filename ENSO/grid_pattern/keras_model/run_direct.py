@@ -33,13 +33,6 @@ def CovLSTM2D_model():
     print('=' * 10)
     return seq
 
-def STResNet_model():
-    seq = STResNet.model()
-    print('=' * 10)
-    print(seq.summary())
-    print('=' * 10)
-    return seq
-
 def FNN_model():
     seq = FNN.model()
     print('=' * 10)
@@ -210,7 +203,6 @@ def main():
     log.write("\nModel MAPE: %s" % (model_sum_mape/(len_frame*(end_seq-start_seq))))
     log.write("\nBaseline MAPE: %s" % (single_point_base_sum_rmse/(len_frame*(end_seq-start_seq))))
     log.close()
-
 
     for k in range(start_seq, end_seq, 80):
         pred_sequence_raw = sst_grid[k][::, ::, ::, ::]
