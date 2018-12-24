@@ -6,6 +6,9 @@ from torch.autograd import Variable
 import torch
 import torch.optim as optim
 import numpy as np
+from math import sqrt
+
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 class ConvLSTMCell(nn.Module):
 
@@ -37,8 +40,8 @@ class ConvLSTMCell(nn.Module):
         self.padding     = kernel_size[0] // 2, kernel_size[1] // 2
         self.bias        = bias
 
-        self.conv = nn.Conv2d(in_channels=1,
-                              out_channels=1,
+        self.conv = nn.Conv2d(in_channels=self.input_dim + self.hidden_dim,
+                              out_channels=4 * self.hidden_dim,
                               kernel_size=self.kernel_size,
                               padding=self.padding,
                               bias=self.bias)
@@ -46,7 +49,7 @@ class ConvLSTMCell(nn.Module):
     def forward(self, input_tensor, cur_state):
 
         h_cur, c_cur = cur_state
-        print(input_tensor.shape)
+        # print(input_tensor.shape)
         combined = torch.cat([input_tensor, h_cur], dim=1)  # concatenate along channel axis
         # print(combined.shape)
         combined_conv = self.conv(combined)
@@ -117,12 +120,11 @@ class ConvLSTM(nn.Module):
         -------
         last_state_list, layer_output
         """
-
         # if not self.batch_first:
         # (t, b, c, h, w) -> (b, t, c, h, w)
 
         # print(input_tensor.shape)
-        input_tensor = input_tensor.permute(0, 1, 4, 2, 3)
+        # input_tensor = input_tensor.permute(0, 1, 4, 2, 3)
         # print(input_tensor.shape)
 
         # # Implement stateful ConvLSTM
@@ -180,15 +182,27 @@ input_size = (10, 50)
 input_dim = 1
 hidden_dim = 1
 kernel_size = (5, 5)
-num_layers = 5
-lr = 0.001
-num_epochs = 10
+num_layers = 10
+lr = 0.1
+num_epochs = 1000
+train_length = 1800
+len_seq = 1980
+len_frame = 12
+start_seq = 1801
+end_seq = 1968
+
+def mse_loss(input, target):
+    return (torch.sum((input - target) ** 2)/(500))
 
 if __name__ == '__main__':
     data = torch.load('sst+1.pt')
-    # print(data.shape)
     train_data = data[0]
     test_data = data[1]
+    train_data = train_data.permute(0, 1, 4, 2, 3)
+    test_data = test_data.permute(0, 1, 4, 2, 3)
+    train_data = Variable(train_data).cuda()
+    test_data = Variable(test_data).cuda()
+
     print("trainset shape: ", train_data.shape)
     print("testset shape: ", test_data.shape)
 
@@ -198,7 +212,6 @@ if __name__ == '__main__':
                         kernel_size = kernel_size,
                         num_layers = num_layers)
 
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     conv_lstm = nn.DataParallel(conv_lstm)
     conv_lstm.to(device)
 
@@ -206,17 +219,51 @@ if __name__ == '__main__':
     optimizer = optim.SGD(conv_lstm.parameters(), lr=lr)
 
     for i in range(num_epochs):
-        inputs = Variable(train_data[0:1800])
-        targets = Variable(test_data[0:1800])
-        # print(inputs.shape)
+        inputs = train_data[:train_length]
+        targets = test_data[:train_length]
         outputs = conv_lstm(input_tensor=inputs)
-        print(outputs[0][0][0])
-        outputs = np.array(list(outputs[0]))
-        print(outputs.shape)
+        outputs = outputs[0][0]
         loss = criterion(outputs, inputs)
-
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
-
+        print("Epoch: {} , Loss: {:.4f}".format(i+1, loss.item()))
     torch.save(conv_lstm.state_dict(), 'model.ckpt')
+
+    model_sum_rmse = 0
+    base_sum_rmse = 0
+
+    for k in range(start_seq, end_seq):
+        # rolling-forecasting with -n steps
+        model_sum_rmse_current = 0
+        base_sum_rmse_current = 0
+
+        pred_sequence_raw = train_data[k][::, ::, ::, ::]
+        pred_sequence = train_data[k][::, ::, ::, ::]
+        act_sequence = train_data[k+len_frame][::, ::, ::, ::]
+
+        for j in range(len_frame):
+            new_frame = conv_lstm(input_tensor=pred_sequence[np.newaxis, ::, ::, ::, ::])
+            new_frame = new_frame[0][0]
+            new = new_frame[::, -1, ::, ::, ::]
+            pred_sequence = torch.cat((pred_sequence, new),0)
+
+            baseline_frame = pred_sequence_raw[j, 0, ::, ::]
+            pred_toplot = pred_sequence[-1, 0, ::, ::]
+            act_toplot = act_sequence[j, 0, ::, ::]
+            pred_sequence = pred_sequence[1:len_frame+1, ::, ::, ::]
+
+            model_rmse = mse_loss(act_toplot, pred_toplot)
+            baseline_rmse = mse_loss(act_toplot, baseline_frame)
+
+            model_sum_rmse, base_sum_rmse = model_sum_rmse + model_rmse, base_sum_rmse + baseline_rmse
+            model_sum_rmse_current, base_sum_rmse_current = model_sum_rmse_current + model_rmse, base_sum_rmse_current + baseline_rmse
+
+        # print("="*10)
+        # print("Round: %s" % str(k+1))
+        # print("Total Model RMSE: %s" % (sqrt(model_sum_rmse_current/len_frame)))
+        # print("Total Baseline RMSE: %s" % (sqrt(base_sum_rmse_current/len_frame)))
+
+    print("="*20)
+    print("Total Model RMSE: %s" % (sqrt(model_sum_rmse/(len_frame*(end_seq-start_seq)))))
+    print("Total Baseline RMSE: %s" % (sqrt(base_sum_rmse/(len_frame*(end_seq-start_seq)))))

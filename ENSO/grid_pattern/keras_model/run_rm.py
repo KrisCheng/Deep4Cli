@@ -147,7 +147,7 @@ def main():
 
         for j in range(len_frame):
             new_frame = seq.predict(pred_sequence[np.newaxis, ::, ::, ::, ::])
-            
+
             new = new_frame[::, -1, ::, ::, ::]
             pred_sequence = np.concatenate((pred_sequence, new), axis=0)
 
@@ -217,14 +217,6 @@ def main():
     log.write("\nModel MAPE: %s" % (model_sum_mape/(len_frame*(end_seq-start_seq))))
     log.write("\nBaseline MAPE: %s" % (single_point_base_sum_rmse/(len_frame*(end_seq-start_seq))))
     log.close()
-
-    # # visulize one seq (Rolling -forecast)
-    # pred_sequence = sst_grid[which_seq][:12, ::, ::, ::]
-    # for j in range(12):
-    #     new_frame = seq.predict(pred_sequence[np.newaxis, ::, ::, ::, ::])
-    #     # TODO why?? ref: keras conv_lstm.py demo
-    #     new = new_frame[::, -1, ::, ::, ::]
-    #     pred_sequence = np.concatenate((pred_sequence, new), axis=0)
 
     for k in range(start_seq, end_seq, 80):
         pred_sequence_raw = sst_grid[k][::, ::, ::, ::]

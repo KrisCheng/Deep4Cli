@@ -104,16 +104,6 @@ if __name__ == '__main__':
     # print(data.shape)
     train_data = data[0]
     test_data = data[1]
-
-    # gradient check
-    convlstm = ConvLSTM(input_channels=1, hidden_channels=[16, 10, 10, 2, 2], kernel_size=3, step=5, effective_step=[4]).cuda()
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    convlstm = nn.DataParallel(convlstm)
-
-    convlstm.to(device)
-
-    loss_fn = torch.nn.MSELoss()
-
     input = Variable(train_data).cuda()
     target = Variable(test_data).double().cuda()
     input = input.permute(0, 1, 4, 2, 3)
@@ -123,11 +113,19 @@ if __name__ == '__main__':
     print("trainset shape: ", input.shape)
     print("testset shape: ", target.shape)
 
+    # gradient check
+    convlstm = ConvLSTM(input_channels=1, hidden_channels=[16, 10, 10, 2, 2], kernel_size=3, step=5, effective_step=[4]).cuda()
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    convlstm = nn.DataParallel(convlstm)
+    convlstm.to(device)
+
+    loss_fn = torch.nn.MSELoss()
+
     outputs = convlstm(input)
     print(outputs[0][0].shape)
-    # res = torch.autograd.gradcheck(loss_fn, (output, target), eps=1e-6, raise_exception=True)
 
-    # loss = criterion(outputs, target)
+    # res = torch.autograd.gradcheck(loss_fn, (output, target), eps=1e-6, raise_exception=True)
+    loss = criterion(outputs, target)
     # optimizer.zero_grad()
     # loss.backward()
     # optimizer.step()
