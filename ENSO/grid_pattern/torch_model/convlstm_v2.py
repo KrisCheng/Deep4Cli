@@ -1,14 +1,31 @@
-# TODO:
+# The PyTorch Version of ConvLSTM.
 # Ref: https://github.com/ndrplz/ConvLSTM_pytorch/blob/master/convlstm.py
 
 import torch.nn as nn
 from torch.autograd import Variable
-import torch
 import torch.optim as optim
+import torch
+import os
 import numpy as np
+import preprocessing as pp
 from math import sqrt
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
+# hypermarameters
+input_size = (10, 50)
+map_height, map_width = 10, 50
+input_dim = 1
+hidden_dim = 1
+kernel_size = (5, 5)
+num_layers = 5
+lr = 0.001
+num_epochs = 20000
+train_length = 1800
+len_seq = 1980
+len_frame = 12
+start_seq = 1801
+end_seq = 1968
 
 class ConvLSTMCell(nn.Module):
 
@@ -49,11 +66,10 @@ class ConvLSTMCell(nn.Module):
     def forward(self, input_tensor, cur_state):
 
         h_cur, c_cur = cur_state
-        # print(input_tensor.shape)
+
         combined = torch.cat([input_tensor, h_cur], dim=1)  # concatenate along channel axis
-        # print(combined.shape)
         combined_conv = self.conv(combined)
-        # print(combined_conv.shape)
+
         cc_i, cc_f, cc_o, cc_g = torch.split(combined_conv, self.hidden_dim, dim=1)
         i = torch.sigmoid(cc_i)
         f = torch.sigmoid(cc_f)
@@ -120,17 +136,7 @@ class ConvLSTM(nn.Module):
         -------
         last_state_list, layer_output
         """
-        # if not self.batch_first:
-        # (t, b, c, h, w) -> (b, t, c, h, w)
 
-        # print(input_tensor.shape)
-        # input_tensor = input_tensor.permute(0, 1, 4, 2, 3)
-        # print(input_tensor.shape)
-
-        # # Implement stateful ConvLSTM
-        # if hidden_state is not None:
-        #     raise NotImplementedError()
-        # else:
         hidden_state = self._init_hidden(batch_size=input_tensor.size(0))
 
         layer_output_list = []
@@ -178,62 +184,62 @@ class ConvLSTM(nn.Module):
             param = [param] * num_layers
         return param
 
-input_size = (10, 50)
-input_dim = 1
-hidden_dim = 1
-kernel_size = (5, 5)
-num_layers = 10
-lr = 0.1
-num_epochs = 1000
-train_length = 1800
-len_seq = 1980
-len_frame = 12
-start_seq = 1801
-end_seq = 1968
+def mse_loss(input, target):  bvbv
+    return (torch.sum((input - target) ** 2) / (map_height * map_width))
 
-def mse_loss(input, target):
-    return (torch.sum((input - target) ** 2)/(500))
+MODEL_PATH = 'model'+ str(num_epochs5) +'.pt'
+DATA_PATH = 'sst+1_12_normalized.pt'
 
 if __name__ == '__main__':
-    data = torch.load('sst+1.pt')
+
+    data = torch.load(DATA_PATH)
     train_data = data[0]
     test_data = data[1]
-    train_data = train_data.permute(0, 1, 4, 2, 3)
-    test_data = test_data.permute(0, 1, 4, 2, 3)
-    train_data = Variable(train_data).cuda()
-    test_data = Variable(test_data).cuda()
+
+    # train_data = train_data.permute(0, 1, 4, 2, 3)
+    # test_data = test_data.permute(0, 1, 4, 2, 3)
 
     print("trainset shape: ", train_data.shape)
     print("testset shape: ", test_data.shape)
 
-    conv_lstm = ConvLSTM(input_size = input_size,
-                        input_dim = input_dim,
-                        hidden_dim = hidden_dim,
-                        kernel_size = kernel_size,
-                        num_layers = num_layers)
+    if not os.path.exists(MODEL_PATH):
 
-    conv_lstm = nn.DataParallel(conv_lstm)
-    conv_lstm.to(device)
+        conv_lstm = ConvLSTM(input_size = input_size,
+                            input_dim = input_dim,
+                            hidden_dim = hidden_dim,
+                            kernel_size = kernel_size,
+                            num_layers = num_layers,
+                            batch_first=True,
+                            bias=True,
+                            return_all_layers=False)
+        conv_lstm = nn.DataParallel(conv_lstm)
+        conv_lstm.to(device)
 
-    criterion = nn.MSELoss()
-    optimizer = optim.SGD(conv_lstm.parameters(), lr=lr)
+        criterion = nn.MSELoss()
+        optimizer = optim.Adam(conv_lstm.parameters(), lr=lr)
 
-    for i in range(num_epochs):
-        inputs = train_data[:train_length]
-        targets = test_data[:train_length]
-        outputs = conv_lstm(input_tensor=inputs)
-        outputs = outputs[0][0]
-        loss = criterion(outputs, inputs)
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
-        print("Epoch: {} , Loss: {:.4f}".format(i+1, loss.item()))
-    torch.save(conv_lstm.state_dict(), 'model.ckpt')
+        for i in range(num_epochs):
+            inputs = train_data[:train_length]
+            targets = test_data[:train_length]
+            outputs = conv_lstm(input_tensor=inputs)
+            outputs = outputs[0][0]
+            loss = criterion(outputs, inputs)
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+            print("Epoch: {} , Loss: {}".format(i+1, loss.item()))
+
+        torch.save(conv_lstm.state_dict(), 'model.pt')
+
+    else:
+        conv_lstm = torch.load(MODEL_PATH)
+        conv_lstm.eval()
 
     model_sum_rmse = 0
     base_sum_rmse = 0
 
     for k in range(start_seq, end_seq):
+
         # rolling-forecasting with -n steps
         model_sum_rmse_current = 0
         base_sum_rmse_current = 0
@@ -248,9 +254,10 @@ if __name__ == '__main__':
             new = new_frame[::, -1, ::, ::, ::]
             pred_sequence = torch.cat((pred_sequence, new),0)
 
-            baseline_frame = pred_sequence_raw[j, 0, ::, ::]
-            pred_toplot = pred_sequence[-1, 0, ::, ::]
-            act_toplot = act_sequence[j, 0, ::, ::]
+            baseline_frame = pp.inverse_normalization(pred_sequence_raw[j, 0, ::, ::])
+            pred_toplot = pp.inverse_normalization(pred_sequence[-1, 0, ::, ::])
+            act_toplot = pp.inverse_normalization(act_sequence[j, 0, ::, ::])
+
             pred_sequence = pred_sequence[1:len_frame+1, ::, ::, ::]
 
             model_rmse = mse_loss(act_toplot, pred_toplot)
@@ -258,11 +265,6 @@ if __name__ == '__main__':
 
             model_sum_rmse, base_sum_rmse = model_sum_rmse + model_rmse, base_sum_rmse + baseline_rmse
             model_sum_rmse_current, base_sum_rmse_current = model_sum_rmse_current + model_rmse, base_sum_rmse_current + baseline_rmse
-
-        # print("="*10)
-        # print("Round: %s" % str(k+1))
-        # print("Total Model RMSE: %s" % (sqrt(model_sum_rmse_current/len_frame)))
-        # print("Total Baseline RMSE: %s" % (sqrt(base_sum_rmse_current/len_frame)))
 
     print("="*20)
     print("Total Model RMSE: %s" % (sqrt(model_sum_rmse/(len_frame*(end_seq-start_seq)))))

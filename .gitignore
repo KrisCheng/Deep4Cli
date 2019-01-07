@@ -6,7 +6,11 @@ Deep4Cli.iml
 *.npy
 *.h5
 *.png
+*.ckpt
+*.pt
+*month_model
 .log
+.ckpt
 data
 record
 reference
@@ -14,5 +18,4 @@ paper
 imgs
 model_*
 model
-*month_model
 settings.json
