@@ -8,6 +8,7 @@ Deep4Cli.iml
 *.png
 *.ckpt
 *.pt
+*.mat
 *month_model
 .log
 .ckpt

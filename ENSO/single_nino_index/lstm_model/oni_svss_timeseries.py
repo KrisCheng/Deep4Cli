@@ -72,6 +72,8 @@ def invert_scale(scaler, X, value):
 def fit_lstm(train, batch_size, nb_epoch, neurons):
 	X, y = train[:, 0:-1], train[:, -1]
 	X = X.reshape(X.shape[0], 1, X.shape[1])
+	print(X.shape)
+	print(y.shape)
 	model = Sequential()
 	model.add(LSTM(neurons, batch_input_shape = (batch_size, X.shape[1], X.shape[2]), stateful = True))
 	model.add(Dense(1))
@@ -116,10 +118,6 @@ series = pandas.read_csv(raw, header=0, parse_dates=[0], index_col=0, squeeze=Tr
 # transform to supervised learning
 raw_values = series.values
 
-# transform data to be stationary
-raw_values = raw_values
-# print(raw_values)
-
 diff_values = difference(raw_values, 1)
 # print(diff_values)
 
@@ -154,8 +152,6 @@ predictions = list()
 for i in range(len(test_scaled)):
     # make one-step forecast
     X, y = test_scaled[i, 0:-1], test_scaled[i, -1]
-    # print(X)
-    # print(y)
     yhat = forecast_lstm(lstm_model, 1, X)
     # invert scaling
     yhat = invert_scale(scaler, X, yhat)
