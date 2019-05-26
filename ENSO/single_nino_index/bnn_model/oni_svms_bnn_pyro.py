@@ -12,7 +12,6 @@ from functools import partial
 import seaborn as sns
 import torch
 import torch.nn as nn
-from pandas import Series
 
 import os
 from functools import partial
@@ -104,69 +103,46 @@ def series_to_supervised(data, n_in=1, n_out=1, dropnan=True):
 		agg.dropna(inplace=True)
 	return agg
 
-p = 2  # number of features
+p = 12  # number of features
 regression_model = RegressionModel(p)
 
 loss_fn = torch.nn.MSELoss(reduction='sum')
 optim = torch.optim.Adam(regression_model.parameters(), lr=0.05)
 num_iterations = 5000
 
-DATA_URL = "https://d2fefpcigoriu7.cloudfront.net/datasets/rugged_data.csv"
 # configure
-n_lag = 0
-n_seq = 2
+n_lag = 12
+n_seq = 1
 n_test = 96
 
-# data = pd.read_csv(DATA_URL, encoding="ISO-8859-1")
 series = pd.read_csv('../../data/oni/csv/nino3_4_anomaly.csv', header=0, parse_dates=[0], index_col=0, squeeze=True)
 # prepare data
 scaler, train, test = prepare_data(series, n_test, n_lag, n_seq)
-train_1 = series.data[:-2]
-train_2 = series.data[1:-1]
-test_1 = series.data[2:]
-train = []
-test = []
-for i in range(1774):
-    list1 = [train_1[i], train_2[i]]
-    list2 = [test_1[i]]
-    train.append(list1)
-    test.append(list2)
-test = np.asarray(train)
-train = torch.tensor(train, dtype=torch.float) 
-test = torch.tensor(test, dtype=torch.float)
 
-data = pd.read_csv(DATA_URL, encoding="ISO-8859-1")
-df = data[["cont_africa", "rugged", "rgdppc_2000"]]
-df = df[np.isfinite(df.rgdppc_2000)]
-df["rgdppc_2000"] = np.log(df["rgdppc_2000"])
-data = torch.tensor(df.values, dtype=torch.float)
+# train = torch.tensor(train, dtype=torch.float) 
+# test = torch.tensor(test, dtype=torch.float)
 
 def main():
-    # x_data = data[:, :-1]
-    # y_data = data[:, -1]
-    x_data = train
-    y_data = test
+    	
+    # x_data = train
+    # y_data = test
+	X, y = train[:, 0:n_lag], train[:, n_lag:]
+	X = X.reshape(X.shape[0], 1, X.shape[1])
+	x_data, y_data = np.array(X), np.array(y)
+	x_data = torch.tensor(x_data, dtype=torch.float) 
+	y_data = torch.tensor(y_data, dtype=torch.float)
+	print(x_data.shape)
+	print(y_data.shape)
 
-    # print(train.shape)
-    # print(test.shape)
-    # print(data.shape)
-    print(x_data.shape)
-    print(y_data.shape)
-    for j in range(num_iterations):
-        # run the model forward on the data
-        y_pred = regression_model(x_data).squeeze(-1)
-        # calculate the mse loss
-        loss = loss_fn(y_pred, y_data)
-        # initialize gradients to zero
-        optim.zero_grad()
-        # backpropagate
-        loss.backward()
-        # take a gradient step
-        optim.step()
-        if (j + 1) % 100 == 0:
-            print("[iteration %04d] loss: %.4f" % (j + 1, loss.item()))
-    # Inspect learned parameters
-    print("Learned parameters:")
-    for name, param in regression_model.named_parameters():
-        print(name, param.data.numpy())
+	for j in range(num_iterations):
+		y_pred = regression_model(x_data).squeeze(-1)
+		loss = loss_fn(y_pred, y_data)
+		optim.zero_grad()
+		loss.backward()
+		optim.step()
+		if (j + 1) % 100 == 0:
+			print("[iteration %04d] loss: %.4f" % (j + 1, loss.item()))
+	print("Learned parameters:")
+	for name, param in regression_model.named_parameters():
+		print(name, param.data.numpy())
 main()

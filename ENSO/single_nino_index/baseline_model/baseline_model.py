@@ -53,22 +53,17 @@ def prepare_data(series, n_test, n_lag, n_seq):
 	train, test = supervised_values[0:-n_test], supervised_values[-n_test:]
 	return train, test
 
-# make a persistence forecast
 def persistence(last_ob, n_seq):
 	return [last_ob for i in range(n_seq)]
 
-# evaluate the persistence model
 def make_forecasts(train, test, n_lag, n_seq):
 	forecasts = list()
 	for i in range(len(test)):
 		X, y = test[i, 0:n_lag], test[i, n_lag:]
-		# make forecast
 		forecast = persistence(X[-1], n_seq)
-		# store the forecast
 		forecasts.append(forecast)
 	return forecasts
 
-# evaluate the RMSE for each forecast time step
 def evaluate_forecasts(test, forecasts, n_lag, n_seq):
     sum_rmse = []
     for i in range(n_seq):
@@ -76,15 +71,10 @@ def evaluate_forecasts(test, forecasts, n_lag, n_seq):
         predicted = [forecast[i] for forecast in forecasts]
         rmse = sqrt(mean_squared_error(actual, predicted))
         sum_rmse.append(rmse)
-        # print('t+%d RMSE: %f' % ((i+1), rmse))
         print("%.3f" % rmse)
-    # print(len(sum_rmse))
     print("%.3f" % ((sum_rmse[0]+sum_rmse[1]+sum_rmse[2]+sum_rmse[3]+sum_rmse[4]+sum_rmse[5])/6))
     print("%.3f" % ((sum_rmse[0]+sum_rmse[1]+sum_rmse[2]+sum_rmse[3]+sum_rmse[4]+sum_rmse[5]+sum_rmse[6]+sum_rmse[7]+sum_rmse[8])/9))
     print("%.3f" % ((sum_rmse[0]+sum_rmse[1]+sum_rmse[2]+sum_rmse[3]+sum_rmse[4]+sum_rmse[5]+sum_rmse[6]+sum_rmse[7]+sum_rmse[8]+sum_rmse[9]+sum_rmse[10]+sum_rmse[11])/12))
-    # print('6 month RMSE Avg: %f' % ((sum_rmse[0]+sum_rmse[1]+sum_rmse[2]+sum_rmse[3]+sum_rmse[4]+sum_rmse[5])/6))
-    # print('9 month RMSE Avg: %f' % ((sum_rmse[0]+sum_rmse[1]+sum_rmse[2]+sum_rmse[3]+sum_rmse[4]+sum_rmse[5]+sum_rmse[6]+sum_rmse[7]+sum_rmse[8])/9))
-    # print('12 month RMSE Avg: %f' % ((sum_rmse[0]+sum_rmse[1]+sum_rmse[2]+sum_rmse[3]+sum_rmse[4]+sum_rmse[5]+sum_rmse[6]+sum_rmse[7]+sum_rmse[8]+sum_rmse[9]+sum_rmse[10]+sum_rmse[11])/12))
 
 # plot the forecasts in the context of the original dataset
 def plot_forecasts(series, forecasts, n_test):
@@ -107,15 +97,17 @@ series = read_csv('../../data/oni/csv/nino3_4_anomaly.csv', header=0, parse_date
 # configure
 n_lag = 1
 n_seq = 12
-n_test = 360
+n_test = 108
+
 # prepare data
 train, test = prepare_data(series, n_test, n_lag, n_seq)
 
 # make forecasts
 forecasts = make_forecasts(train, test, n_lag, n_seq)
-# evaluate forecasts
 
+# evaluate forecasts
 evaluate_forecasts(test, forecasts, n_lag, n_seq)
+
 # plot forecasts
 # print(forecasts)
 plot_forecasts(series[-n_test:], forecasts, n_test+11)
