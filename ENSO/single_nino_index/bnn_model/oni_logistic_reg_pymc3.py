@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 
 '''
-Desc:  the LR model of nino index prediction, implemented by PyMC3.
+Desc:  the Logistic regression model of nino index prediction, implemented by PyMC3.
 DataSource: https://www.esrl.noaa.gov/psd/gcos_wgsp/Timeseries/
 Author: Kris Peng
-Date: 2019/05/12
+Date: 2019/06/09
 '''
 
 import os
@@ -58,19 +58,6 @@ def difference(dataset, interval=1):
 def prepare_data(series, n_test, n_lag, n_seq):
     raw_values = series.values
 
-	# # transform data to be stationary
-	# diff_series = difference(raw_values, 1)
-	# diff_values = diff_series.values
-	# diff_values = diff_values.reshape(len(diff_values), 1)
-
-	# rescale values to -1, 1
-	# scaler = MinMaxScaler(feature_range=(-1, 1))
-	# scaled_values = scaler.fit_transform(diff_values)
-	# scaled_values = scaled_values.reshape(len(scaled_values), 1)
-	# supervised = series_to_supervised(scaled_values, n_lag, n_seq)
-	# supervised_values = supervised.values
-	# train, test = supervised_values[0:-n_test], supervised_values[-n_test:]
-
     train = []
     test = []
     for i in range(len(series) - n_test):
@@ -91,7 +78,7 @@ n_seq = 1
 n_test = 108
 
 series = read_csv('../../data/oni/csv/nino3_4_anomaly.csv', header=0, parse_dates=[0], index_col=0, squeeze=True)
-# print(series.values)
+
 train, test = prepare_data(series, n_test, n_lag, n_seq)
 train_X, train_Y = train[::,0:12], train[::,12]
 test_X, test_Y = test[::,0:12], test[::,12]
@@ -101,32 +88,27 @@ print(train_Y.shape)
 print(test_X.shape)
 print(test_Y.shape)
 
-#Preprocess data for Modeling
+# Preprocess data for Modeling
 shA_X = shared(train_X)
-#Generate Model
+# Generate Model
 linear_model = pm.Model()
 
 with linear_model:
     alpha = pm.Normal("alpha", mu=0, sd=1)
     betas = pm.Normal("betas", mu=0, sd=10, shape=12)
     sigma = pm.HalfNormal("sigma", sd=1)
-
     # Expected value of outcome
     mu = alpha + np.array([betas[j] * shA_X[:,j] for j in range(12)]).sum()
-
     # Likelihood (sampling distribution of observations)
-    likelihood = pm.Normal("likelihood", mu=mu, sd=sigma, observed=train_Y)
-
+    likelihood = pm.Bernoulli("likelihood", mu=mu, sd=sigma, observed=train_Y)
     # Obtain starting values via Maximum A Posteriori Estimate
     map_estimate = pm.find_MAP(model=linear_model, fmin=optimize.fmin_powell)
-
     # Instantiate Sampler
     step = pm.NUTS(scaling=map_estimate)
-
     # MCMC
     trace = pm.sample(1000, step, start=map_estimate, progressbar=True, njobs=1)
 
-#Traceplot
+# Traceplot
 pm.traceplot(trace)
 
 # Prediction
