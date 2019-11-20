@@ -134,6 +134,6 @@ sum = 0
 for i in range(96):
     sum = sum + (predict[i] - actual[i]) ** 2
 plt.title('Bayesian Regression Result')
-plt.ylabel("NINO 3.4 Index")
+plt.ylabel("Nino3.4 Index")
 plt.show()
 print("RMSE: " + str((sum/96) ** 0.5))

@@ -5,14 +5,15 @@ Author: Kris Peng
 Copyright (c) 2018 - Kris Peng <kris.dacpc@gmail.com>
 '''
 
-import numpy
+import numpy as np
 from pandas import Series
 from pandas import DataFrame
 from pandas import TimeGrouper
 from pandas import datetime
 from pandas import read_csv
 from matplotlib import pyplot
-from pandas.tools.plotting import lag_plot
+from pandas.plotting import lag_plot
+import matplotlib.pyplot as plt
 
 def parser(x):
     if x.endswith('11') or x.endswith('12')or x.endswith('10'):
@@ -21,13 +22,15 @@ def parser(x):
        return datetime.strptime(x, '%Y-0%m') 
 
 # load dataset
-# df = read_csv('../data/oni/csv/all_nino_anomaly.csv', header=0, parse_dates=[0], index_col=0, date_parser=parser)
+data = read_csv('../data/oni/csv/all_nino_anomaly_diff.csv', header=0, parse_dates=[0], index_col=0, date_parser=parser)
 
-series = Series.from_csv('../data/oni/csv/nino3_4_anomaly.csv', header=0)
-# # 1.Bacic information
-print(series.describe())
-lag_plot(series)
-pyplot.show()
+# series = Series.from_csv('../data/oni/csv/nino3_4_anomaly.csv', header=0)
+# # # 1.Bacic information
+# print(series.describe())
+# lag_plot(series)
+# pyplot.show()
+
+
 
 # # print(dataset.head())
 # values = df.values
@@ -53,6 +56,19 @@ pyplot.show()
 # pyplot.show()
 
 # # 1. line plot
+corr = data.corr()
+fig = plt.figure()
+ax = fig.add_subplot(111)
+cax = ax.matshow(corr,cmap='coolwarm', vmin=-1, vmax=1)
+fig.colorbar(cax)
+ticks = np.arange(0,len(data.columns),1)
+ax.set_xticks(ticks)
+plt.xticks(rotation=90)
+ax.set_yticks(ticks)
+ax.set_xticklabels(data.columns)
+ax.set_yticklabels(data.columns)
+plt.show()
+
 # i = 1
 # fig = pyplot.figure()
 # for col in df.columns.tolist():
@@ -72,7 +88,6 @@ pyplot.show()
 #         pyplot.xlabel('')
 #     i += 1
 # pyplot.show()
-
 
 
 # # 2.Seasonal Line Plots
@@ -95,7 +110,7 @@ pyplot.show()
 # series.plot(kind='kde')
 # pyplot.show()
 
-# # 4.Box and Whisker
+# # # 4.Box and Whisker
 # groups = series['2010':'2017'].groupby(TimeGrouper('A'))
 # years = DataFrame()
 # for name, group in groups:

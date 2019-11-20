@@ -163,7 +163,7 @@ def evaluate_forecasts(test, forecasts, n_lag, n_seq):
 def plot_forecasts(series, forecasts, n_test, linestyle = None):
 	pyplot.figure(figsize=(30, 20))
 	pyplot.plot(series.values, label='observed')
-	pyplot.title("oni_singlevariate_multistep_timeseries")
+	pyplot.title("Nino3.4 Forecasting")
 	pyplot.legend(loc='upper right')
 	for i in range(len(forecasts)):
 		if i%n_seq == 0 and i != 0:

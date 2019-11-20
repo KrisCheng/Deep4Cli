@@ -26,7 +26,11 @@
 from pandas import Series
 from matplotlib import pyplot
 from statsmodels.tsa.seasonal import seasonal_decompose
-series = Series.from_csv('../data/oni/csv/nino3_4.csv', header=0)
-result = seasonal_decompose(series, model="multiplicative")
-result.plot()
+# series = Series.from_csv('../data/oni/csv/nino3_4.csv', header=0)
+# result = seasonal_decompose(series, model="multiplicative")
+# result.plot()
+# pyplot.show()
+series = Series.from_csv('../data/oni/csv/nino3_4_anomaly.csv', header=0)
+# series.plot(style='k.')
+series.plot()
 pyplot.show()
