@@ -180,7 +180,7 @@ series = read_csv('../../data/oni/csv/nino3_4_anomaly.csv', header=0, parse_date
 n_lag = 12
 n_seq = 12
 n_test = 108
-n_epochs = 1
+n_epochs = 20
 n_batch = 1
 n_neurons = 10
 
