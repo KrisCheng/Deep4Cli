@@ -40,62 +40,85 @@ import pymc3 as pm
 
 df = pd.read_csv('../../data/oni/csv/all.csv')
 
-# Calculate percentile for grades
-# Plot percentiles for grades
-# Correlations of numerical values
-print(df.corr()['Nino3_4'].sort_values())
+# print(df.corr()['Nino3_4'].sort_values())
+# print(df.describe())
 
-# def format_data(df):
-#     # Targets are final grade of student
-#     labels = df['Nino3_4']
-    
-#     # Find correlations with the Grade
-#     most_correlated = df.corr().abs()['Nino3_4'].sort_values(ascending=False)
-    
-#     # Maintain the top 6 most correlation features with Grade
-#     most_correlated = most_correlated[:8]
-    
-#     df = df.ix[:, most_correlated.index]
-    
-#     # Split into training/testing sets with 25% split
-#     X_train, X_test, y_train, y_test = train_test_split(df, labels, 
-#                                                         test_size = 0.2,
-#                                                         random_state=42)
-    
-#     return X_train, X_test, y_train, y_test
 
-# X_train, X_test, y_train, y_test = format_data(df)
-# print(X_train.shape)
-# print(X_test.shape)
+# # Bar plot of grades
+# plt.bar(df['Nino3_4'].value_counts().index, 
+#         df['Nino3_4'].value_counts().values,
+#          fill = 'navy', edgecolor = 'k', width = 1)
+# plt.xlabel('Nino3_4'); plt.ylabel('Count'); plt.title('Distribution of Final Grades');
+# plt.xticks(list(range(-3, 3)));
 
-# # # Calculate correlation coefficient
-# # def corrfunc(x, y, **kws):
-# #     r, _ = stats.pearsonr(x, y)
-# #     ax = plt.gca()
-# #     ax.annotate("r = {:.2f}".format(r),
-# #                 xy=(.1, .6), xycoords=ax.transAxes,
-# #                size = 12)
-# # cmap = sns.cubehelix_palette(light=1, dark = 0.1,
-# #                              hue = 0.5, as_cmap=True)
+def format_data(df):
+    # Targets are final grade of student
+    labels = df['Nino3_4']
+    
+    # Find correlations with the Grade
+    most_correlated = df.corr().abs()['Nino3_4'].sort_values(ascending=False)
+    
+    # Maintain the top 6 most correlation features with Grade
+    most_correlated = most_correlated[:8]
+    
+    df = df.ix[:, most_correlated.index]
+    
+    # Split into training/testing sets with 25% split
+    X_train, X_test, y_train, y_test = train_test_split(df, labels, 
+                                                        test_size = 0.2,
+                                                        random_state=42)
+    
+    return X_train, X_test, y_train, y_test
 
-# # sns.set_context(font_scale=2)
-# # # Pair grid set up
-# # g = sns.PairGrid(X_train)
-# # # Scatter plot on the upper triangle
-# # g.map_upper(plt.scatter, s=10, color = 'red')
-# # # Distribution on the diagonal
-# # g.map_diag(sns.distplot, kde=False, color = 'red')
-# # # Density Plot and Correlation coefficients on the lower triangle
-# # g.map_lower(sns.kdeplot, cmap = cmap)
-# # g.map_lower(corrfunc);
-# # # plt.show()
+X_train, X_test, y_train, y_test = format_data(df)
+print(X_train.shape)
+print(X_test.shape)
 
+# Calculate correlation coefficient
+def corrfunc(x, y, **kws):
+    r, _ = stats.pearsonr(x, y)
+    ax = plt.gca()
+    ax.annotate("r = {:.2f}".format(r),
+                xy=(.1, .6), xycoords=ax.transAxes,
+               size = 12)
+cmap = sns.cubehelix_palette(light=1, dark = 0.1,
+                             hue = 0.5, as_cmap=True)
+
+sns.set_context(font_scale=2)
+# Pair grid set up
+g = sns.PairGrid(X_train)
+# Scatter plot on the upper triangle
+g.map_upper(plt.scatter, s=10, color = 'red')
+# Distribution on the diagonal
+g.map_diag(sns.distplot, kde=False, color = 'red')
+# Density Plot and Correlation coefficients on the lower triangle
+g.map_lower(sns.kdeplot, cmap = cmap)
+g.map_lower(corrfunc);
+# plt.show()
+
+# Create relation to the median grade column
+X_plot = X_train.copy()
+X_plot['relation_median'] = (X_plot['Nino3_4'] >= 0)
+X_plot['relation_median'] = X_plot['relation_median'].replace({True: 'above', False: 'below'})
+X_plot = X_plot.drop(columns='Nino3_4')
+
+plt.figure(figsize=(12, 12))
+# Plot the distribution of each variable colored
+# by the relation to the median grade
+for i, col in enumerate(X_plot.columns[:-1]):
+    plt.subplot(4, 2, i + 1)
+    subset_above = X_plot[X_plot['relation_median'] == 'above']
+    subset_below = X_plot[X_plot['relation_median'] == 'below']
+    sns.kdeplot(subset_above[col], label = 'Above Median', color = 'green')
+    sns.kdeplot(subset_below[col], label = 'Below Median', color = 'red')
+    plt.legend(); plt.title('Distribution of %s' % col)
+    
+plt.tight_layout()
 
 # # Calculate mae and rmse
 # def evaluate_predictions(predictions, true):
 #     mae = np.mean(abs(predictions - true))
 #     rmse = np.sqrt(np.mean((predictions - true) ** 2))
-    
 #     return mae, rmse
 
 # # Naive baseline is the median
@@ -309,4 +332,4 @@ print(df.corr()['Nino3_4'].sort_values())
 # model_effect('DMI', normal_trace, X_train.drop(columns='Nino3_4'))
 # model_effect('Nino1_2', normal_trace, X_train.drop(columns='Nino3_4'))
 # model_effect('SOI', normal_trace, X_train.drop(columns='Nino3_4'))
-# plt.show()
+plt.show()
